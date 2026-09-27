@@ -1,23 +1,24 @@
 <!DOCTYPE html>
+<!-- K Terminal — 3615 KORHOGO. Tout le terminal tient dans ce fichier unique : styles, moteur, services. -->
 <html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Terminal 3615</title>
-<meta name="description" content="3615 KORHOGO : le Minitel de Korhogo Fauna (Mauk Tenieb). Terminal Vidéotex, la Fauna, ses jeux, tchat et messagerie en direct. Français / English.">
+<title>K Terminal</title>
+<meta name="description" content="K Terminal — le Minitel de Korhogo Fauna. Composez le 3615 : Enter Korhogo, le Kalabass, la météo et l'encyclopédie. Français / English.">
 <meta name="theme-color" content="#191613">
 <meta property="og:type" content="website">
-<meta property="og:title" content="3615 KORHOGO">
+<meta property="og:title" content="K Terminal">
 <meta property="og:description" content="Le Minitel de Korhogo Fauna. Composez le 3615.">
-<meta property="og:image" content="https://mauktenieb.github.io/3615korhogo/apercu.png">
-<meta property="og:url" content="https://mauktenieb.github.io/3615korhogo/">
+<meta property="og:image" content="https://mauktenieb.github.io/3615/apercu.png">
+<meta property="og:url" content="https://mauktenieb.github.io/3615/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="icone.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap">
 <style>
-/* Terminal 3615 — boîtier, écran cathodique et clavier */
+/* K Terminal — boîtier, écran cathodique et clavier */
 :root {
   color-scheme: dark;
   --desk: #191613;
@@ -135,8 +136,20 @@ body {
   border-radius: inherit;
   background:
     radial-gradient(ellipse 70% 45% at 28% 12%, rgba(255, 255, 255, .07), transparent 60%),
+    linear-gradient(112deg, transparent 40%, rgba(255, 255, 255, .028) 46%, rgba(255, 255, 255, .05) 50%, rgba(255, 255, 255, .025) 54%, transparent 61%),
+    radial-gradient(ellipse 45% 32% at 86% 92%, rgba(255, 255, 255, .035), transparent 60%),
     radial-gradient(ellipse at 50% 50%, transparent 58%, rgba(0, 0, 0, .55) 100%);
   box-shadow: inset 0 0 40px rgba(0, 0, 0, .7);
+}
+.crt-grime {
+  position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit;
+  background-image:
+    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='160'%20height='160'%3E%3Cfilter%20id='g'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='saturate'%20values='0'/%3E%3C/filter%3E%3Crect%20width='160'%20height='160'%20filter='url(%23g)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='480'%20height='480'%3E%3Cfilter%20id='s'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.012%200.016'%20numOctaves='3'%20seed='7'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.8%20-0.52'/%3E%3C/filter%3E%3Crect%20width='480'%20height='480'%20filter='url(%23s)'/%3E%3C/svg%3E");
+  background-size: 160px 160px, 480px 480px;
+  mix-blend-mode: soft-light;
+  opacity: .55;
 }
 .crt.off canvas { opacity: 0; transform: scale(1, .004); }
 .crt.boot canvas { animation: boot .55s ease-out; }
@@ -317,7 +330,24 @@ body {
   text-transform: none;
   opacity: .62;
 }
-.fk-send { background: linear-gradient(180deg, #c9c4b8, #b2ad9f); }
+/* ENVOI : même gris que les autres touches ; halo électroluminescent autour,
+   porté par un pseudo-élément derrière la touche (jamais sur elle) */
+.fk-send { position: relative; z-index: 0; }
+@keyframes sendglow {
+  0%, 100% { opacity: .45; transform: scale(.97); }
+  50% { opacity: .85; transform: scale(1); }
+}
+.fk-send::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  z-index: -1;
+  border-radius: 12px;
+  background: radial-gradient(ellipse at center, rgba(255, 130, 55, .55) 0%, rgba(255, 130, 55, .20) 45%, rgba(255, 130, 55, 0) 72%);
+  animation: sendglow 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.fk-send:active::before, .fk-send.down::before { animation: none; opacity: .3; }
 .fk-cx {
   grid-column: span 2;
   color: #fff3e8;
@@ -390,23 +420,23 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
 }
 .topline-kor { text-transform: none; letter-spacing: .08em; font-size: 16px; color: var(--ink-dim); text-decoration: none; border-bottom: 1px solid transparent; }
 .topline-kor:hover, .topline-kor:focus-visible { color: var(--ink); border-bottom-color: currentColor; outline: none; }
-
 </style>
 </head>
 <body>
 <main class="desk">
   <header class="topline">
-    <span class="topline-name">Terminal 3615</span>
-    <a class="topline-sub topline-kor" href="https://mauktenieb.github.io/korhogo" target="_blank" rel="noopener">korhogo</a>
+    <span class="topline-name">K Terminal</span>
+    <a class="topline-sub topline-kor" href="https://mauktenieb.github.io/katabase" target="_blank" rel="noopener">katabase</a>
   </header>
 
   <section class="terminal" data-fr-label="Terminal Vidéotex" data-en-label="Videotex terminal" aria-label="Terminal Vidéotex">
     <div class="hood">
       <div class="bezel">
-        <div class="crt" id="crt" data-fr-title="Déposez un fichier .vdt ici pour le rejouer" data-en-title="Drop a .vdt file here to replay it" title="Déposez un fichier .vdt ici pour le rejouer">
+        <div class="crt" id="crt">
           <canvas id="screen" width="960" height="750" data-fr-label="Écran du terminal, 40 colonnes par 25 rangées" data-en-label="Terminal screen, 40 columns by 25 rows" aria-label="Écran du terminal, 40 colonnes par 25 rangées"></canvas>
           <div class="crt-scan" aria-hidden="true"></div>
           <div class="crt-glass" aria-hidden="true"></div>
+          <div class="crt-grime" aria-hidden="true"></div>
         </div>
       </div>
 
@@ -475,7 +505,7 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
         <button type="button" class="fk" data-fn="GUIDE"><span data-fr="Guide" data-en="Guide">Guide</span><small data-fr="F1" data-en="F1">F1</small></button>
         <button type="button" class="fk" data-fn="CORRECTION"><span data-fr="Correction" data-en="Correct">Correction</span><small data-fr="⌫" data-en="⌫">⌫</small></button>
         <button type="button" class="fk" data-fn="SUITE"><span data-fr="Suite" data-en="Next">Suite</span><small data-fr="Page ↓ · Tab" data-en="PgDn · Tab">Page ↓ · Tab</small></button>
-        <button type="button" class="fk fk-send" data-fn="ENVOI"><span data-fr="Envoi" data-en="Send">Envoi</span><small data-fr="Entrée" data-en="Enter">Entrée</small></button>
+        <button type="button" class="fk fk-send" data-fn="ENVOI"><span data-fr="Envoi" data-en="Send">Envoi</span></button>
         <button type="button" class="fk fk-cx" data-fn="CONNEXION"><span data-fr="Connexion / Fin" data-en="Connect / End">Connexion / Fin</span><small data-fr="F9" data-en="F9">F9</small></button>
       </div>
     </div>
@@ -505,12 +535,11 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
     </div>
     <div class="manual-col">
       <h2><span data-fr="Au 3615" data-en="On 3615">Au 3615</span><span class="alt" data-fr="On 3615" data-en="Au 3615">On 3615</span></h2>
-      <div class="manual-p"><span data-i18n-html data-fr="&lt;b&gt;KORHOGO&lt;/b&gt;&amp;nbsp;: la Fauna (THE KAVE), la &lt;b&gt;messagerie&lt;/b&gt; (tchat en direct, un salon par masque, boîte aux lettres, e-mail), ERRATIC, FAUNA CHESS, FANATIC, OILY WARS. Le n°&amp;nbsp;2 permet de &lt;b&gt;m'écrire&lt;/b&gt;. Les &lt;b&gt;autres services&lt;/b&gt; (météo, encyclopédie, horloge, jeux…) sont au n°&amp;nbsp;10. Déposez un fichier &lt;b&gt;.vdt&lt;/b&gt; sur l&#x27;écran pour rejouer une page d&#x27;époque." data-en="&lt;b&gt;KORHOGO&lt;/b&gt;: the Fauna (THE KAVE), &lt;b&gt;messaging&lt;/b&gt; (live chat, a room per mask, mailbox, e-mail), ERRATIC, FAUNA CHESS, FANATIC, OILY WARS. No.&amp;nbsp;2 lets you &lt;b&gt;write to me&lt;/b&gt;. The &lt;b&gt;other services&lt;/b&gt; (weather, encyclopedia, clock, games…) are at no.&amp;nbsp;10. Drop a &lt;b&gt;.vdt&lt;/b&gt; file on the screen to replay a vintage page."><b>KORHOGO</b>&nbsp;: la Fauna (THE KAVE), la <b>messagerie</b> (tchat en direct, un salon par masque, boîte aux lettres, e-mail), ERRATIC, FAUNA CHESS, FANATIC, OILY WARS. Le n°&nbsp;2 permet de <b>m'écrire</b>. Les <b>autres services</b> (météo, encyclopédie, horloge, jeux…) sont au n°&nbsp;10. Déposez un fichier <b>.vdt</b> sur l'écran pour rejouer une page d'époque.</span><span class="alt" data-i18n-html data-fr="&lt;b&gt;KORHOGO&lt;/b&gt;: the Fauna (THE KAVE), &lt;b&gt;messaging&lt;/b&gt; (live chat, a room per mask, mailbox, e-mail), ERRATIC, FAUNA CHESS, FANATIC, OILY WARS. No.&amp;nbsp;2 lets you &lt;b&gt;write to me&lt;/b&gt;. The &lt;b&gt;other services&lt;/b&gt; (weather, encyclopedia, clock, games…) are at no.&amp;nbsp;10. Drop a &lt;b&gt;.vdt&lt;/b&gt; file on the screen to replay a vintage page." data-en="&lt;b&gt;KORHOGO&lt;/b&gt;&amp;nbsp;: la Fauna (THE KAVE), la &lt;b&gt;messagerie&lt;/b&gt; (tchat en direct, un salon par masque, boîte aux lettres, e-mail), ERRATIC, FAUNA CHESS, FANATIC, OILY WARS. Le n°&amp;nbsp;2 permet de &lt;b&gt;m'écrire&lt;/b&gt;. Les &lt;b&gt;autres services&lt;/b&gt; (météo, encyclopédie, horloge, jeux…) sont au n°&amp;nbsp;10. Déposez un fichier &lt;b&gt;.vdt&lt;/b&gt; sur l&#x27;écran pour rejouer une page d&#x27;époque."><b>KORHOGO</b>: the Fauna (THE KAVE), <b>messaging</b> (live chat, a room per mask, mailbox, e-mail), ERRATIC, FAUNA CHESS, FANATIC, OILY WARS. No.&nbsp;2 lets you <b>write to me</b>. The <b>other services</b> (weather, encyclopedia, clock, games…) are at no.&nbsp;10. Drop a <b>.vdt</b> file on the screen to replay a vintage page.</span></div>
+      <div class="manual-p"><span data-i18n-html data-fr="&lt;b&gt;KORHOGO&lt;/b&gt;&amp;nbsp;: entrez, feuilletez les fiches de la Fauna (Enter Korhogo), puis ouvrez &lt;b&gt;Kalabass&lt;/b&gt;&amp;nbsp;: les Direct Kaves (on y parle, en direct) et les boîtes aux lettres. Le n°&amp;nbsp;3 ouvre les &lt;b&gt;autres services&lt;/b&gt;&amp;nbsp;: météo et encyclopédie." data-en="&lt;b&gt;KORHOGO&lt;/b&gt;: enter, browse the Fauna profiles (Enter Korhogo), then open &lt;b&gt;Kalabass&lt;/b&gt;: the Direct Kaves (live chat) and the mailboxes. No.&amp;nbsp;3 opens the &lt;b&gt;other services&lt;/b&gt;: weather and the encyclopedia."><b>KORHOGO</b>&nbsp;: entrez, feuilletez les fiches de la Fauna (Enter Korhogo), puis ouvrez <b>Kalabass</b>&nbsp;: les Direct Kaves (on y parle, en direct) et les boîtes aux lettres. Le n°&nbsp;3 ouvre les <b>autres services</b>&nbsp;: météo et encyclopédie.</span><span class="alt" data-i18n-html data-fr="&lt;b&gt;KORHOGO&lt;/b&gt;: enter, browse the Fauna profiles (Enter Korhogo), then open &lt;b&gt;Kalabass&lt;/b&gt;: the Direct Kaves (live chat) and the mailboxes. No.&amp;nbsp;3 opens the &lt;b&gt;other services&lt;/b&gt;: weather and the encyclopedia." data-en="&lt;b&gt;KORHOGO&lt;/b&gt;&amp;nbsp;: entrez, feuilletez les fiches de la Fauna (Enter Korhogo), puis ouvrez &lt;b&gt;Kalabass&lt;/b&gt;&amp;nbsp;: les Direct Kaves (on y parle, en direct) et les boîtes aux lettres. Le n°&amp;nbsp;3 ouvre les &lt;b&gt;autres services&lt;/b&gt;&amp;nbsp;: météo et encyclopédie."><b>KORHOGO</b>: enter, browse the Fauna profiles (Enter Korhogo), then open <b>Kalabass</b>: the Direct Kaves (live chat) and the mailboxes. No.&nbsp;3 opens the <b>other services</b>: weather and the encyclopedia.</span></div>
     </div>
   </section>
 
   <textarea id="kbd" class="kbd-sink" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Saisie clavier du terminal"></textarea>
-  <input type="file" id="vdtfile" accept=".vdt,.vtx,.vid,.bin,application/octet-stream" hidden>
 </main>
 
 <script>
@@ -586,7 +615,6 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
   global.L = I.L;
   global.K = I.K;
 })(window);
-
 </script>
 <script>
 /* ---- js/videotex.js ---- */
@@ -1204,7 +1232,6 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
     norm: norm, encode: encode, wrap: wrap, PAL_COLOR: PAL_COLOR, PAL_MONO: PAL_MONO
   };
 })(window);
-
 </script>
 <script>
 /* ---- js/sound.js ---- */
@@ -1343,14 +1370,12 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
 
   global.VDXSound = Sound;
 })(window);
-
 </script>
 <script>
 /* ---- js/services.js ---- */
 /* ==========================================================================
-   Services du 3615 : kiosque, METEO, ENCYCLO, EPHEMERIDE, HORLOGE, PENDU,
-   SERPENT, MIRE, VDT (la messagerie est dans messagerie.js, KORHOGO dans
-   korhogo.js). Chaque service reçoit l'hôte (h) et expose enter(), render(),
+   Services du 3615 : kiosque, METEO, ENCYCLO (la messagerie est dans
+   messagerie.js, KORHOGO dans korhogo.js). Chaque service reçoit l'hôte (h) et expose enter(), render(),
    key(), help() et éventuellement leave() / repeat().
    Tous les textes passent par L(fr, en) ; les touches par K(nom).
    ========================================================================== */
@@ -1409,7 +1434,7 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
   // Ligne d'aide « TOUCHE   explication » avec la touche traduite
   function hk(name, fr, en, w) { return [[3, pad(K(name), w || 11)], [7, L(fr, en)]]; }
 
-  /* ---------- Lecteur paginé (ENCYCLO, EPHEMERIDE) ------------------------ */
+  /* ---------- Lecteur paginé (ENCYCLO) ------------------------------------ */
   function Reader(h, opts) {
     this.h = h; this.o = opts; this.p = 0;
     this.top = opts.top || 7; this.per = opts.per || 15;
@@ -1451,23 +1476,16 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
   var LIST = [
     ['METEO', 'METEO', 'WEATHER', 'Météo en direct', 'Live weather'],
     ['ENCYCLO', 'ENCYCLO', 'ENCYCLO', 'Encyclopédie Wikipédia', 'Wikipedia encyclopedia'],
-    ['EPHEMERIDE', 'EPHEMERIDE', 'ONTHISDAY', "Ce jour dans l'histoire", 'This day in history'],
-    ['HORLOGE', 'HORLOGE', 'CLOCK', 'Horloge parlante', 'Speaking clock'],
-    ['PENDU', 'PENDU', 'HANGMAN', 'Jeu du pendu', 'Hangman'],
-    ['SERPENT', 'SERPENT', 'SNAKE', 'Jeu du serpent', 'Snake game'],
-    ['MSG', 'MSG', 'MSG', 'Tchat, BAL, e-mail', 'Chat, mailbox, e-mail'],
-    ['MIRE', 'MIRE', 'TESTCARD', 'Mire de réglage', 'Test card'],
-    ['VDT', 'VDT', 'VDT', 'Lecteur de pages .vdt', '.vdt page player'],
-    ['KORHOGO', 'KORHOGO', 'KORHOGO', 'Mauk Tenieb presents', 'Mauk Tenieb presents']
+    ['MSG', 'MSG', 'MSG', 'Kaves, Kalabass', 'Kaves, Kalabass'],
+    ['KORHOGO', 'KORHOGO', 'KORHOGO', 'La Fauna, les fiches', 'The Fauna, the profiles']
   ];
   var ALIAS = {
     METEOFRANCE: 'METEO', TEMPS: 'METEO', WEATHER: 'METEO', WIKI: 'ENCYCLO', WIKIPEDIA: 'ENCYCLO',
-    ENCYCLOPEDIE: 'ENCYCLO', ENCYCLOPEDIA: 'ENCYCLO', EPHEM: 'EPHEMERIDE', HISTOIRE: 'EPHEMERIDE',
-    ONTHISDAY: 'EPHEMERIDE', HISTORY: 'EPHEMERIDE', HEURE: 'HORLOGE', CLOCK: 'HORLOGE', TIME: 'HORLOGE',
-    HANGMAN: 'PENDU', SNAKE: 'SERPENT', MESSAGERIE: 'MSG', MESSAGE: 'MSG', MESSAGES: 'MSG', BAL: 'MSG',
-    TCHAT: 'MSG', CHAT: 'MSG', MAIL: 'MSG', EMAIL: 'MSG', MAILBOX: 'MSG', ULLA: 'MSG',
-    TEST: 'MIRE', TESTCARD: 'MIRE', KIOSQUE: 'KIOSQUE', KIOSK: 'KIOSQUE', TELETEL: 'KIOSQUE',
-    GUIDE: 'KIOSQUE', LECTEUR: 'VDT', PLAYER: 'VDT', KAVE: 'KORHOGO', FAUNA: 'KORHOGO', MAUKTENIEB: 'KORHOGO'
+    ENCYCLOPEDIE: 'ENCYCLO', ENCYCLOPEDIA: 'ENCYCLO', MESSAGERIE: 'MSG', MESSAGE: 'MSG', MESSAGES: 'MSG',
+    BAL: 'MSG', TCHAT: 'MSG', CHAT: 'MSG', MAIL: 'MSG', EMAIL: 'MSG', MAILBOX: 'MSG', ULLA: 'MSG',
+    KIOSQUE: 'KIOSQUE', KIOSK: 'KIOSQUE', TELETEL: 'KIOSQUE', GUIDE: 'KIOSQUE',
+    KREW: 'MSG', KREWS: 'MSG',
+    KAVE: 'MSG', KAVES: 'MSG', FAUNA: 'KORHOGO', MAUKTENIEB: 'KORHOGO'
   };
   S.resolve = function (q) {
     q = norm(q).toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -1515,11 +1533,11 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
       LIST.forEach(function (s, i) {
         v.pos(11 + i, 1).fg(7).text(lpad(i + 1, 2) + ' ').fg(3).text(pad(L(s[1], s[2]), 11)).fg(6).text(L(s[3], s[4]));
       });
-      v.pos(21, 2).fg(7).text(L('Code ou n° :', 'Code or no.:'));
-      v.pos(21, 29); kbtn(v, 'ENVOI');
+      v.pos(17, 2).fg(7).text(L('Code ou n° :', 'Code or no.:'));
+      v.pos(17, 29); kbtn(v, 'ENVOI');
       footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
-      h.form([{ r: 21, c: 15, len: 12 }]);
+      h.form([{ r: 17, c: 15, len: 12 }]);
     },
     key: function (k, vals) {
       var h = this.h;
@@ -1824,649 +1842,12 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
     }
   };
 
-  /* ======================================================================
-     EPHEMERIDE — « Ce jour-là » (Wikipédia)
-     ====================================================================== */
-  S.EPHEMERIDE = {
-    help: function () {
-      return [
-        L('Les événements survenus un jour comme', 'Events that happened on a day like'),
-        L("aujourd'hui, d'après Wikipédia.", 'today, according to Wikipedia.'),
-        '',
-        L('Pour une autre date, tapez-la sous la', 'For another date, type it as'),
-        L('forme JJ/MM puis ' + K('ENVOI') + '.', 'DD/MM, then ' + K('ENVOI') + '.'),
-        '',
-        hk('SUITE', 'page suivante', 'next page'),
-        hk('RETOUR', 'page précédente', 'previous page'),
-        hk('SOMMAIRE', 'retour au kiosque', 'back to the kiosk')
-      ];
-    },
-    enter: function (h) {
-      this.h = h;
-      var d = new Date();
-      this.load(d.getDate(), d.getMonth() + 1);
-    },
-    load: function (day, month) {
-      var self = this, h = this.h;
-      this.day = day; this.month = month; this.reader = null;
-      var v = new Vdt(), title = S.code('EPHEMERIDE');
-      header(v, title, lpad(day, 2, '0') + '/' + lpad(month, 2, '0'));
-      v.pos(8, 3).fg(7).size('h').text(I.dayMonth(day, month));
-      v.pos(11, 3).fg(6).flash(1).text(L('Consultation des archives...', 'Searching the archives...'));
-      footer(v, [[L('Kiosque', 'Kiosk'), 'SOMMAIRE']]);
-      h.clearForm();
-      h.out(v);
-      var mm = lpad(month, 2, '0'), dd = lpad(day, 2, '0');
-      h.fetchJSON(wiki() + '/api/rest_v1/feed/onthisday/selected/' + mm + '/' + dd)
-        .catch(function () { return h.fetchJSON('https://api.wikimedia.org/feed/v1/wikipedia/' + I.lang + '/onthisday/selected/' + mm + '/' + dd); })
-        .then(function (r) {
-          if (r && ((r.selected && r.selected.length) || (r.events && r.events.length))) return r;
-          throw new Error('empty');
-        })
-        // Repli : la page du jour de Wikipédia (« 26 septembre » / « September 26 »), section Événements
-        .catch(function () { return self.dayPage(day, month); })
-        .then(function (r) {
-          var ev = ((r && (r.selected || r.events)) || []).slice().sort(function (a, b) { return a.year - b.year; });
-          if (!ev.length) throw new Error('empty');
-          var lines = [];
-          ev.forEach(function (e) {
-            var y = e.year < 0 ? (-e.year) + L(' av.', ' BC') : String(e.year);
-            wrap(e.text, 31).forEach(function (l, i) {
-              lines.push(i === 0 ? [[3, pad(y, 7)], [7, l]] : [[7, '       ' + l]]);
-            });
-            lines.push('');
-          });
-          self.reader = new Reader(h, {
-            title: title, heading: L('Le ', '') + I.dayMonth(day, month), lines: lines,
-            footer: [[L('Kiosque', 'Kiosk'), 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]
-          });
-          self.reader.render(true);
-          self.dateField();
-        })
-        .catch(function () {
-          var w = new Vdt().pos(11, 1).can().pos(11, 3).fg(7).text(L('Archives injoignables pour le moment.', 'Archives unreachable for now.')).bell();
-          h.out(w);
-          self.dateField();
-        });
-    },
-    dayPage: function (day, month) {
-      var en = I.lang === 'en';
-      var title = en ? I.month(month - 1) + ' ' + day : (day === 1 ? '1er' : day) + ' ' + I.month(month - 1);
-      return this.h.fetchJSON(wiki() + '/w/api.php?action=query&prop=extracts&explaintext=1&exsectionformat=wiki&redirects=1&format=json&origin=*&titles=' + encodeURIComponent(title))
-        .then(function (r) {
-          var pages = r && r.query && r.query.pages, p = null;
-          for (var id in pages) p = pages[id];
-          var txt = (p && p.extract) || '', out = [], on = false;
-          txt.split('\n').forEach(function (line) {
-            var hd = line.match(/^(=+)\s*(.*?)\s*=+\s*$/);
-            if (hd) {
-              if (hd[1].length === 2) on = /^(événements|events)$/i.test(hd[2]);
-              return;
-            }
-            if (!on) return;
-            var m = line.match(/^\s*(\d{1,4})\s*(av\. J\.-C\.|BC)?\s*[:\u2013\u2014-]\s*(.{8,})$/);
-            if (m) out.push({ year: m[2] ? -(+m[1]) : +m[1], text: m[3] });
-          });
-          if (!out.length) throw new Error('empty');
-          return { events: out };
-        });
-    },
-    dateField: function () {
-      var v = new Vdt().pos(22, 1).can().pos(22, 2).fg(6).text(L('Autre date (JJ/MM) :', 'Other date (DD/MM):'));
-      this.h.out(v);
-      this.h.form([{ r: 22, c: 23, len: 5 }]);
-    },
-    render: function () {
-      if (this.reader) { this.reader.render(true); this.dateField(); }
-      else this.load(this.day, this.month);
-    },
-    key: function (k, vals) {
-      var h = this.h;
-      if (k.fn === 'SUITE') { if (this.reader) this.reader.next(); this.h.refocus(); return true; }
-      if (k.fn === 'RETOUR') { if (this.reader) this.reader.prev(); this.h.refocus(); return true; }
-      if (k.fn === 'ENVOI') {
-        var m = String(vals[0] || '').match(/^\s*(\d{1,2})\D+(\d{1,2})\s*$/);
-        if (!m) { if (!vals[0] && this.reader) { this.reader.next(); h.refocus(); return true; } h.bell(); return true; }
-        var dd = +m[1], mo = +m[2];
-        var maxd = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][mo - 1];
-        if (!maxd || dd < 1 || dd > maxd) { h.clearField(0); h.bell(); return true; }
-        this.load(dd, mo);
-        return true;
-      }
-      return false;
-    }
-  };
-
-  /* ======================================================================
-     HORLOGE — grands chiffres semi-graphiques + horloge parlante
-     (4 tops à la française, 3 « strokes » à l'anglaise)
-     ====================================================================== */
-  function dayOfYear(d) {
-    var start = new Date(d.getFullYear(), 0, 1);
-    return Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - start) / 864e5) + 1;
-  }
-  function isoWeek(d) {
-    var t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    var n = t.getUTCDay() || 7;
-    t.setUTCDate(t.getUTCDate() + 4 - n);
-    var y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
-    return Math.ceil(((t - y0) / 864e5 + 1) / 7);
-  }
-  function hms(d) { return lpad(d.getHours(), 2, '0') + ':' + lpad(d.getMinutes(), 2, '0') + ':' + lpad(d.getSeconds(), 2, '0'); }
-
-  S.HORLOGE = {
-    help: function () {
-      return L('fr', 'en') === 'fr' ? [
-        "L'heure exacte de votre appareil, en",
-        'grands chiffres.',
-        '',
-        'Appuyez sur ' + K('ENVOI') + ' pour entendre',
-        "l'horloge parlante : l'heure annoncée",
-        'est atteinte au quatrième top.',
-        '',
-        'Le son doit être activé sur le',
-        'terminal (commutateur SON).'
-      ] : [
-        'The exact time of your device, in',
-        'big digits.',
-        '',
-        'Press ' + K('ENVOI') + ' to hear the speaking',
-        'clock: the time it announces is',
-        'reached at the third stroke.',
-        '',
-        'Sound must be on (SOUND switch).'
-      ];
-    },
-    enter: function (h) { this.h = h; this.render(); },
-    offsets: function (str) {
-      var offs = [], x = 0;
-      for (var i = 0; i < str.length; i++) { offs.push(x); x += str[i] === ':' ? 2 : 4; }
-      return offs;
-    },
-    render: function () {
-      var self = this, h = this.h, v = new Vdt(), d = new Date();
-      this.stop();
-      header(v, S.code('HORLOGE'), L('Heure locale', 'Local time'));
-      var date = I.longDate(d);
-      v.pos(6, Math.max(1, Math.floor((40 - norm(date).length) / 2) + 1)).fg(7).size('h').text(date);
-      var info = L('Jour ' + dayOfYear(d) + " de l'année, semaine " + isoWeek(d), 'Day ' + dayOfYear(d) + ' of the year, week ' + isoWeek(d));
-      v.pos(17, Math.floor((40 - norm(info).length) / 2) + 1).fg(6).text(info);
-      v.pos(19, 3).fg(7).text(L('Horloge parlante :', 'Speaking clock   :'));
-      v.pos(19, 22); kbtn(v, 'ENVOI');
-      footer(v, [[L('Kiosque', 'Kiosk'), 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      h.clearForm();
-      h.out(v);
-      this.shown = null;
-      this.day = d.getDate();
-      h.term.then(function () {
-        self.timer = setInterval(function () { self.tick(); }, 200);
-        self.tick();
-      });
-    },
-    tick: function () {
-      var h = this.h;
-      if (h.term.pending()) return;
-      var d = new Date();
-      if (d.getDate() !== this.day) { this.render(); return; }
-      var s = hms(d);
-      if (s === this.shown) return;
-      var col = Math.floor((40 - Vdt.bigWidth(s)) / 2) + 1, offs = this.offsets(s);
-      var v = new Vdt();
-      for (var i = 0; i < s.length; i++) {
-        if (!this.shown || this.shown[i] !== s[i]) v.big(8, col + offs[i], s[i], 7);
-      }
-      this.shown = s;
-      h.out(v);
-    },
-    speakTime: function () {
-      var self = this, h = this.h, en = I.lang === 'en';
-      if (this.speaking) { h.bell(); return; }
-      this.speaking = true;
-      var now = Date.now();
-      var target = Math.ceil((now + 7000) / 10000) * 10000;
-      var t = new Date(target), H = t.getHours(), M = t.getMinutes(), Sx = t.getSeconds();
-      var phrase = en
-        ? 'At the third stroke, it will be ' + H + ' ' + (M < 10 ? 'oh ' : '') + M + ' and ' + Sx + ' seconds, precisely.'
-        : 'Au quatrième top, il sera exactement ' + H + ' heures ' + M + ' minutes et ' + Sx + ' secondes.';
-      var line = en
-        ? 'At the 3rd stroke: ' + lpad(H, 2, '0') + ':' + lpad(M, 2, '0') + ':' + lpad(Sx, 2, '0')
-        : 'Au 4e top : ' + H + ' h ' + lpad(M, 2, '0') + ' min ' + lpad(Sx, 2, '0') + ' s';
-      h.out(new Vdt().pos(21, 1).can().pos(21, 3).fg(3).text(line));
-      h.snd.speak(phrase, en ? 'en-GB' : 'fr-FR');
-      (en ? [2, 1, 0] : [3, 2, 1, 0]).forEach(function (k) {
-        self.tops.push(setTimeout(function () { h.snd.top(k === 0); }, target - k * 1000 - now));
-      });
-      this.tops.push(setTimeout(function () {
-        self.speaking = false;
-        h.out(new Vdt().pos(21, 1).can());
-      }, target - now + 1500));
-    },
-    tops: [],
-    stop: function () {
-      clearInterval(this.timer);
-      this.tops.forEach(clearTimeout); this.tops = [];
-      this.speaking = false;
-      try { if (global.speechSynthesis) speechSynthesis.cancel(); } catch (e) { /* rien */ }
-    },
-    leave: function () { this.stop(); },
-    key: function (k) {
-      if (k.fn === 'ENVOI') { this.speakTime(); return true; }
-      return false;
-    }
-  };
-
-  /* ======================================================================
-     PENDU / HANGMAN
-     ====================================================================== */
-  var MOTS = {
-    fr: ('MINITEL TELEPHONE ORDINATEUR CLAVIER ECRAN MODEM ANNUAIRE KIOSQUE TELETEL PIXEL MOSAIQUE ' +
-      'BAGUETTE FROMAGE CROISSANT BICYCLETTE CHATEAU MONTAGNE RIVIERE ELEPHANT GIRAFE PAPILLON HORLOGE ' +
-      'BOUSSOLE LANTERNE PARAPLUIE CHOCOLAT CERISE FRAMBOISE ACCORDEON TROMPETTE VIOLONCELLE GUITARE ' +
-      'TAMBOUR BIBLIOTHEQUE DICTIONNAIRE ENCYCLOPEDIE CARTABLE CRAYON CAHIER TABLEAU SATELLITE FUSEE ' +
-      'PLANETE GALAXIE COMETE ETOILE NUAGE TEMPETE BROUILLARD AVALANCHE VOLCAN GLACIER DESERT OASIS ' +
-      'JUNGLE SAVANE PRAIRIE FORET CHAMPIGNON ESCARGOT HERISSON ECUREUIL RENARD BLAIREAU HIBOU CHOUETTE ' +
-      'PINGOUIN DAUPHIN BALEINE REQUIN PIEUVRE CREVETTE HOMARD TORTUE CROCODILE KANGOUROU ZEBRE ' +
-      'RHINOCEROS HIPPOPOTAME LOCOMOTIVE TRAMWAY AEROPORT PAQUEBOT HELICOPTERE MONTGOLFIERE TRICYCLE ' +
-      'TROTTINETTE AUTOROUTE CARREFOUR BOULANGERIE PHARMACIE MAIRIE MUSEE CATHEDRALE FONTAINE JARDIN ' +
-      'TERRASSE BALCON GRENIER ESCALIER CHEMINEE FENETRE SERRURE TIROIR ARMOIRE FAUTEUIL LAMPADAIRE ' +
-      'TELEVISION MAGNETOSCOPE DISQUETTE CASSETTE TELECOPIE ANTENNE TRANSISTOR PHOSPHORE CATHODIQUE'),
-    en: ('TERMINAL TELEPHONE COMPUTER KEYBOARD SCREEN MODEM DIRECTORY KIOSK VIDEOTEX PIXEL MOSAIC ' +
-      'BISCUIT CHEESE PANCAKE BICYCLE CASTLE MOUNTAIN RIVER ELEPHANT GIRAFFE BUTTERFLY CLOCK COMPASS ' +
-      'LANTERN UMBRELLA CHOCOLATE CHERRY RASPBERRY ACCORDION TRUMPET CELLO GUITAR DRUM LIBRARY ' +
-      'DICTIONARY ENCYCLOPEDIA SATCHEL PENCIL NOTEBOOK BLACKBOARD SATELLITE ROCKET PLANET GALAXY ' +
-      'COMET STAR CLOUD STORM FOG AVALANCHE VOLCANO GLACIER DESERT OASIS JUNGLE SAVANNA PRAIRIE ' +
-      'FOREST MUSHROOM SNAIL HEDGEHOG SQUIRREL FOX BADGER OWL PENGUIN DOLPHIN WHALE SHARK OCTOPUS ' +
-      'SHRIMP LOBSTER TORTOISE CROCODILE KANGAROO ZEBRA RHINOCEROS HIPPOPOTAMUS LOCOMOTIVE TRAMWAY ' +
-      'AIRPORT STEAMSHIP HELICOPTER BALLOON TRICYCLE SCOOTER MOTORWAY CROSSROADS BAKERY PHARMACY ' +
-      'MUSEUM CATHEDRAL FOUNTAIN GARDEN BALCONY ATTIC STAIRCASE CHIMNEY WINDOW PADLOCK DRAWER ' +
-      'WARDROBE ARMCHAIR LAMPPOST TELEVISION CASSETTE FLOPPY ANTENNA TRANSISTOR PHOSPHOR CATHODE')
-  };
-  function words() { return MOTS[I.lang].split(' ').filter(function (w) { return w.length <= 12; }); }
-  var GALLOWS = [
-    [[0, 19, 16, 2]],
-    [[3, 0, 2, 19]],
-    [[3, 0, 14, 2], [5, 4, 1, 1], [6, 3, 1, 1], [7, 2, 1, 1]],
-    [[14, 2, 1, 3]],
-    [[13, 5, 3, 1], [13, 7, 3, 1], [13, 6, 1, 1], [15, 6, 1, 1]],
-    [[14, 8, 1, 5]],
-    [[12, 9, 5, 1]],
-    [[13, 13, 1, 1], [12, 14, 1, 2], [15, 13, 1, 1], [16, 14, 1, 2]]
-  ];
-  function gallowsArt(stage) {
-    var g = [], x, y;
-    for (y = 0; y < 21; y++) g.push(new Array(21).join('.').split(''));
-    for (var s = 0; s <= stage && s < GALLOWS.length; s++) {
-      GALLOWS[s].forEach(function (r) {
-        for (y = r[1]; y < r[1] + r[3]; y++) for (x = r[0]; x < r[0] + r[2]; x++) g[y][x] = '#';
-      });
-    }
-    return g.map(function (row) { return row.join(''); });
-  }
-  var MAXERR = 7;
-
-  S.PENDU = {
-    help: function () {
-      return [
-        L('Devinez le mot lettre par lettre.', 'Guess the word letter by letter.'),
-        '',
-        L('Tapez simplement une lettre : pas', 'Just type a letter: no need to'),
-        L("besoin d'appuyer sur " + K('ENVOI') + '.', 'press ' + K('ENVOI') + '.'),
-        '',
-        L('Sept erreurs et le pendu est complet.', 'Seven mistakes and the man is hanged.'),
-        '',
-        hk('ENVOI', 'nouveau mot', 'new word'),
-        hk('SOMMAIRE', 'retour au kiosque', 'back to the kiosk')
-      ];
-    },
-    enter: function (h) { this.h = h; this.newGame(); },
-    newGame: function () {
-      var w = words();
-      this.word = w[Math.floor(Math.random() * w.length)];
-      this.tried = []; this.err = 0; this.over = false;
-      this.render();
-    },
-    masked: function () {
-      var t = this.tried;
-      return this.word.split('').map(function (c) { return t.indexOf(c) >= 0 ? c : '_'; }).join(' ');
-    },
-    drawState: function (v) {
-      var self = this;
-      v.art(6, 3, gallowsArt(this.err), 7);
-      v.pos(8, 16).can().pos(8, 16).fg(7).size('h').text(this.masked()).size('n');
-      v.pos(10, 16).can().pos(10, 16).fg(6).text(L('Erreurs : ', 'Mistakes: ')).fg(this.err >= 5 ? 1 : 7)
-        .text(this.err + L(' sur ', ' of ') + MAXERR);
-      v.pos(15, 1).can().pos(15, 3);
-      if (!this.tried.length) v.fg(5).text(L('aucune', 'none'));
-      this.tried.forEach(function (c) { v.fg(self.word.indexOf(c) >= 0 ? 7 : 1).text(c); });
-      return v;
-    },
-    stats: function () { return this.h.load('pendu', { g: 0, p: 0 }); },
-    render: function () {
-      var h = this.h, v = new Vdt(), st = this.stats();
-      header(v, S.code('PENDU'), L('Devinez le mot', 'Guess the word'));
-      v.pos(12, 16).fg(6).text(this.word.length + L(' lettres', ' letters'));
-      v.pos(14, 3).fg(6).text(L('Lettres jouées :', 'Letters played:'));
-      this.drawState(v);
-      v.pos(18, 3).fg(7).text(this.over ? '' : L('Tapez une lettre de A à Z.', 'Type a letter from A to Z.'));
-      v.pos(20, 3).fg(5).text(L('Parties gagnées : ', 'Games won: ') + st.g + L(' sur ', ' of ') + st.p);
-      footer(v, [[L('Nouveau mot', 'New word'), 'ENVOI'], [L('Kiosque', 'Kiosk'), 'SOMMAIRE']]);
-      h.clearForm();
-      h.out(v);
-    },
-    finish: function (won) {
-      var h = this.h, st = this.stats();
-      st.p++; if (won) st.g++;
-      h.save('pendu', st);
-      this.over = true;
-      var v = new Vdt().pos(18, 1).can().pos(18, 3);
-      if (won) {
-        v.fg(7).flash(1).text(L('Bravo !', 'Well done!')).flash(0).fg(7)
-          .text(L(' Trouvé avec ' + this.err + ' erreur' + (this.err > 1 ? 's' : '') + '.',
-            ' Found with ' + this.err + ' mistake' + (this.err === 1 ? '' : 's') + '.'));
-      } else {
-        v.fg(7).flash(1).text(L('Pendu !', 'Hanged!')).flash(0).fg(7).text(L(' Le mot était ', ' The word was ') + this.word + '.');
-        v.pos(8, 16).can().pos(8, 16).fg(3).size('h').text(this.word.split('').join(' ')).size('n');
-        v.bell();
-      }
-      v.pos(20, 1).can().pos(20, 3).fg(5).text(L('Parties gagnées : ', 'Games won: ') + st.g + L(' sur ', ' of ') + st.p);
-      h.out(v);
-    },
-    key: function (k) {
-      var h = this.h;
-      if (k.fn === 'ENVOI') { this.newGame(); return true; }
-      if (!k.ch) return false;
-      if (this.over) { h.bell(); return true; }
-      var c = norm(k.ch).toUpperCase().normalize('NFD').charAt(0);
-      if (!/[A-Z]/.test(c)) { h.bell(); return true; }
-      if (this.tried.indexOf(c) >= 0) { h.bell(); return true; }
-      this.tried.push(c);
-      if (this.word.indexOf(c) < 0) this.err++;
-      h.out(this.drawState(new Vdt()));
-      if (this.masked().indexOf('_') < 0) this.finish(true);
-      else if (this.err >= MAXERR) this.finish(false);
-      return true;
-    }
-  };
-
-  /* ======================================================================
-     SERPENT / SNAKE — jeu en semi-graphique (80 × 63 points)
-     ====================================================================== */
-  var FW = 80, FH = 63, FTOP = 3;
-  S.SERPENT = {
-    help: function () {
-      return [
-        L('Guidez le serpent vers les points', 'Steer the snake towards the blinking'),
-        L('clignotants sans toucher les bords ni', 'dots without touching the edges or'),
-        L('votre propre queue.', 'your own tail.'),
-        '',
-        L('Directions :', 'Directions:'),
-        [[3, L('  Flèches', '  Arrows')], [7, L(' du clavier, ou', ' on the keyboard, or')]],
-        [[3, '  Z Q S D'], [7, L(' ou ', ' or ')], [3, '8 4 2 6']],
-        '',
-        hk('ENVOI', 'commencer une partie', 'start a game'),
-        hk('SOMMAIRE', 'retour au kiosque', 'back to the kiosk')
-      ];
-    },
-    enter: function (h) { this.h = h; this.alive = false; this.render(); },
-    render: function () {
-      var h = this.h, v = new Vdt(), name = S.code('SERPENT');
-      this.stop();
-      this.best = h.load('serpent', 0);
-      v.cls().cur(0);
-      v.pos(1, 1).fg(7).inv(1).text(' ' + name + ' ').inv(0);
-      this.scoreBytes(v);
-      v.pos(2, 1).g1().fg(4).rep(0x70, 40).g0();
-      v.pos(12, 21 - name.length).fg(7).size('d').text(name);
-      v.pos(15, 9).fg(6).text(L('Flèches, ZQSD ou 8 4 2 6', 'Arrows, ZQSD or 8 4 2 6'));
-      v.pos(17, 11).fg(7).text(L('Jouer ', 'Play ')); kbtn(v, 'ENVOI');
-      v.pos(24, 1).fg(6).text(' ' + L('Kiosque', 'Kiosk') + ' '); kbtn(v, 'SOMMAIRE');
-      v.fg(6).text('  ' + L('Aide', 'Help') + ' '); kbtn(v, 'GUIDE');
-      h.clearForm();
-      h.out(v);
-    },
-    scoreBytes: function (v) {
-      v.pos(1, 12).fg(7).text('Score ').fg(3).text(lpad(this.score || 0, 4, '0'))
-        .fg(7).text(L('   Record ', '   Best   ')).fg(3).text(lpad(this.best || 0, 4, '0'));
-      return v;
-    },
-    start: function () {
-      var h = this.h, v = new Vdt();
-      this.stop();
-      this.grid = new Uint8Array(FW * FH);
-      this.snake = [];
-      for (var i = 0; i < 6; i++) { this.snake.push({ x: 20 + i, y: 30 }); this.grid[30 * FW + 20 + i] = 1; }
-      this.dir = { x: 1, y: 0 }; this.next = this.dir;
-      this.score = 0; this.speed = 100; this.alive = true;
-      for (var r = FTOP; r <= 23; r++) v.pos(r, 1).can();
-      this.scoreBytes(v);
-      this.food = null; this.placeFood();
-      this.snake.forEach(function (p) { this.cellBytes(v, p.x, p.y); }, this);
-      this.cellBytes(v, this.food.x, this.food.y);
-      h.term.flush();
-      h.term.now(v.bytes());
-      this.loop();
-    },
-    loop: function () {
-      var self = this;
-      this.timer = setTimeout(function () { self.step(); if (self.alive) self.loop(); }, this.speed);
-    },
-    stop: function () { clearTimeout(this.timer); this.alive = false; },
-    leave: function () { this.stop(); },
-    placeFood: function () {
-      var x, y, n = 0;
-      do { x = 2 + Math.floor(Math.random() * (FW - 4)); y = 2 + Math.floor(Math.random() * (FH - 4)); n++; }
-      while (this.grid[y * FW + x] && n < 500);
-      this.food = { x: x, y: y };
-      this.grid[y * FW + x] = 2;
-    },
-    cellBytes: function (v, x, y) {
-      var cx = Math.floor(x / 2), cy = Math.floor(y / 3), bits = 0, food = false, body = false;
-      for (var k = 0; k < 6; k++) {
-        var px = cx * 2 + (k & 1), py = cy * 3 + (k >> 1), g = this.grid[py * FW + px];
-        if (g) { bits |= 1 << k; if (g === 2) food = true; else body = true; }
-      }
-      v.pos(FTOP + cy, cx + 1).g1();
-      if (food && !body) v.flash(1).fg(3); else v.fg(7);
-      v.mos(bits);
-      return v;
-    },
-    step: function () {
-      var h = this.h;
-      if (!this.alive) return;
-      if (h.term.pending()) return;
-      this.dir = this.next;
-      var head = this.snake[this.snake.length - 1];
-      var nx = head.x + this.dir.x, ny = head.y + this.dir.y;
-      var v = new Vdt();
-      if (nx < 0 || ny < 0 || nx >= FW || ny >= FH || this.grid[ny * FW + nx] === 1) { this.die(); return; }
-      var ate = this.grid[ny * FW + nx] === 2;
-      this.snake.push({ x: nx, y: ny });
-      this.grid[ny * FW + nx] = 1;
-      this.cellBytes(v, nx, ny);
-      if (ate) {
-        this.score++;
-        this.speed = Math.max(45, this.speed - 3);
-        this.placeFood();
-        this.cellBytes(v, this.food.x, this.food.y);
-        this.scoreBytes(v);
-        h.snd.top(false);
-      } else {
-        var tail = this.snake.shift();
-        this.grid[tail.y * FW + tail.x] = 0;
-        this.cellBytes(v, tail.x, tail.y);
-      }
-      h.term.now(v.bytes());
-    },
-    die: function () {
-      var h = this.h;
-      this.stop();
-      if (this.score > (this.best || 0)) { this.best = this.score; h.save('serpent', this.best); }
-      var v = new Vdt();
-      v.pos(11, 12).fg(7).inv(1).text(pad('', 18)).inv(0);
-      v.pos(12, 12).fg(7).inv(1).text(pad(L('     PERDU !', '    GAME OVER'), 18)).inv(0);
-      v.pos(13, 12).fg(7).inv(1).text(pad('   Score : ' + this.score, 18)).inv(0);
-      v.pos(14, 12).fg(7).inv(1).text(pad(' ' + K('ENVOI') + L(' : rejouer', ': play again'), 18)).inv(0);
-      v.pos(15, 12).fg(7).inv(1).text(pad('', 18)).inv(0);
-      this.scoreBytes(v);
-      v.bell();
-      h.out(v);
-    },
-    turn: function (dx, dy) {
-      if (!this.alive) return;
-      if (dx === -this.dir.x && dy === -this.dir.y) return;
-      this.next = { x: dx, y: dy };
-    },
-    key: function (k) {
-      if (k.fn === 'ENVOI') { this.start(); return true; }
-      var d = k.dir;
-      if (!d && k.ch) {
-        d = { Z: 'U', W: 'U', '8': 'U', S: 'D', '2': 'D', Q: 'L', A: 'L', '4': 'L', D: 'R', '6': 'R' }[k.ch.toUpperCase()];
-        if (!d) return true;
-      }
-      if (d === 'U') this.turn(0, -1);
-      else if (d === 'D') this.turn(0, 1);
-      else if (d === 'L') this.turn(-1, 0);
-      else if (d === 'R') this.turn(1, 0);
-      else return false;
-      return true;
-    }
-  };
-
-  /* ======================================================================
-     MIRE / TEST CARD — tous les attributs de l'écran
-     ====================================================================== */
-  S.MIRE = {
-    help: function () {
-      return L('fr', 'en') === 'fr' ? [
-        'La mire affiche tout ce que sait faire',
-        "l'écran Vidéotex :",
-        '',
-        '- les huit couleurs et leurs niveaux',
-        '  de gris sur un écran noir et blanc ;',
-        '- les tailles de caractères ;',
-        '- clignotement, inversion, souligné ;',
-        '- les 64 caractères semi-graphiques,',
-        '  pleins puis disjoints ;',
-        '- les accents du jeu G2.',
-        '',
-        'Le commutateur COULEUR du terminal',
-        'bascule entre les deux rendus.'
-      ] : [
-        'The test card shows everything the',
-        'Videotex screen can do:',
-        '',
-        '- the eight colours and their grey',
-        '  levels on a black-and-white screen;',
-        '- character sizes;',
-        '- blinking, inverse, underline;',
-        '- the 64 mosaic characters, solid',
-        '  then separated;',
-        '- the accents of the G2 set.',
-        '',
-        'The COLOUR switch on the terminal',
-        'toggles between both renderings.'
-      ];
-    },
-    enter: function (h) { this.h = h; this.render(); },
-    render: function () {
-      var v = new Vdt(), r, k;
-      v.cls().cur(0);
-      v.pos(1, 1).fg(7).inv(1).text(L(' MIRE DE REGLAGE ', ' TEST CARD ')).inv(0).fg(6).text(L('   Vidéotex 40x25', '   Videotex 40x25'));
-      for (r = 3; r <= 7; r++) { v.pos(r, 1).g1(); for (k = 0; k < 8; k++) v.fg(k).rep(0x7F, 5); }
-      (I.lang === 'en' ? ['BLACK', 'RED', 'GREEN', 'YELLOW', 'BLUE', 'MAGENTA', 'CYAN', 'WHITE']
-        : ['NOIR', 'ROUGE', 'VERT', 'JAUNE', 'BLEU', 'MAGENTA', 'CYAN', 'BLANC']).forEach(function (n, i) {
-        v.pos(8 + (i & 1), 1 + i * 5).fg(7).text(n);
-      });
-      v.pos(11, 1).g1();
-      [0, 4, 1, 5, 2, 6, 3, 7].forEach(function (c) { v.fg(c).rep(0x7F, 5); });
-      v.pos(12, 1).fg(6).text(L('Luminance croissante (noir et blanc)', 'Rising luminance (black and white)'));
-      v.pos(14, 1).fg(7).size('h').text(L('Double hauteur', 'Double height')).size('n').fg(6).text(L(' et normale', ' and normal'));
-      v.pos(16, 1).fg(7).size('w').text(L('Double largeur', 'Double width'));
-      v.pos(18, 1).fg(3).size('d').text(L('GRANDE', 'LARGE')).size('n').fg(7).text(L(' taille', ' size'));
-      v.pos(19, 1).fg(7).flash(1).text(L('Clignotant', 'Blinking')).flash(0).text('  ').inv(1).text(L('Inverse', 'Inverse')).inv(0)
-        .text('  ').und(1).text(L('Souligné', 'Underline')).und(0);
-      v.pos(20, 1).fg(6).text('G1').pos(20, 5).g1().fg(7);
-      for (k = 0x20; k <= 0x3F; k++) v.raw(k);
-      v.pos(21, 5).g1().fg(7);
-      for (k = 0x60; k <= 0x7F; k++) v.raw(k);
-      v.pos(22, 1).fg(6).text(L('Dis.', 'Sep.')).pos(22, 5).g1().fg(7).und(1);
-      for (k = 0x60; k <= 0x7F; k++) v.raw(k);
-      v.pos(23, 2).fg(7).text('àâäçéèêëîïôöùûü œ ß £ ° ± ¼ ½ ¾ ← ↑ → ↓');
-      footer(v, [[L('Kiosque', 'Kiosk'), 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      this.h.clearForm();
-      this.h.out(v);
-    },
-    key: function () { return false; }
-  };
-
-  /* ======================================================================
-     VDT — lecteur de pages Vidéotex enregistrées
-     ====================================================================== */
-  S.VDT = {
-    help: function () {
-      return [
-        L('Les pages Minitel étaient transmises', 'Minitel pages were sent as Videotex'),
-        L('sous forme de flux Vidéotex, souvent', 'streams, often archived as .vdt'),
-        L('archivés en fichiers .vdt.', 'files.'),
-        '',
-        L('Appuyez sur ' + K('ENVOI') + ' pour choisir un', 'Press ' + K('ENVOI') + ' to pick a file on your'),
-        L('fichier sur votre appareil, ou déposez', 'device, or drop the file straight'),
-        L("le fichier directement sur l'écran.", 'onto the screen.'),
-        '',
-        L('La page se dessine à la vitesse de', 'The page draws at the line speed'),
-        L('ligne choisie sur le terminal.', 'set on the terminal.'),
-        '',
-        hk('REPETITION', 'rejouer la page', 'replay the page'),
-        hk('SOMMAIRE', 'retour au lecteur', 'back to the player')
-      ];
-    },
-    enter: function (h) { this.h = h; this.playing = false; this.render(); },
-    render: function () {
-      var h = this.h, v = new Vdt();
-      this.playing = false;
-      header(v, 'VDT', L('Lecteur', 'Player'));
-      v.pos(6, 3).size('h').fg(7).text(L('Lecteur de pages', 'Page player'));
-      wrap(L("Rejouez une page Vidéotex enregistrée (.vdt), telle qu'elle s'affichait sur un Minitel, octet par octet.",
-        'Replay a recorded Videotex page (.vdt) exactly as a Minitel displayed it, byte by byte.'), 36)
-        .forEach(function (l, i) { v.pos(8 + i, 3).fg(6).text(l); });
-      v.pos(13, 3).fg(7).text(L('Choisir un fichier :', 'Choose a file      :'));
-      v.pos(13, 24); kbtn(v, 'ENVOI');
-      v.pos(15, 3).fg(7).text(L("ou déposez-le sur l'écran.", 'or drop it onto the screen.'));
-      if (this.last) v.pos(18, 3).fg(5).text(L('Dernier fichier : ', 'Last file: ')).fg(3).text(cut(this.lastName, 18));
-      if (this.last) keyHints(v, 19, [[L('Le rejouer', 'Replay it'), 'REPETITION']], 2);
-      footer(v, [[L('Kiosque', 'Kiosk'), 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      h.clearForm();
-      h.out(v);
-    },
-    play: function (bytes, name) {
-      var h = this.h;
-      this.last = bytes; this.lastName = name || 'page.vdt';
-      this.playing = true;
-      h.clearForm();
-      h.term.flush();
-      h.term.send(Uint8Array.of(0x14, 0x0C));
-      h.term.send(bytes);
-      h.term.then(function () { h.term.send(Uint8Array.of(0x14)); });
-    },
-    repeat: function () { if (this.last) this.play(this.last, this.lastName); else this.render(); },
-    key: function (k) {
-      var self = this;
-      if (k.fn === 'ENVOI' && !this.playing) {
-        this.h.pickFile(function (bytes, name) { self.play(bytes, name); });
-        return true;
-      }
-      if (k.fn === 'SOMMAIRE' && this.playing) { this.render(); return true; }
-      return this.playing && !!k.ch;
-    }
-  };
-
   global.VDXServices = S;
   global.VDXUI = {
     header: header, kheader: kheader, footer: footer, keyHints: keyHints, kbtn: kbtn, hk: hk, rule: rule, message: message,
     clearMessage: clearMessage, drawLine: drawLine, cut: cut, pad: pad, lpad: lpad, Reader: Reader
   };
 })(window);
-
 </script>
 <script>
 /* ---- js/vendor/nostr-tools.js ---- */
@@ -10211,7 +9592,6 @@ var NostrTools = (() => {
   }
   return __toCommonJS(nostr_tools_exports);
 })();
-
 </script>
 <script>
 /* ---- js/messagerie.js ---- */
@@ -10219,17 +9599,17 @@ var NostrTools = (() => {
    Messagerie de la Fauna (3615 KORHOGO › MESSAGERIE, ou 3615 MSG)
    - Connectés : chaque terminal en ligne signale sa présence toutes les
      minutes ; l'accueil affiche le nombre de connectés en direct.
-   - TCHAT par salons : le Hall (3615) et un salon par masque de la Fauna,
+   - KAVES : le Kave général (3615) et un Kave par personnage de la Fauna,
      avec le nombre de présents dans chacun.
-   - Boîte aux lettres : messages privés différés, chiffrés, lus à la
-     prochaine connexion du destinataire (MESSAGE clignote en rangée 0).
-   - Annuaire, profil (pseudo, masque, clé de secours), e-mail composé par
-     le terminal et envoyé par la messagerie de l'usager.
+   - Votre Kalabass : messagerie personnelle, messages privés différés
+     et chiffrés, reçus et envoyés dans un même fil (MESSAGE clignote
+     en rangée 0 quand un message attend).
+   - Annuaire, profil (pseudo, masque, clé de secours), boîte d'Unkle
+     Maukie (message déposé par la messagerie de l'usager, sans relais).
 
    Transport : protocole ouvert Nostr (relais publics, rien à héberger).
    Chaque terminal crée sa propre clé, gardée dans le navigateur.
-   - présence : kind 30078 adressable (le relais garde le dernier signal) ;
-   - salons : kind 42 (NIP-28) ; messages privés : kind 4 (NIP-04, chiffré ;
+   - présence : kind 30078 adressable (le relais garde le dernier signal) ;    - Kaves : kind 42 (NIP-28) ; messages privés : kind 4 (NIP-04, chiffré ;
      l'expéditeur et le destinataire restent visibles des relais).
    ========================================================================== */
 (function (global) {
@@ -10286,9 +9666,9 @@ var NostrTools = (() => {
     if (m) return m.vt === 0 ? 7 : m.vt;
     return pk ? [2, 3, 5, 6, 7, 1][parseInt(pk.slice(0, 2), 16) % 6] : 7;
   }
-  // Salon : clé « 3615 » (le Hall), code d'un masque (« AU »), ou nom libre
+  // Kave : clé « 3615 » (le Kave général), code d'un masque (« AU »), ou nom libre
   function roomLabel(key) {
-    if (key === HALL) return L('LE HALL', 'THE HALL');
+    if (key === HALL) return L('KAVE GÉNÉRAL', 'GENERAL KAVE');
     var m = maskByCode(key);
     return m ? norm(m.name).toUpperCase() : key;
   }
@@ -10469,6 +9849,24 @@ var NostrTools = (() => {
         .filter(function (e) { return e.pubkey !== self.pk; })
         .sort(function (a, b) { return b.created_at - a.created_at; });
     },
+    // Messagerie personnelle : reçus et envoyés, du plus récent au plus ancien
+    personal: function () {
+      var self = this, out = [];
+      Object.keys(this.inbox).forEach(function (id) {
+        var ev = self.inbox[id], txt = self.plain[id];
+        if (txt === undefined) return;                       // pas encore déchiffré
+        if (ev.pubkey === self.pk) {
+          var to = (ev.tags.filter(function (t) { return t[0] === 'p'; })[0] || [])[1];
+          if (to) out.push({ ev: ev, out: true, text: txt });
+        } else out.push({ ev: ev, out: false, text: txt });
+      });
+      return out.sort(function (a, b) { return b.ev.created_at - a.ev.created_at; });
+    },
+    byEvent: function (ev) {
+      var t = this.plain[ev.id];
+      if (t === undefined) return null;
+      return { ev: ev, out: ev.pubkey === this.pk, text: t };
+    },
     readSet: function () { return store('bal.read') || []; },
     markRead: function (id) {
       var r = this.readSet(); if (r.indexOf(id) < 0) { r.push(id); store('bal.read', r.slice(-800)); }
@@ -10497,6 +9895,9 @@ var NostrTools = (() => {
   var LOG_TOP = 3, LOG_BOT = 20;
   function header(v, sub) { return UI.kheader(v, sub); }
 
+  var MAUK = 'mauktenieb@gmail.com';
+  var MAUK_NICK = 'UNKLE MAUKIE';
+
   var M = {
     help: function () {
       var v = this.view;
@@ -10504,10 +9905,10 @@ var NostrTools = (() => {
         L('Tapez votre message puis ' + K('ENVOI') + '.', 'Type your message, then ' + K('ENVOI') + '.'),
         '',
         L('Commandes :', 'Commands:'),
-        [[3, '/s NOM   '], [7, L('changer de salon', 'change room')]],
-        [[3, '/s AUBE  '], [7, L('salon d\'un masque', 'a mask\'s room')]],
-        [[3, '/p       '], [7, L('liste des présents', 'who is here')]],
-        [[3, '/m NOM   '], [7, L('écrire en privé (BAL)', 'private message (mailbox)')]],
+        [[3, '/s NOM   '], [7, L('entrer dans un Kave', 'enter another Kave')]],
+        [[3, '/s 0     '], [7, L('Kave général', 'the general Kave')]],
+        [[3, '/p       '], [7, L('les présents', 'who is here')]],
+        [[3, '/m NOM   '], [7, L('laisser un message (BAL)', 'leave a message (mailbox)')]],
         '',
         L('Le fil défile en page, comme sur un', 'The log wraps page by page, as on a'),
         L('Minitel : la ligne vide suit le', 'Minitel: the blank line follows the'),
@@ -10515,24 +9916,25 @@ var NostrTools = (() => {
         L('Les pseudos portent la couleur de', 'Nicknames wear the colour of their'),
         L('leur masque.', 'mask.'),
         '',
-        hk('SOMMAIRE', 'liste des salons', 'list of rooms')
+    hk('SOMMAIRE', 'les Kaves', 'the Kaves')
       ];
       if (v === 'rooms') return [
-        L('Le Hall accueille tout le monde.', 'The Hall welcomes everyone.'),
-        L('Chaque masque a son salon.', 'Each mask of the Fauna has its room.'),
+        L('Le Kave général est ouvert à tous.', 'The general Kave is open to all.'),
+        L('Chaque personnage a son Kave.', 'Each character has its Kave.'),
         '',
         L('Le chiffre à droite du nom donne le', 'The number after each name is how'),
         L('nombre de présents.', 'many people are in.'),
         '',
-        L('Tapez 0 pour le Hall, le numéro d\'un', 'Type 0 for the Hall, a mask\'s'),
-        L('masque, ou le nom d\'un salon libre.', 'number, or the name of a free room.')
+        L('Tapez 0 pour le Kave général, le', 'Type 0 for the general Kave, a'),
+        L('numéro d\'un personnage, ou un nom', "character's number, or a name")
       ];
       return [
-        L('Tchat : le Hall, un salon par masque.', 'Chat: the Hall and a room per mask.'),
-        L('BAL : messages privés chiffrés, lus', 'Mailbox: encrypted private messages,'),
-        L('à la prochaine connexion. MESSAGE', 'read at the next connection. MAIL'),
-        L('clignote en haut de l\'écran quand un', 'blinks at the top of the screen'),
-        L('message vous attend.', 'when one is waiting.'),
+        L('Direct Kaves : on entre, on parle, en direct.', 'Direct Kaves: step in, talk, live.'),
+        L('Votre Kalabass : votre messagerie.', 'Your Kalabass: your own mailbox.'),
+        L('Vos messages reçus et vos messages', 'Received messages and sent ones'),
+        L('envoyés s\'y lisent, réponse directe.', 'read in one thread, one-press reply.'),
+        L('MESSAGE clignote en haut de l\'écran', 'MAIL blinks at the top of the screen'),
+        L('quand un message vous attend.', 'when one is waiting.'),
         '',
         L('Chaque usager a un pseudo, un code', 'Each user has a nickname, a code'),
         L('(DUPONT#A1B2) et peut porter un', '(SMITH#A1B2) and may wear a mask'),
@@ -10540,10 +9942,10 @@ var NostrTools = (() => {
         '',
         L('Votre identité est gardée dans ce', 'Your identity is kept in this'),
         L('navigateur : notez la clé de secours', 'browser: write down the backup key'),
-        L('(Mon profil) pour la retrouver.', '(My profile) to recover it.'),
+        L('(Votre profil) pour la retrouver.', '(Your profile) to recover it.'),
         '',
-        L('E-mail : le terminal ouvre votre', 'E-mail: the terminal opens your own'),
-        L('messagerie, qui envoie le message.', 'mail app, which sends the message.')
+        L('Le n° 5 est la boîte d\'Unkle Maukie.', 'No. 5 is the box of Unkle Maukie.'),
+
       ];
     },
     enter: function (h) {
@@ -10563,29 +9965,29 @@ var NostrTools = (() => {
     r_menu: function () {
       var h = this.h, v = new Vdt(), un = NET.unread(), mk = maskByCode(NET.mask());
       this.stopChat();
-      header(v, L('MESSAGERIE', 'MESSAGING'));
-      v.pos(5, 2).size('h').fg(mk ? maskColor(mk.code) : 7).text(L('Bonjour ', 'Hello ') + NET.nick());
+      header(v, 'KALABASS');
       v.pos(6, 2).fg(6).text(L('Votre code : ', 'Your code: ')).fg(3).text(NET.nick() + '#' + NET.code().slice(0, 4));
       if (mk) v.pos(7, 2).fg(6).text(L('Votre masque : ', 'Your mask: ')).fg(maskColor(mk.code)).text(cut(mk.name, 20));
       var items = [
-        [L('Tchat', 'Chat'), L('Hall et masques', 'Hall and masks')],
-        [L('Boîte aux lettres', 'Mailbox'), un ? un + L(' non lu' + (un > 1 ? 's' : ''), ' unread') : ''],
-        [L('Écrire à un usager', 'Write to a user'), L('message différé', 'to read later')],
+        [L('Direct Kaves', 'Direct Kaves'), L('on y parle', 'talk, live')],
+        [L('Votre Kalabass', 'Your Kalabass'), un ? un + L(' non lu' + (un > 1 ? 's' : ''), ' unread') : ''],
+        [L('Écrire', 'Write'), L('à un autre Krew', 'to another Krew')],
         [L('Annuaire', 'Directory'), Object.keys(NET.dir).length + L(' usagers', ' users')],
-        [L('Envoyer un e-mail', 'Send an e-mail'), ''],
-        [L('Mon profil', 'My profile'), L('pseudo, masque', 'nickname, mask')]
+        [L('Unkle Maukie', 'Unkle Maukie'), L('laisser un mot', 'leave a word')],
+        [L('Votre profil', 'Your profile'), L('pseudo, masque', 'nickname, mask')]
       ];
       items.forEach(function (it, i) {
-        v.pos(9 + i * 2, 3).fg(3).text((i + 1) + '  ').fg(7).text(pad(it[0], 19)).fg(i === 1 && un ? 3 : 6);
+        var num = i === 5 ? 7 : i + 1;          // le 6 n'existe pas
+        v.pos(8 + i * 2, 3).fg(3).text(num + '  ').fg(7).text(pad(it[0], 19)).fg(i === 1 && un ? 3 : 6);
         if (i === 1 && un) v.flash(1);
         v.text(it[1]).flash(0);
       });
-      v.pos(21, 3).fg(7).text(L('Votre choix :', 'Your choice:'));
-      v.pos(21, 20); kbtn(v, 'ENVOI');
+      v.pos(22, 3).fg(7).text(L('Votre choix :', 'Your choice:'));
+      v.pos(22, 20); kbtn(v, 'ENVOI');
       this.netLine(v);
       UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
-      h.form([{ r: 21, c: 17, len: 1 }]);
+      h.form([{ r: 22, c: 17, len: 1 }]);
     },
     netLine: function (v) {
       var up = NET.relaysUp();
@@ -10595,20 +9997,63 @@ var NostrTools = (() => {
     },
     k_menu: function (k, vals) {
       if (k.fn !== 'ENVOI') return false;
-      var go = { '1': 'rooms', '2': 'inbox', '3': 'write', '4': 'dir', '5': 'mail', '6': 'profile' }[vals[0]];
+      var go = { '1': 'rooms', '2': 'inbox', '3': 'write', '4': 'dir', '5': 'mauk', '7': 'profile' }[vals[0]];
       if (!go) { this.h.clearField(0); this.h.bell(); return true; }
       this.view = go; this.page = 0; this.to = ''; this.render();
+      return true;
+    },
+
+    /* ----- Unkle Maukie (boîte discrète, hors relais) ----- */
+    r_mauk: function () {
+      var h = this.h, v = new Vdt();
+      header(v, 'UNKLE MAUKIE');
+      v.pos(5, 3).fg(6).text(L('Qui êtes-vous :', 'Who you are   :'));
+      v.pos(6, 3).fg(6).text(L('Où répondre   :', 'Where to reply:'));
+      v.pos(8, 3).fg(6).text(L('Message :', 'Message:'));
+      v.pos(19, 3).fg(5).text(L('La nuit porte conseil.', 'The night brings counsel.'));
+      UI.keyHints(v, 21, [[L('Suivant', 'Next'), 'SUITE'], [L('Effacer', 'Clear'), 'ANNULATION']]);
+      UI.footer(v, [[L('Déposer', 'Post'), 'ENVOI'], ['Menu', 'SOMMAIRE']]);
+      h.out(v);
+      var f = [{ r: 5, c: 19, len: 21, value: h.load('kor.contact.name', '') }, { r: 6, c: 19, len: 21, value: h.load('kor.contact.mail', '') }];
+      for (var i = 0; i < 9; i++) f.push({ r: 10 + i, c: 2, len: 38, auto: true });
+      h.form(f, { start: f[0].value ? 2 : 0 });
+    },
+    k_mauk: function (k, vals) {
+      var h = this.h;
+      if (k.fn === 'SOMMAIRE') { this.view = 'menu'; this.render(); return true; }
+      if (k.fn !== 'ENVOI') return false;
+      var name = (vals[0] || '').trim(), mail = (vals[1] || '').trim();
+      var body = vals.slice(2).map(function (l) { return l.replace(/\s+$/, ''); });
+      while (body.length && !body[body.length - 1]) body.pop();
+      if (!body.length) { UI.message(h, L('Le message est vide.', 'The message is empty.'), true); h.focusField(2); return true; }
+      if (mail && !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(mail)) { UI.message(h, L('Adresse e-mail invalide.', 'Invalid e-mail address.'), true); h.focusField(1); return true; }
+      h.save('kor.contact.name', name); h.save('kor.contact.mail', mail);
+      // les lignes coupées par le Minitel sont recollées ; une ligne vide sépare les paragraphes
+      var paras = [], cur = [];
+      body.forEach(function (l) { if (l.trim()) cur.push(l.trim()); else if (cur.length) { paras.push(cur.join(' ')); cur = []; } });
+      if (cur.length) paras.push(cur.join(' '));
+      var text = paras.join('\n\n') + '\n\n-- \n' + (name || L('Une ombre', 'A shadow')) + (mail ? ' <' + mail + '>' : '') +
+        '\n' + L('Mot déposé dans la boîte d\'Unkle Maukie, 3615 KORHOGO.', 'Left in the box of Unkle Maukie, 3615 KORHOGO.');
+      var subject = '3615' + (name ? ' - ' + name : '');
+      var url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(MAUK) +
+        '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
+      var opened = true;
+      try { opened = !!global.open(url, '_blank', 'noopener'); } catch (e) { opened = false; }
+      if (!opened) {
+        try { global.location.href = 'mailto:' + MAUK + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text); } catch (e) { /* rien */ }
+      }
+      UI.message(h, L('Déposé.', 'Posted.'));
       return true;
     },
 
     /* ----- profil ----- */
     r_profile: function () {
       var h = this.h, v = new Vdt(), mk = maskByCode(NET.mask()), f = fauna();
-      header(v, L('MON PROFIL', 'MY PROFILE'));
+      header(v, L('VOTRE PROFIL', 'YOUR PROFILE'));
       v.pos(5, 3).fg(7).text(L('Pseudo (12 car.) :', 'Nickname (12 ch.):'));
       v.pos(7, 3).fg(7).text(L('Masque (0-18)    :', 'Mask (0-18)      :'));
       v.pos(7, 26).fg(mk ? maskColor(mk.code) : 5).text(mk ? cut(mk.name, 14) : L('aucun', 'none'));
-      v.pos(8, 3).fg(5).text(L('n° de THE KAVE, 0 pour aucun', 'THE KAVE number, 0 for none'));
+      v.pos(8, 3).fg(5).text(L('n° de personnage, 0 pour aucun', 'character number, 0 for none'));
       v.pos(10, 3).fg(6).text(L('Votre code : ', 'Your code: ')).fg(3).text(NET.code());
       wrap(L('Le code vous distingue des homonymes. On vous écrit à PSEUDO#CODE.',
         'The code tells you apart from namesakes. People write to you at NICK#CODE.'), 36)
@@ -10656,18 +10101,18 @@ var NostrTools = (() => {
       this.render();
     },
 
-    /* ----- salons ----- */
+    /* ----- Direct Kaves (les Kaves) ----- */
     r_rooms: function () {
       var h = this.h, v = new Vdt(), f = fauna(), nh = NET.inRoom(HALL).length;
-      header(v, L('TCHAT', 'CHAT'));
-      v.pos(5, 1).fg(7).text(' 0 ').fg(3).text(pad(L('LE HALL', 'THE HALL'), 13)).fg(2).text(nh ? lpad(nh, 2) : '  ');
+      header(v, 'DIRECT KAVES');
+      v.pos(5, 1).fg(7).text(' 0 ').fg(3).text(pad(L('KAVE GÉNÉRAL', 'GENERAL KAVE'), 15)).fg(2).text(nh ? lpad(nh, 2) : '  ');
       v.pos(5, 41 - onlineText(NET.online()).length).fg(2).text(onlineText(NET.online()));
       f.forEach(function (m, i) {
         var col = i < 9 ? 1 : 21, r = 7 + (i % 9), n = NET.inRoom(m.code).length;
         v.pos(r, col).fg(7).text(lpad(i + 1, 2) + ' ').fg(maskColor(m.code)).text(pad(m.name, 14)).fg(2).text(n ? lpad(n, 2) : '  ');
       });
-      v.pos(17, 2).fg(5).text(L('Présents à droite de chaque salon.', 'People present after each room.'));
-      v.pos(21, 2).fg(7).text(L('Salon (n° ou nom) :', 'Room (no. or name):'));
+      v.pos(17, 2).fg(5).text(L('Les présents sont à droite du nom.', 'People present after each name.'));
+      v.pos(21, 2).fg(7).text(L('Kave (n° ou nom) :', 'Kave (no. or name):'));
       v.pos(21, 33); kbtn(v, 'ENVOI');
       UI.footer(v, [['Menu', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
@@ -10712,7 +10157,7 @@ var NostrTools = (() => {
         setTimeout(function () { if (!loaded) { loaded = true; backlog.forEach(function (ev) { self.show(ev); }); self.status(); } }, 6000);
       });
     },
-    // Quitte le salon en cours (le signal de présence le retire)
+    // Quitte le Kave en cours (le signal de présence le retire)
     stopChat: function () {
       if (this.sub) { try { this.sub.close(); } catch (e) { /* rien */ } this.sub = null; }
       if (NET.room) NET.setRoom('');
@@ -10734,8 +10179,9 @@ var NostrTools = (() => {
     },
     r_chat: function () {
       var h = this.h, v = new Vdt(), m = maskByCode(this.room);
+      var lbl = this.room === HALL ? L('GÉNÉRAL', 'GENERAL') : roomLabel(this.room);
       v.cls().cur(0);
-      v.pos(1, 1).fg(7).inv(1).text(L(' TCHAT ', ' CHAT ')).inv(0).fg(m ? maskColor(m.code) : 3).text(' ' + cut(roomLabel(this.room), 18));
+      v.pos(1, 1).fg(7).inv(1).text(L(' KAVE ', ' KAVE ')).inv(0).fg(m ? maskColor(m.code) : 3).text(' ' + cut(lbl, 18));
       v.pos(2, 1).g1().fg(3).rep(0x70, 40).g0();
       v.pos(21, 1).g1().fg(3).rep(0x23, 40).g0();
       v.pos(23, 1).fg(3).text('>');
@@ -10803,7 +10249,7 @@ var NostrTools = (() => {
         }
         if (c === 'p') { this.sys(L('Présents : ', 'Here: ') + this.here().join(', ')); return true; }
         if (c === 'm') { this.stopChat(); this.view = 'write'; this.to = cleanNick(arg.split(/\s/)[0] || ''); this.render(); return true; }
-        this.sys(L('Commandes : /s salon, /p, /m pseudo', 'Commands: /s room, /p, /m nick'));
+        this.sys(L('Commandes : /s Kave, /p, /m pseudo', 'Commands: /s Kave, /p, /m nick'));
         return true;
       }
       if (!this.rid) { h.bell(); return true; }
@@ -10815,24 +10261,25 @@ var NostrTools = (() => {
       return true;
     },
 
-    /* ----- boîte aux lettres ----- */
+    /* ----- Votre Kalabass : messagerie personnelle (reçus + envoyés) ----- */
     r_inbox: function () {
-      var h = this.h, v = new Vdt(), list = NET.received(), per = 8, read = NET.readSet(), self0 = this;
+      var h = this.h, v = new Vdt(), list = NET.personal(), per = 8, read = NET.readSet(), self0 = this;
       var pages = Math.max(1, Math.ceil(list.length / per));
       this.page = Math.min(this.page || 0, pages - 1);
-      header(v, L('BAL ', 'MAIL ') + (this.page + 1) + '/' + pages);
+      header(v, L('VOTRE KALABASS ', 'YOUR KALABASS ') + (this.page + 1) + '/' + pages);
       if (!list.length) {
-        v.pos(7, 3).fg(7).text(L('Aucun message pour le moment.', 'No messages yet.'));
-        v.pos(9, 3).fg(5).text(L('Les messages arrivent en direct :', 'Messages arrive live:'));
-        v.pos(10, 3).fg(5).text(L('cette page se remplit toute seule.', 'this page fills itself.'));
+        v.pos(7, 3).fg(7).text(L('Votre messagerie est vide.', 'Your mailbox is empty.'));
+        v.pos(9, 3).fg(5).text(L('On vous écrit à PSEUDO#CODE ; vos', 'People write to NICK#CODE; your'));
+        v.pos(10, 3).fg(5).text(L('messages partis paraissent aussi ici.', 'sent messages show up here too.'));
       }
-      list.slice(this.page * per, this.page * per + per).forEach(function (ev, i) {
-        var n = self0.page * per + i + 1, r = 5 + i * 2, p = splitSubject(NET.plain[ev.id]);
-        var unread = read.indexOf(ev.id) < 0;
-        v.pos(r, 1).fg(3).text(lpad(n, 2)).fg(unread ? 3 : 7).text(unread ? ' * ' : '   ')
-          .fg(maskColor(NET.maskOf(ev.pubkey), ev.pubkey)).text(pad(NET.label(ev.pubkey), 17)).fg(5).text(fmtWhen(ev.created_at));
-        v.pos(r + 1, 6).fg(6).text(cut(p.subj || (NET.plain[ev.id] || L('(illisible)', '(unreadable)')).replace(/\s+/g, ' '), 34));
+      list.slice(this.page * per, this.page * per + per).forEach(function (m, i) {
+        var n = self0.page * per + i + 1, r = 5 + i * 2, p = splitSubject(m.text);
+        var unread = !m.out && read.indexOf(m.ev.id) < 0;
+        v.pos(r, 1).fg(3).text(lpad(n, 2)).fg(5).text(m.out ? ' > ' : ' < ')
+          .fg(maskColor(NET.maskOf(m.ev.pubkey), m.ev.pubkey)).text(pad(NET.label(m.ev.pubkey), 17)).fg(5).text(fmtWhen(m.ev.created_at));
+        v.pos(r + 1, 6).fg(6).text(cut(p.subj || (m.text || L('(illisible)', '(unreadable)')).replace(/\s+/g, ' '), 34));
       });
+      if (list.length) v.pos(20, 2).fg(5).text(L('< recu   > envoye', '< received   > sent'));
       v.pos(21, 2).fg(7).text(L('N° du message :', 'Message no.  :'));
       v.pos(21, 22); kbtn(v, 'ENVOI');
       UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
@@ -10841,19 +10288,20 @@ var NostrTools = (() => {
       h.form([{ r: 21, c: 18, len: 3 }]);
     },
     k_inbox: function (k, vals) {
-      var list = NET.received(), pages = Math.max(1, Math.ceil(list.length / 8)), h = this.h;
+      var list = NET.personal(), pages = Math.max(1, Math.ceil(list.length / 8)), h = this.h;
       if (k.fn === 'SUITE') { if (this.page < pages - 1) { this.page++; this.render(); } else h.bell(); return true; }
       if (k.fn === 'RETOUR') { if (this.page > 0) { this.page--; this.render(); } else h.bell(); return true; }
       if (k.fn === 'SOMMAIRE') { this.view = 'menu'; this.render(); return true; }
       if (k.fn !== 'ENVOI') return false;
       var n = parseInt(vals[0], 10);
       if (!(n >= 1 && n <= list.length)) { h.clearField(0); h.bell(); return true; }
-      this.cur = list[n - 1]; this.view = 'read'; this.render();
+      this.cur = list[n - 1].ev; this.view = 'read'; this.render();
       return true;
     },
     r_read: function () {
-      var h = this.h, v = new Vdt(), ev = this.cur, p = splitSubject(NET.plain[ev.id]);
-      NET.markRead(ev.id);
+      var h = this.h, v = new Vdt(), ev = this.cur, m = NET.byEvent(ev), out = !!m && m.out;
+      var p = splitSubject(out ? m.text : NET.plain[ev.id]);
+      if (!out) NET.markRead(ev.id);
       header(v, 'MESSAGE');
       v.pos(5, 2).fg(6).text(L('De    : ', 'From : ')).fg(maskColor(NET.maskOf(ev.pubkey), ev.pubkey)).text(NET.label(ev.pubkey));
       v.pos(6, 2).fg(6).text(L('Le    : ', 'Sent : ')).fg(7).text(fmtFull(ev.created_at));
@@ -10862,15 +10310,16 @@ var NostrTools = (() => {
       var lines = wrap(p.body, 38);
       lines.slice(0, 11).forEach(function (l, i) { v.pos(10 + i, 2).fg(7).text(l); });
       if (lines.length > 11) v.pos(21, 2).fg(5).text('...');
-      UI.keyHints(v, 23, [[L('Répondre', 'Reply'), 'ENVOI']]);
-      UI.footer(v, [[L('BAL', 'Mailbox'), 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+      UI.keyHints(v, 23, [[out ? L('Réécrire', 'Write again') : L('Répondre', 'Reply'), 'ENVOI']]);
+      UI.footer(v, [[L('Votre Kalabass', 'Your Kalabass'), 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.clearForm();
       h.out(v);
     },
     k_read: function (k) {
       if (k.fn === 'SOMMAIRE' || k.fn === 'RETOUR') { this.view = 'inbox'; this.render(); return true; }
       if (k.fn === 'ENVOI') {
-        var ev = this.cur, p = splitSubject(NET.plain[ev.id]);
+        var ev = this.cur, m = NET.byEvent(ev), out = !!m && m.out;
+        var p = splitSubject(out ? m.text : NET.plain[ev.id]);
         this.to = NET.label(ev.pubkey); this.toPk = ev.pubkey;
         this.subj = p.subj ? (/^re:/i.test(p.subj) ? p.subj : 'Re: ' + p.subj) : '';
         this.view = 'write'; this.render();
@@ -10955,41 +10404,11 @@ var NostrTools = (() => {
       return true;
     },
 
-    /* ----- e-mail (sans relais : la messagerie de l'usager envoie) ----- */
-    r_mail: function () {
-      var h = this.h, v = new Vdt();
-      header(v, 'E-MAIL');
-      v.pos(5, 3).fg(6).text(L('A     :', 'To   :'));
-      v.pos(7, 3).fg(6).text(L('Objet :', 'Subj.:'));
-      v.pos(9, 3).fg(6).text(L('Texte :', 'Text :'));
-      wrap(L(K('ENVOI') + ' ouvre votre messagerie avec ce message prêt : vérifiez-le, puis envoyez-le.',
-        K('ENVOI') + ' opens your mail app with this message ready: check it, then send it.'), 38)
-        .forEach(function (l, i) { v.pos(18 + i, 2).fg(5).text(l); });
-      UI.footer(v, [[L('Préparer', 'Compose'), 'ENVOI'], ['Menu', 'SOMMAIRE']]);
-      h.out(v);
-      var f = [{ r: 5, c: 11, len: 29 }, { r: 7, c: 11, len: 29 }];
-      for (var i = 0; i < 7; i++) f.push({ r: 10 + i, c: 2, len: 38, auto: true });
-      h.form(f);
-    },
-    k_mail: function (k, vals) {
-      var h = this.h;
-      if (k.fn === 'SOMMAIRE') { this.view = 'menu'; this.render(); return true; }
-      if (k.fn !== 'ENVOI') return false;
-      var to = (vals[0] || '').trim().toLowerCase();
-      if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(to)) { UI.message(h, L('Adresse e-mail invalide.', 'Invalid e-mail address.'), true); h.focusField(0); return true; }
-      var body = vals.slice(2).join('\n').replace(/\s+$/, '');
-      var url = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(vals[1] || '') +
-        '&body=' + encodeURIComponent(body + '\n\n-- \n' + L('Envoyé depuis le 3615 KORHOGO', 'Sent from 3615 KORHOGO'));
-      try { global.location.href = url; } catch (e) { /* rien */ }
-      UI.message(h, L('Votre messagerie s\'ouvre...', 'Opening your mail app...'));
-      return true;
-    },
-
     /* ----- réseau absent ----- */
     r_nonet: function () {
       var v = new Vdt();
-      header(v, L('MESSAGERIE', 'MESSAGING'));
-      v.pos(8, 3).fg(7).text(L('Messagerie indisponible :', 'Messaging unavailable:'));
+      header(v, 'KALABASS');
+      v.pos(8, 3).fg(7).text(L('Kalabass indisponible :', 'Kalabass unavailable:'));
       v.pos(9, 3).fg(7).text(L('module réseau non chargé.', 'network module not loaded.'));
       UI.footer(v, [['KORHOGO!', 'SOMMAIRE']]);
       this.h.clearForm(); this.h.out(v);
@@ -11027,7 +10446,6 @@ var NostrTools = (() => {
   S.NET = NET;
   VDXUI.onlineText = onlineText;
 })(window);
-
 </script>
 <script>
 /* ---- js/korhogo-data.js ---- */
@@ -12646,13 +12064,12 @@ window.KORHOGO_FAUNA = [
 ]
 }
 ];
-
 </script>
 <script>
 /* ---- js/korhogo.js ---- */
 /* ==========================================================================
    3615 KORHOGO — portage Vidéotex de https://mauktenieb.github.io/korhogo
-   THE KAVE (la Fauna), ERRATIC, FAUNA CHESS, FANATIC, OILY WARS, THE DIARY.
+   ENTER KORHOGO (les fiches de la Fauna).
 
    Copyright (c) Mauk Tenieb & Korhogo. Tous droits réservés.
    Korhogo(TM), Korhogo Fauna(TM), Fauna Masks(TM), Fauna Chess(TM),
@@ -12669,8 +12086,8 @@ window.KORHOGO_FAUNA = [
   var cut = UI.cut, pad = UI.pad;
 
   function lpad(s, n, ch) { s = String(s); while (s.length < n) s = (ch || ' ') + s; return s; }
-  function byName(n) { for (var i = 0; i < FAUNA.length; i++) if (FAUNA[i].name === n) return FAUNA[i]; return null; }
   var faceCache = {};
+
   function faceBytes(f, color) {
     var key = f.name + (color ? '/c' : '');
     if (!faceCache[key]) {
@@ -12720,30 +12137,16 @@ window.KORHOGO_FAUNA = [
      ====================================================================== */
   // [mode, libellé FR, libellé EN] ; MSG et KIOSQUE sont des services du terminal
   var MENU = [
-    ['KAVE', 'ENTER THE KAVE', 'ENTER THE KAVE'],
-    ['WRITE', 'ÉCRIRE À MAUK TENIEB', 'WRITE TO MAUK TENIEB'],
-    ['@MSG', 'MESSAGERIE', 'MESSAGING'],
-    ['ERRATIC', 'ERRATIC', 'ERRATIC'],
-    ['CHESS', 'FAUNA CHESS', 'FAUNA CHESS'],
-    ['FANATIC', 'FANATIC', 'FANATIC'],
-    ['OILY', 'OILY WARS', 'OILY WARS'],
-    ['DIARY', 'THE DIARY', 'THE DIARY'],
-    ['LAWS', 'THE OIL, ITS LAWS', 'THE OIL, ITS LAWS'],
-    ['@KIOSQUE', 'AUTRES SERVICES', 'OTHER SERVICES']
+    ['KAVE', 'ENTER KORHOGO', 'ENTER KORHOGO'],
+    ['@MSG', 'KALABASS', 'KALABASS'],
+    ['@KIOSQUE', 'AUTRES SERVICES', 'OTHER']
   ];
   KM.HOME = {
     help: function () {
       return [
-        [[3, ' 1 '], [7, 'ENTER THE KAVE    '], [6, L('la Fauna', 'the Fauna')]],
-        [[3, ' 2 '], [7, L('ÉCRIRE À MAUK TENIEB', 'WRITE TO MAUK TENIEB')]],
-        [[3, ' 3 '], [7, pad(L('MESSAGERIE', 'MESSAGING'), 18)], [6, L('tchat, BAL', 'chat, mailbox')]],
-        [[3, ' 4 '], [7, 'ERRATIC           '], [6, 'memory']],
-        [[3, ' 5 '], [7, 'FAUNA CHESS       '], [6, L('échecs', 'chess')]],
-        [[3, ' 6 '], [7, 'FANATIC           '], [6, L('code secret', 'secret code')]],
-        [[3, ' 7 '], [7, 'OILY WARS         '], [6, L('bataille', 'sea battle')]],
-        [[3, ' 8 '], [7, 'THE DIARY']],
-        [[3, ' 9 '], [7, 'THE OIL, ITS LAWS']],
-        [[3, '10 '], [7, pad(L('AUTRES SERVICES', 'OTHER SERVICES'), 18)], [6, L('météo, jeux', 'weather, games')]],
+        [[3, ' 1 '], [7, 'ENTER KORHOGO     '], [6, L('la Fauna', 'the Fauna')]],
+        [[3, ' 2 '], [7, pad('KALABASS', 18)], [6, L('Kaves, BAL', 'Kaves, mailbox')]],
+        [[3, ' 3 '], [7, pad(L('AUTRES SERVICES', 'OTHER'), 18)], [6, L('météo, encyclopédie', 'weather, encyclopedia')]],
         '',
         L('Numéro puis ', 'Number, then ') + K('ENVOI') + '.',
         L('En haut : le nombre de connectés,', 'At the top: how many people are'),
@@ -12755,17 +12158,17 @@ window.KORHOGO_FAUNA = [
       var v = new Vdt();
       v.cls().cur(0);
       this.countBytes(v);
-      v.pos(3, 11).fg(6).text('MAUK TENIEB PRESENTS');
+      v.pos(3, 19).fg(6).text('3615');
       v.big(4, 6, 'KORHOGO!', 3);
       MENU.forEach(function (m, i) {
-        v.pos(12 + i, 9).fg(3).text(lpad(i + 1, 2) + '  ').fg(m[0] === '@KIOSQUE' ? 6 : m[0] === 'WRITE' ? 3 : 7).text(L(m[1], m[2]));
+        v.pos(12 + i, 9).fg(3).text(lpad(i + 1, 2) + '  ').fg(m[0] === '@KIOSQUE' ? 6 : 7).text(L(m[1], m[2]));
       });
-      v.pos(22, 11).fg(7).text('>');
-      v.pos(22, 17); UI.kbtn(v, 'ENVOI');
-      v.pos(23, 1).fg(5).text(' Homeland for Korhogo(TM)');
+      v.pos(16, 11).fg(7).text('>');
+      v.pos(16, 17); UI.kbtn(v, 'ENVOI');
+      v.pos(19, 14).fg(5).text(L('Lure, Lore, More', 'Lure, Lore, More'));
       UI.footer(v, [[L('Aide', 'Help'), 'GUIDE'], [L('Quitter', 'Quit'), 'CONNEXION/FIN']]);
       h.out(v);
-      h.form([{ r: 22, c: 13, len: 2 }]);
+      h.form([{ r: 16, c: 13, len: 1 }]);
       // le compte a pu changer pendant l'affichage : on le remet à jour une fois la page dessinée
       h.term.then(function () { setTimeout(function () { KOR.presence(); }, 0); });
     },
@@ -12793,18 +12196,18 @@ window.KORHOGO_FAUNA = [
   };
 
   /* ======================================================================
-     THE KAVE — We are The Fauna!
+     ENTER KORHOGO — We are The Fauna!
      ====================================================================== */
   KM.KAVE = {
     help: function () {
       return [
-        L('Numéro d\'un masque, puis ', 'Type the number of a mask, then ') + K('ENVOI') + '.',
+        L('Numéro d\'un personnage, puis ', 'Type the number of a character, then ') + K('ENVOI') + '.',
         '',
         L('Sur une fiche :', 'On a profile:'),
-        UI.hk('SUITE', 'page ou masque suivant', 'next page, next mask'),
+        UI.hk('SUITE', 'page ou personnage suivant', 'next page, next character'),
         UI.hk('RETOUR', 'page précédente', 'previous page'),
         UI.hk('REPETITION', 'réentendre la devise', 'hear the motto again'),
-        UI.hk('SOMMAIRE', 'retour à la Kave', 'back to the Kave'),
+        UI.hk('SOMMAIRE', 'retour à la liste', 'back to the list'),
         '',
         L('Les textes de la Fauna restent dans', 'The Fauna texts stay in their'),
         L('leur langue d\'origine, l\'anglais.', 'original language, English.')
@@ -12815,17 +12218,17 @@ window.KORHOGO_FAUNA = [
     render: function (h) {
       stopSpeech();
       if (this.cur >= 0) { this.renderProf(h, true); return; }
-      var v = kh(new Vdt(), 'THE KAVE');
+      var v = kh(new Vdt(), 'ENTER KORHOGO');
       v.pos(6, 2).fg(3).size('h').text('We are The Fauna!');
       FAUNA.forEach(function (f, i) {
         var col = i < 9 ? 2 : 21, r = 8 + (i % 9);
         v.pos(r, col).fg(7).text(lpad(i + 1, 2) + ' ').fg(f.vt).text(cut(f.name, 15));
       });
-      v.pos(21, 2).fg(7).text(L('Masque n° :', 'Mask no.  :'));
-      v.pos(21, 19); UI.kbtn(v, 'ENVOI');
+      v.pos(21, 2).fg(7).text(L('Personnage n° :', 'Character no. :'));
+      v.pos(21, 21); UI.kbtn(v, 'ENVOI');
       UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
-      h.form([{ r: 21, c: 15, len: 2 }]);
+      h.form([{ r: 21, c: 18, len: 2 }]);
     },
     renderProf: function (h, full) {
       var f = FAUNA[this.cur], self = this;
@@ -12849,7 +12252,7 @@ window.KORHOGO_FAUNA = [
         });
         wrap('"' + f.motto + '"', 38).slice(0, 2).forEach(function (l, i) { v.pos(20 + i, 2).fg(f.vt).text(l); });
         UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
-        UI.footer(v, [['The Kave', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+        UI.footer(v, [['ENTER KORHOGO', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
         h.out(v);
         h.term.then(function () { if (h.svc === KOR && KOR.mode === KM.KAVE && self.page === 0) speakMotto(h, f.motto); });
         return;
@@ -12859,7 +12262,7 @@ window.KORHOGO_FAUNA = [
         v = kh(new Vdt(), sub);
         v.pos(5, 2).fg(f.vt).size('h').text(cut(f.name, 38));
         UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
-        UI.footer(v, [['The Kave', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+        UI.footer(v, [['ENTER KORHOGO', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       } else {
         v = new Vdt().pos(2, 30).can().pos(2, 41 - sub.length).fg(7).text(sub);
       }
@@ -12907,1020 +12310,6 @@ window.KORHOGO_FAUNA = [
   };
 
   /* ======================================================================
-     ERRATIC — Korhogo · Memory
-     ====================================================================== */
-  var LEVELS = [[6, 'easy', 'facile'], [9, 'medium', 'moyen'], [12, 'hard', 'difficile'], [18, 'full fauna', 'Fauna entière']];
-  function fmtTime(s) { return Math.floor(s / 60) + ':' + lpad(s % 60, 2, '0'); }
-  KM.ERRATIC = {
-    help: function () {
-      return [
-        L('Retrouvez les paires de masques.', 'Find the pairs of masks.'),
-        '',
-        L('Déplacez le curseur avec les flèches,', 'Move the cursor with the arrow keys,'),
-        L('Z Q S D ou 8 4 2 6, puis retournez la', 'W A S D, Z Q S D or 8 4 2 6, then turn'),
-        L('carte avec ', 'the card with ') + K('ENVOI') + L(' ou la barre d\'espace.', ' or the space bar.'),
-        '',
-        UI.hk('SOMMAIRE', 'choix du niveau', 'choose the level')
-      ];
-    },
-    enter: function (h) { this.game = null; this.render(h); },
-    leave: function () { clearInterval(this.timer); clearTimeout(this.hideT); },
-    render: function (h) {
-      clearInterval(this.timer);
-      if (this.game) { this.renderGame(h); return; }
-      var bests = h.load('kor.erratic', {});
-      var v = kh(new Vdt(), 'ERRATIC');
-      v.pos(5, 3).fg(6).text('Korhogo . Memory');
-      v.pos(7, 3).fg(3).size('d').text('THE FAUNA');
-      LEVELS.forEach(function (l, i) {
-        var b = bests[l[0]];
-        v.pos(10 + i * 2, 5).fg(3).text((i + 1) + '  ').fg(7).text(pad(l[0] + L(' paires', ' pairs'), 10)).fg(6).text(L(l[2], l[1]));
-        if (b) v.pos(11 + i * 2, 18).fg(5).text(L('record ', 'best ') + b.moves + ' / ' + fmtTime(b.time));
-      });
-      v.pos(19, 5).fg(5).text(L('record : coups / temps', 'best: moves / time'));
-      v.pos(21, 3).fg(7).text(L('Niveau :', 'Level  :'));
-      v.pos(21, 15); UI.kbtn(v, 'ENVOI');
-      UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      h.out(v);
-      h.form([{ r: 21, c: 12, len: 1 }]);
-    },
-    start: function (h, n) {
-      var pool = FAUNA.slice().sort(function () { return Math.random() - 0.5; }).slice(0, n), deck = [];
-      pool.forEach(function (f) { deck.push({ f: f, up: false, done: false }); deck.push({ f: f, up: false, done: false }); });
-      for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
-      var cols = n <= 6 ? 4 : 6;
-      this.game = { n: n, deck: deck, cols: cols, rows: deck.length / cols, cur: 0, open: [], moves: 0, found: 0, t0: 0, elapsed: 0, lock: false, over: false };
-      this.renderGame(h);
-    },
-    geo: function (i) {
-      var g = this.game, w = g.cols * 5 - 1, left = Math.floor((40 - w) / 2) + 1;
-      var top = g.rows === 6 ? 5 : 6;
-      return { r: top + Math.floor(i / g.cols) * 3, c: left + (i % g.cols) * 5 };
-    },
-    cardBytes: function (v, i) {
-      var g = this.game, card = g.deck[i], p = this.geo(i), cur = i === g.cur && !g.over;
-      v.pos(p.r, p.c - 1).fg(7).text(cur ? '>' : ' ');
-      if (card.up || card.done) {
-        var tc = card.f.vt === 4 || card.f.vt === 1 ? 7 : 0;
-        v.g1().bg(card.f.vt).g0().fg(tc).text(' ' + card.f.code + ' ');
-        v.bg(0).fg(7).text(cur ? '<' : ' ');
-        v.pos(p.r + 1, p.c).g1().bg(card.f.vt).fg(tc).rep(card.done ? 0x70 : 0x20, 4);
-      } else {
-        v.g1().fg(3).raw(0x39, 0x66, 0x39, 0x66).g0().fg(7).text(cur ? '<' : ' ');
-        v.pos(p.r + 1, p.c).g1().fg(3).raw(0x66, 0x39, 0x66, 0x39);
-      }
-      return v.g0();
-    },
-    hud: function (v) {
-      var g = this.game;
-      v.pos(4, 1).can().pos(4, 3).fg(6).text(L('PAIRES ', 'PAIRS ')).fg(7).text(g.found + '/' + g.n)
-        .fg(6).text(L('   COUPS ', '   MOVES ')).fg(7).text(String(g.moves))
-        .fg(6).text(L('   TEMPS ', '   TIME ')).fg(7).text(fmtTime(g.elapsed));
-      return v;
-    },
-    renderGame: function (h) {
-      var g = this.game, self = this, v = kh(new Vdt(), 'ERRATIC');
-      h.clearForm();
-      this.hud(v);
-      for (var i = 0; i < g.deck.length; i++) this.cardBytes(v, i);
-      UI.footer(v, [[L('Retourner', 'Flip'), 'ENVOI'], [L('Niveaux', 'Levels'), 'SOMMAIRE']]);
-      h.out(v);
-      clearInterval(this.timer);
-      this.timer = setInterval(function () {
-        if (!g.t0 || g.over || h.term.pending()) return;
-        var e = Math.floor((Date.now() - g.t0) / 1000);
-        if (e !== g.elapsed) { g.elapsed = e; h.out(self.hud(new Vdt())); }
-      }, 250);
-    },
-    move: function (h, dr, dc) {
-      var g = this.game, r = Math.floor(g.cur / g.cols), c = g.cur % g.cols, old = g.cur;
-      r = (r + dr + g.rows) % g.rows; c = (c + dc + g.cols) % g.cols;
-      g.cur = r * g.cols + c;
-      var v = new Vdt();
-      this.cardBytes(v, old); this.cardBytes(v, g.cur);
-      h.term.now(v.bytes());
-    },
-    flip: function (h) {
-      var g = this.game, self = this, card = g.deck[g.cur];
-      if (g.lock || card.up || card.done) { h.bell(); return; }
-      if (!g.t0) g.t0 = Date.now();
-      card.up = true;
-      g.open.push(g.cur);
-      h.snd.top(false);
-      var v = this.cardBytes(new Vdt(), g.cur);
-      if (g.open.length === 2) {
-        g.moves++;
-        var a = g.deck[g.open[0]], b = g.deck[g.open[1]];
-        if (a.f === b.f) {
-          a.done = b.done = true; a.up = b.up = false;
-          var ia = g.open[0], ib = g.open[1];
-          g.open = []; g.found++;
-          this.cardBytes(v, ia); this.cardBytes(v, ib);
-          v.pos(22, 1).can().pos(22, 2).fg(a.f.vt).text(cut(a.f.name.toUpperCase(), 38));
-          v.pos(23, 1).can().pos(23, 2).fg(6).text(cut('"' + a.f.motto + '"', 38));
-          if (g.found === g.n) this.win(h, v);
-        } else {
-          g.lock = true;
-          var o = g.open.slice();
-          this.hideT = setTimeout(function () {
-            o.forEach(function (i) { g.deck[i].up = false; });
-            g.open = []; g.lock = false;
-            var w = new Vdt(); o.forEach(function (i) { self.cardBytes(w, i); });
-            h.out(w);
-          }, 1000);
-        }
-      }
-      this.hud(v);
-      h.out(v);
-    },
-    win: function (h, v) {
-      var g = this.game;
-      g.over = true;
-      var bests = h.load('kor.erratic', {}), b = bests[g.n];
-      if (!b || g.moves < b.moves || (g.moves === b.moves && g.elapsed < b.time)) { bests[g.n] = { moves: g.moves, time: g.elapsed }; h.save('kor.erratic', bests); }
-      v.pos(22, 1).can().pos(22, 2).fg(3).flash(1).text(L('TROUVÉ !', 'FOUND!')).flash(0).fg(7).text(L(' Toutes les paires.', ' All pairs matched.'));
-      v.pos(23, 1).can().pos(23, 2).fg(6).text(g.moves + L(' coups . ', ' moves . ') + fmtTime(g.elapsed) + '   ').fg(7).text(L('Rejouer ', 'Play again '));
-      UI.kbtn(v, 'ENVOI');
-    },
-    key: function (h, k, vals) {
-      if (!this.game) {
-        if (k.fn !== 'ENVOI') return false;
-        var n = parseInt(vals[0], 10);
-        if (!(n >= 1 && n <= LEVELS.length)) { h.clearField(0); h.bell(); return true; }
-        this.lastLevel = LEVELS[n - 1][0];
-        this.start(h, this.lastLevel);
-        return true;
-      }
-      var g = this.game;
-      if (k.fn === 'SOMMAIRE') { clearInterval(this.timer); clearTimeout(this.hideT); this.game = null; this.render(h); return true; }
-      if (k.fn === 'ENVOI' || k.ch === ' ') {
-        if (g.over) this.start(h, g.n); else this.flip(h);
-        return true;
-      }
-      if (g.over) return !!k.ch;
-      var d = k.dir || { Z: 'U', '8': 'U', S: 'D', '2': 'D', Q: 'L', '4': 'L', D: 'R', '6': 'R' }[(k.ch || '').toUpperCase()];
-      if (d === 'U') this.move(h, -1, 0); else if (d === 'D') this.move(h, 1, 0);
-      else if (d === 'L') this.move(h, 0, -1); else if (d === 'R') this.move(h, 0, 1);
-      else return !!k.ch;
-      return true;
-    }
-  };
-
-  /* ======================================================================
-     FAUNA CHESS — règles et IA du site (Kerema)
-     ====================================================================== */
-  var CH = {};
-  CH.isSpec = function (p) { return p && (p.t === 'G' || p.t === 'M'); };
-  CH.canCap = function (att, tgt) {
-    if (!tgt) return true;
-    if (att.col === tgt.col) return false;
-    if (CH.isSpec(att) && CH.isSpec(tgt)) return false;
-    if (CH.isSpec(tgt) && !tgt.moved) return false;
-    return true;
-  };
-  CH.copy = function (b) { return b.map(function (row) { return row.map(function (p) { return p ? { t: p.t, col: p.col, moved: p.moved, av: p.av } : null; }); }); };
-  CH.moves = function (r, c, board) {
-    var p = board[r][c]; if (!p) return [];
-    var out = [];
-    function tryAdd(nr, nc) { if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) return; if (CH.canCap(p, board[nr][nc])) out.push([nr, nc]); }
-    function slide(dr, dc) {
-      for (var i = 1; i < 8; i++) {
-        var nr = r + dr * i, nc = c + dc * i;
-        if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
-        var t = board[nr][nc];
-        if (t) { if (CH.canCap(p, t)) out.push([nr, nc]); break; }
-        out.push([nr, nc]);
-      }
-    }
-    var K8 = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
-    if (p.t === 'K' || CH.isSpec(p)) K8.forEach(function (d) { tryAdd(r + d[0], c + d[1]); });
-    if (p.t === 'R') [[0, 1], [0, -1], [1, 0], [-1, 0]].forEach(function (d) { slide(d[0], d[1]); });
-    if (p.t === 'B') [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (d) { slide(d[0], d[1]); });
-    if (p.t === 'Q') K8.forEach(function (d) { slide(d[0], d[1]); });
-    return out;
-  };
-  CH.apply = function (board, m) {
-    var nb = CH.copy(board), p = nb[m[0]][m[1]];
-    nb[m[2]][m[3]] = p; nb[m[0]][m[1]] = null;
-    if (CH.isSpec(p)) p.moved = true;
-    return nb;
-  };
-  var PV = { K: 10000, Q: 900, R: 500, B: 330, G: 400, M: 400 };
-  CH.eval = function (b) {
-    var s = 0;
-    for (var r = 0; r < 8; r++) for (var c = 0; c < 8; c++) {
-      var p = b[r][c]; if (!p) continue;
-      var v = PV[p.t] || 0;
-      if (CH.isSpec(p) && p.moved) v -= 50;
-      var cd = Math.abs(c - 3.5) + Math.abs(r - 3.5);
-      s += (p.col === 'w' ? 1 : -1) * (v + (4 - cd) * 3);
-    }
-    return s;
-  };
-  CH.all = function (col, b) {
-    var out = [];
-    for (var r = 0; r < 8; r++) for (var c = 0; c < 8; c++) {
-      if (b[r][c] && b[r][c].col === col) CH.moves(r, c, b).forEach(function (m) { out.push([r, c, m[0], m[1]]); });
-    }
-    return out;
-  };
-  CH.mm = function (b, depth, a, bb, max) {
-    if (depth === 0) return CH.eval(b);
-    var hasW = false, hasB = false;
-    for (var r = 0; r < 8; r++) for (var c = 0; c < 8; c++) { var p = b[r][c]; if (p && p.t === 'K') { if (p.col === 'w') hasW = true; else hasB = true; } }
-    if (!hasW) return -99999; if (!hasB) return 99999;
-    var moves = CH.all(max ? 'w' : 'b', b);
-    if (!moves.length) return max ? -9999 : 9999;
-    var best = max ? -Infinity : Infinity;
-    for (var i = 0; i < moves.length; i++) {
-      var v = CH.mm(CH.apply(b, moves[i]), depth - 1, a, bb, !max);
-      if (max) { if (v > best) best = v; if (v > a) a = v; }
-      else { if (v < best) best = v; if (v < bb) bb = v; }
-      if (bb <= a) break;
-    }
-    return best;
-  };
-  CH.best = function (b, col, depth) {
-    var moves = CH.all(col, b); if (!moves.length) return null;
-    var max = col === 'w', best = max ? -Infinity : Infinity, bm = moves[Math.floor(Math.random() * moves.length)];
-    moves.forEach(function (m) {
-      var v = CH.mm(CH.apply(b, m), depth, -Infinity, Infinity, !max);
-      if (max ? v > best : v < best) { best = v; bm = m; }
-    });
-    return bm;
-  };
-  CH.init = function (katabatik) {
-    var names = { w: { Q: 'Aube', R1: 'Honey Buzzard', R2: 'Plague of Justinian' }, b: { Q: 'Maiden Call', R1: 'Auvergne', R2: 'Poisoned Well' } };
-    if (Math.random() < 0.5) names.b.Q = 'Naphta'; else names.w.Q = 'Naphta';
-    var cn = Math.random() < 0.5 ? 'b' : 'w';
-    names[cn][Math.random() < 0.5 ? 'R1' : 'R2'] = 'Croisière Noire';
-    var b = []; for (var r = 0; r < 8; r++) { b.push([null, null, null, null, null, null, null, null]); }
-    b[7][1] = { t: 'R', col: 'w', av: names.w.R1 }; b[7][2] = { t: 'B', col: 'w', av: "Ts'ui Pên" };
-    b[7][3] = { t: 'Q', col: 'w', av: names.w.Q }; b[7][4] = { t: 'K', col: 'w', av: 'Unkle Maukie' };
-    b[7][5] = { t: 'B', col: 'w', av: 'C7H5N3O6' }; b[7][6] = { t: 'R', col: 'w', av: names.w.R2 };
-    b[0][1] = { t: 'R', col: 'b', av: names.b.R1 }; b[0][2] = { t: 'B', col: 'b', av: 'Hátra Lövés' };
-    b[0][3] = { t: 'Q', col: 'b', av: names.b.Q }; b[0][4] = { t: 'K', col: 'b', av: 'dogXim' };
-    b[0][5] = { t: 'B', col: 'b', av: 'Silent Pact' }; b[0][6] = { t: 'R', col: 'b', av: names.b.R2 };
-    var gc = 3, mk = 4;
-    if (katabatik) { gc = Math.floor(Math.random() * 8); mk = Math.floor(Math.random() * 8); }
-    b[3][gc] = { t: 'G', col: 'w', moved: false, av: 'Grand Colonel' };
-    b[4][mk] = { t: 'M', col: 'b', moved: false, av: 'Malika' };
-    return b;
-  };
-  // Pièces dessinées en semi-graphique (6 × 6 points)
-  var PIECE = {
-    K: ['..##..', '.####.', '..##..', '.####.', '.####.', '######'],
-    Q: ['#.##.#', '######', '.####.', '..##..', '.####.', '######'],
-    R: ['#.##.#', '######', '.####.', '.####.', '.####.', '######'],
-    B: ['..##..', '.##.#.', '.#.##.', '..##..', '.####.', '######'],
-    G: ['.####.', '#.##.#', '######', '#.##.#', '.####.', '..##..'],
-    M: ['.####.', '##..##', '#.##.#', '##..##', '.####.', '..##..']
-  };
-  var DOT = ['......', '......', '..##..', '..##..', '......', '......'];
-  var CURSOR = ['##..##', '#....#', '......', '......', '#....#', '##..##'];
-  function mergeArt(a, b) {
-    return a.map(function (l, i) { return l.split('').map(function (ch, j) { return ch === '#' || b[i][j] === '#' ? '#' : '.'; }).join(''); });
-  }
-  var LV = [['Easy', 1, 'Facile'], ['Moderate', 2, 'Moyen'], ['Hard', 3, 'Difficile'], ['2 Players', 0, '2 joueurs']];
-  var FILES = 'abcdefgh';
-
-  KM.CHESS = {
-    help: function () {
-      return [
-        L('Prenez le Roi adverse pour gagner.', 'Take the enemy King to win.'),
-        L('Pas de pions ni de cavaliers.', 'No pawns, no knights.'),
-        [[3, L('Or', 'Gold')], [7, L(' : Baku Boom (blancs). ', ': Baku Boom (White). ')], [5, 'Violet'], [7, L(' :', ':')]],
-        L('Kerema (noirs).', 'Kerema (Black).'),
-        L('Grand Colonel et Malika : un pas dans', 'Grand Colonel and Malika: one step in'),
-        L('tous les sens ; en pointillé, ils sont', 'any direction; dotted, they cannot be'),
-        L('intouchables tant qu\'ils n\'ont pas', 'taken until they have moved, and they'),
-        L('bougé, et ne se prennent jamais.', 'never take each other.'),
-        L('Katabatik : déploiement au hasard.', 'Katabatik: random deployment.'),
-        '',
-        L('Jouer : flèches puis ', 'Play: arrow keys, then ') + K('ENVOI') + L(' sur la', ' on the'),
-        L('pièce et la case, ou tapez le coup', 'piece and the square, or type the'),
-        L('(d1d4).', 'move (d1d4).')
-      ];
-    },
-    enter: function (h) { this.g = null; this.render(h); },
-    leave: function () { clearTimeout(this.aiT); },
-    render: function (h) {
-      if (this.g) { this.renderGame(h); return; }
-      var v = kh(new Vdt(), 'FAUNA CHESS');
-      v.pos(5, 3).fg(3).text('Baku Boom ').fg(6).text(L('Blancs', 'White'));
-      v.pos(6, 3).fg(5).text('Kerema    ').fg(6).text(L('Noirs', 'Black'));
-      v.pos(8, 3).fg(6).text(L('Niveau', 'Level'));
-      LV.forEach(function (l, i) { v.pos(10 + i, 5).fg(3).text((i + 1) + '  ').fg(7).text(L(l[2], l[0])); });
-      v.pos(16, 3).fg(7).text(L('Niveau (1-4)     :', 'Level (1-4)      :'));
-      v.pos(18, 3).fg(7).text(L('Katabatik (O/N)  :', 'Katabatik (Y/N)  :'));
-      v.pos(20, 3).fg(5).text(L('Contre Kerema, votre couleur est tirée', 'Against Kerema, your colour is drawn'));
-      v.pos(21, 3).fg(5).text(L('au sort.', 'at random.'));
-      UI.keyHints(v, 23, [[L('Champ suivant', 'Next field'), 'SUITE'], [L('Jouer', 'Play'), 'ENVOI']]);
-      UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      h.out(v);
-      h.form([{ r: 16, c: 22, len: 1, value: String(h.load('kor.chess.lv', 1)) }, { r: 18, c: 22, len: 1, value: 'N' }]);
-    },
-    start: function (h, lvIdx, kata) {
-      var lv = LV[lvIdx];
-      this.g = {
-        b: CH.init(kata), turn: 'w', mode: lv[1] ? 'ai' : '2p', depth: lv[1] || 0,
-        player: lv[1] ? (Math.random() < 0.5 ? 'w' : 'b') : 'w', cur: [6, 4], sel: null, hints: [], last: null, log: [], over: false
-      };
-      this.g.cur = this.g.player === 'w' ? [6, 4] : [1, 4];
-      this.renderGame(h);
-      if (this.g.mode === 'ai' && this.g.player !== 'w') this.aiTurn(h);
-    },
-    flip: function () { return this.g.mode === 'ai' && this.g.player === 'b'; },
-    scr: function (r, c) {
-      var f = this.flip(), vr = f ? 7 - r : r, vc = f ? 7 - c : c;
-      return { top: 5 + vr * 2, col: 3 + vc * 3 };
-    },
-    // Case = 3 colonnes × 2 rangées = 6 × 6 points semi-graphiques
-    sqBytes: function (v, r, c) {
-      var g = this.g, p = g.b[r][c], s = this.scr(r, c);
-      var isCur = g.cur[0] === r && g.cur[1] === c && !g.over;
-      var isSel = g.sel && g.sel[0] === r && g.sel[1] === c;
-      var isHint = g.hints.some(function (m) { return m[0] === r && m[1] === c; });
-      // Couleur : pièces or et violet sur damier bleu et noir, comme sur le site.
-      // Noir et blanc : pièces blanches et noires sur deux gris moyens.
-      var color = KOR.h && KOR.h.term.rend.mode === 'color';
-      var bg = (r + c) % 2 === 0 ? (color ? 4 : 5) : (color ? 0 : 4), fg = 7, px = null, flash = false;
-      var sep = !!(p && CH.isSpec(p) && !p.moved);
-      if (p) { px = PIECE[p.t]; fg = p.col === 'w' ? (color ? 3 : 7) : (color ? 5 : 0); }
-      if (isHint && p) bg = 1;                                  // prise possible
-      else if (isHint) { px = DOT; fg = 7; }                    // case accessible
-      if (isSel) { bg = 2; fg = color ? 7 : 0; }                // pièce choisie
-      if (isCur) {
-        if (p) flash = true;
-        else { px = isHint ? mergeArt(DOT, CURSOR) : CURSOR; fg = 7; }
-      }
-      for (var row = 0; row < 2; row++) {
-        v.pos(s.top + row, s.col).g1().bg(bg).fg(fg);
-        if (flash) v.flash(1);
-        if (sep) v.und(1);
-        for (var cc = 0; cc < 3; cc++) {
-          var bits = 0;
-          if (px) for (var k = 0; k < 6; k++) {
-            if (px[row * 3 + (k >> 1)].charAt(cc * 2 + (k & 1)) === '#') bits |= 1 << k;
-          }
-          v.mos(bits);
-        }
-      }
-      return v.g0();
-    },
-    side: function (v, full) {
-      var g = this.g, you = function (c) { return g.mode === 'ai' && g.player === c ? L(' VOUS', ' YOU') : ''; };
-      for (var r = full ? 5 : 11; r <= 20; r++) v.pos(r, 28).can();
-      if (full) {
-        v.pos(5, 28).fg(3).text('Baku Boom');
-        v.pos(6, 28).fg(6).text(L('Blancs', 'White')).fg(7).text(you('w'));
-        v.pos(8, 28).fg(5).text('Kerema');
-        v.pos(9, 28).fg(6).text(L('Noirs', 'Black')).fg(7).text(you('b'));
-      }
-      v.pos(11, 29).fg(g.over ? 3 : 7);
-      if (g.over) v.flash(1).text(L('PARTIE FINIE', 'GAME OVER')).flash(0);
-      else v.text(g.turn === 'w' ? L('AUX BLANCS', "WHITE'S TURN") : L('AUX NOIRS', "BLACK'S TURN"));
-      var sp = g.sel ? g.b[g.sel[0]][g.sel[1]] : g.b[g.cur[0]][g.cur[1]];
-      if (sp && sp.av) {
-        var f = byName(sp.av);
-        wrap(sp.av.toUpperCase(), 12).slice(0, 2).forEach(function (l, i) { v.pos(13 + i, 29).fg(f ? f.vt : 3).text(l); });
-      }
-      g.log.slice(-4).forEach(function (m, i) { v.pos(17 + i, 29).fg(m.col === 'w' ? 7 : 6).text(m.col + ' ' + m.n); });
-      return v;
-    },
-    renderGame: function (h) {
-      var g = this.g, v = kh(new Vdt(), 'FAUNA CHESS'), r, c;
-      for (r = 0; r < 8; r++) for (c = 0; c < 8; c++) this.sqBytes(v, r, c);
-      for (r = 0; r < 8; r++) { var s = this.scr(r, 0); v.pos(s.top + 1, 1).fg(6).text(String(8 - r)); }
-      for (c = 0; c < 8; c++) { var s2 = this.scr(0, c); v.pos(21, s2.col + 1).fg(6).text(FILES[c]); }
-      this.side(v, true);
-      v.pos(23, 2).fg(7).text(L('Coup :', 'Move :'));
-      UI.keyHints(v, 23, [[L('Jouer', 'Play'), 'ENVOI']], 15);
-      UI.footer(v, [['Menu', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      h.out(v);
-      h.form([{ r: 23, c: 9, len: 4 }]);
-    },
-    redraw: function (h, squares, v) {
-      v = v || new Vdt();
-      var seen = {};
-      squares.forEach(function (sq) { var k = sq[0] * 8 + sq[1]; if (!seen[k]) { seen[k] = 1; this.sqBytes(v, sq[0], sq[1]); } }, this);
-      this.side(v);
-      h.out(v);
-      h.refocus();
-    },
-    select: function (h, r, c) {
-      var g = this.g, old = g.hints.slice(); if (g.sel) old.push(g.sel);
-      g.sel = [r, c]; g.hints = CH.moves(r, c, g.b);
-      h.snd.top(false);
-      this.redraw(h, old.concat(g.hints, [[r, c]]));
-    },
-    play: function (h, m) {
-      var g = this.g, p = g.b[m[0]][m[1]], cap = g.b[m[2]][m[3]];
-      var old = g.hints.slice(); if (g.sel) old.push(g.sel); if (g.last) old.push([g.last[0], g.last[1]], [g.last[2], g.last[3]]);
-      g.b = CH.apply(g.b, m);
-      g.last = m; g.sel = null; g.hints = [];
-      g.log.push({ col: g.turn, n: FILES[m[1]] + (8 - m[0]) + FILES[m[3]] + (8 - m[2]) });
-      if (cap) h.snd.beep(); else h.snd.top(false);
-      var v = new Vdt();
-      if (cap && cap.t === 'K') {
-        g.over = true;
-        var wn = g.turn === 'w' ? L('Les blancs', 'White') : L('Les noirs', 'Black');
-        v.pos(22, 1).can().pos(22, 2).fg(3).flash(1).text(wn).flash(0).fg(7).text(L(' gagnent - Roi pris.', ' wins - King taken.'));
-        this.redraw(h, old.concat([[m[0], m[1]], [m[2], m[3]], g.cur]), v);
-        return;
-      }
-      g.turn = g.turn === 'w' ? 'b' : 'w';
-      v.pos(22, 1).can();
-      if (g.mode === 'ai' && g.turn !== g.player) v.pos(22, 2).fg(6).text(L('Kerema réfléchit...', 'Kerema thinks...'));
-      else if (g.mode === 'ai') v.pos(22, 2).fg(6).text((g.turn === 'w' ? L('Noirs : ', 'Black: ') : L('Blancs : ', 'White: ')) + FILES[m[1]] + (8 - m[0]) + '-' + FILES[m[3]] + (8 - m[2]));
-      this.redraw(h, old.concat([[m[0], m[1]], [m[2], m[3]]]), v);
-      if (g.mode === 'ai' && g.turn !== g.player) this.aiTurn(h);
-    },
-    aiTurn: function (h) {
-      var self = this, g = this.g;
-      clearTimeout(this.aiT);
-      this.aiT = setTimeout(function () {
-        if (h.svc !== KOR || KOR.mode !== KM.CHESS || self.g !== g || g.over) return;
-        var m = CH.best(g.b, g.turn, g.depth);
-        if (m) self.play(h, m);
-      }, 450);
-    },
-    action: function (h) {
-      var g = this.g, r = g.cur[0], c = g.cur[1], p = g.b[r][c];
-      if (g.sel && g.hints.some(function (m) { return m[0] === r && m[1] === c; })) { this.play(h, [g.sel[0], g.sel[1], r, c]); return; }
-      if (p && p.col === g.turn) { this.select(h, r, c); return; }
-      h.bell();
-      var old = g.hints.slice(); if (g.sel) old.push(g.sel);
-      g.sel = null; g.hints = [];
-      this.redraw(h, old);
-    },
-    key: function (h, k, vals) {
-      var g = this.g;
-      if (!g) {
-        if (k.fn !== 'ENVOI') return false;
-        var n = parseInt(vals[0], 10);
-        if (!(n >= 1 && n <= 4)) { h.clearField(0); h.focusField(0); h.bell(); return true; }
-        h.save('kor.chess.lv', n);
-        this.start(h, n - 1, /^[OY]/i.test(vals[1] || ''));
-        return true;
-      }
-      if (k.fn === 'SOMMAIRE') { clearTimeout(this.aiT); this.g = null; this.render(h); return true; }
-      if (g.over) { if (k.fn === 'ENVOI') { this.g = null; this.render(h); return true; } return !!k.ch; }
-      var myTurn = g.mode === '2p' || g.turn === g.player;
-      if (k.dir) {
-        var f = this.flip() ? -1 : 1, d = { U: [-1, 0], D: [1, 0], L: [0, -1], R: [0, 1] }[k.dir];
-        var old = g.cur.slice();
-        g.cur = [Math.min(7, Math.max(0, g.cur[0] + d[0] * f)), Math.min(7, Math.max(0, g.cur[1] + d[1] * f))];
-        var v = new Vdt(); this.sqBytes(v, old[0], old[1]); this.sqBytes(v, g.cur[0], g.cur[1]); this.side(v);
-        h.term.now(v.bytes()); h.refocus();
-        return true;
-      }
-      if (k.fn === 'ENVOI') {
-        if (!myTurn) { h.bell(); return true; }
-        var q = (vals[0] || '').toLowerCase();
-        if (q) {
-          var mm = q.match(/^([a-h])([1-8])([a-h])([1-8])$/);
-          h.clearField(0);
-          if (!mm) { msg(h, L('Coup : lettre + chiffre, deux fois (d1d4).', 'Move: letter + digit, twice (d1d4).'), true); h.bell(); return true; }
-          var fr = 8 - (+mm[2]), fc = FILES.indexOf(mm[1]), tr = 8 - (+mm[4]), tc = FILES.indexOf(mm[3]);
-          var pc = g.b[fr][fc];
-          if (!pc || pc.col !== g.turn || !CH.moves(fr, fc, g.b).some(function (m) { return m[0] === tr && m[1] === tc; })) {
-            msg(h, L('Coup impossible.', 'Illegal move.'), true); h.bell(); return true;
-          }
-          this.play(h, [fr, fc, tr, tc]);
-          return true;
-        }
-        this.action(h);
-        return true;
-      }
-      return false;
-    }
-  };
-
-  /* ======================================================================
-     FANATIC — le code secret de quatre Masques
-     ====================================================================== */
-  var MASKS = [
-    { l: 'H', n: 'Honey Buzzard', c: 1 }, { l: 'C', n: 'C7H5N3O6', c: 6 }, { l: 'T', n: 'Truce', c: 3 },
-    { l: 'A', n: 'Auvergne', c: 2 }, { l: 'P', n: 'Poisoned Well', c: 5 }, { l: 'N', n: 'Naphta', c: 7 }
-  ];
-  function maskBy(l) { for (var i = 0; i < MASKS.length; i++) if (MASKS[i].l === l) return MASKS[i]; return null; }
-  function chip(v, m) {
-    var tc = m.c === 1 || m.c === 4 ? 7 : 0;
-    return v.g1().bg(m.c).g0().fg(tc).text(' ' + m.l + ' ').bg(0);
-  }
-  KM.FANATIC = {
-    help: function () {
-      return [
-        L('Trouvez le code de quatre Masques en', 'Find the code of four Masks in ten'),
-        L('dix essais au plus.', 'tries at most.'),
-        '',
-        L('Tapez quatre lettres (H C T A P N) ou', 'Type four letters (H C T A P N) or'),
-        L('chiffres (1 à 6), puis ', 'digits (1 to 6), then ') + K('ENVOI') + '.',
-        UI.hk('CORRECTION', 'retire le dernier Masque', 'removes the last Mask'),
-        UI.hk('ANNULATION', 'vide la ligne', 'clears the row'),
-        '',
-        L('Plein : bon Masque, bonne place.', 'Solid: right Mask, right place.'),
-        L('Pointillé : bon Masque, autre place.', 'Dotted: right Mask, wrong place.')
-      ];
-    },
-    enter: function (h) { this.newGame(h); },
-    newGame: function (h) {
-      this.secret = []; for (var i = 0; i < 4; i++) this.secret.push(MASKS[Math.floor(Math.random() * 6)].l);
-      this.rows = []; this.cur = []; this.over = false; this.won = false;
-      this.render(h);
-    },
-    rowBytes: function (v, i) {
-      var r = 10 + i, row = this.rows[i], cur = i === this.rows.length && !this.over;
-      v.pos(r, 1).can().pos(r, 2).fg(cur ? 3 : 5).text(lpad(i + 1, 2) + ' ');
-      var guess = row ? row.g : (cur ? this.cur : []);
-      for (var k = 0; k < 4; k++) {
-        if (guess[k]) chip(v, maskBy(guess[k])); else v.fg(5).text(' . ');
-        v.text(' ');
-      }
-      if (row) {
-        v.pos(r, 23).g1().fg(7);
-        for (var b = 0; b < 4; b++) {
-          if (b < row.black) v.und(0).raw(0x7F);
-          else if (b < row.black + row.white) v.und(1).raw(0x7F);
-          else v.und(0).fg(5).raw(0x30).fg(7);
-          v.raw(0x20);
-        }
-        v.g0();
-      }
-      return v;
-    },
-    status: function (v) {
-      v.pos(22, 1).can().pos(22, 2);
-      if (this.won) v.fg(3).flash(1).text(L('CODE CASSÉ', 'CODE BROKEN')).flash(0).fg(7).text(L(' en ', ' in ') + this.rows.length + L(' essais.', ' tries.'));
-      else if (this.over) {
-        v.fg(7).text(L('PLUS D\'ESSAIS. Le code : ', 'OUT OF TRIES. The code: '));
-        this.secret.forEach(function (l) { chip(v, maskBy(l)); });
-      } else v.fg(6).text(L('Essai ', 'Try ') + (this.rows.length + 1) + ' / 10');
-      return v;
-    },
-    render: function (h) {
-      var v = kh(new Vdt(), 'FANATIC');
-      h.clearForm();
-      v.pos(5, 2).fg(7).text(L('Trouvez le code de quatre Masques.', 'Break the secret code of four Masks.'));
-      MASKS.forEach(function (m, i) {
-        v.pos(6 + (i >> 1), i % 2 ? 21 : 2);
-        chip(v, m).fg(6).text(' ' + m.n);
-      });
-      for (var i = 0; i < 10; i++) this.rowBytes(v, i);
-      v.pos(21, 2).g1().fg(7).raw(0x7F).g0().fg(6).text(L(' bonne place   ', ' right place   ')).g1().fg(7).und(1).raw(0x7F).und(0).g0().fg(6).text(L(' ailleurs', ' elsewhere'));
-      this.status(v);
-      UI.keyHints(v, 23, [[L('Vérifier', 'Check'), 'ENVOI'], [L('Retirer', 'Remove'), 'CORRECTION']]);
-      UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      h.out(v);
-    },
-    check: function (h) {
-      var s = this.secret.slice(), g = this.cur.slice(), black = 0, white = 0, i, j;
-      for (i = 0; i < 4; i++) if (g[i] === s[i]) { black++; s[i] = null; g[i] = null; }
-      for (i = 0; i < 4; i++) {
-        if (g[i] == null) continue;
-        for (j = 0; j < 4; j++) if (s[j] != null && g[i] === s[j]) { white++; s[j] = null; break; }
-      }
-      this.rows.push({ g: this.cur.slice(), black: black, white: white });
-      this.cur = [];
-      if (black === 4) { this.over = true; this.won = true; }
-      else if (this.rows.length >= 10) this.over = true;
-      var v = new Vdt();
-      this.rowBytes(v, this.rows.length - 1);
-      if (!this.over) this.rowBytes(v, this.rows.length);
-      this.status(v);
-      if (this.won) h.snd.top(true); else if (this.over) v.bell(); else h.snd.top(false);
-      h.out(v);
-    },
-    key: function (h, k) {
-      if (k.fn === 'ENVOI') {
-        if (this.over) { this.newGame(h); return true; }
-        if (this.cur.length < 4) { h.bell(); return true; }
-        this.check(h); return true;
-      }
-      if (this.over) return !!k.ch;
-      if (k.fn === 'CORRECTION') { if (!this.cur.length) h.bell(); else { this.cur.pop(); h.out(this.rowBytes(new Vdt(), this.rows.length)); } return true; }
-      if (k.fn === 'ANNULATION') { this.cur = []; h.out(this.rowBytes(new Vdt(), this.rows.length)); return true; }
-      if (k.ch) {
-        var c = norm(k.ch).toUpperCase();
-        if (/^[1-6]$/.test(c)) c = MASKS[+c - 1].l;
-        if (!maskBy(c) || this.cur.length >= 4) { h.bell(); return true; }
-        this.cur.push(c);
-        h.snd.top(false);
-        h.out(this.rowBytes(new Vdt(), this.rows.length));
-        return true;
-      }
-      return false;
-    }
-  };
-
-  /* ======================================================================
-     OILY WARS — bataille de tankers
-     ====================================================================== */
-  var BN = 8, FLEET = [{ n: 'Supertanker', s: 4 }, { n: 'Tanker', s: 3 }, { n: 'Barge', s: 3 }, { n: 'Skiff', s: 2 }];
-  var COLS8 = 'ABCDEFGH';
-  function grid() { var g = []; for (var r = 0; r < BN; r++) { g.push([]); for (var c = 0; c < BN; c++) g[r].push({ ship: -1, hit: false }); } return g; }
-  function canPlace(g, r, c, size, horiz) {
-    for (var i = 0; i < size; i++) {
-      var rr = horiz ? r : r + i, cc = horiz ? c + i : c;
-      if (rr < 0 || rr >= BN || cc < 0 || cc >= BN) return false;
-      for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) {
-        var nr = rr + dr, nc = cc + dc;
-        if (nr >= 0 && nr < BN && nc >= 0 && nc < BN && g[nr][nc].ship >= 0) return false;
-      }
-    }
-    return true;
-  }
-  function place(g, ships, r, c, size, horiz, name) {
-    var cells = [];
-    for (var i = 0; i < size; i++) { var rr = horiz ? r : r + i, cc = horiz ? c + i : c; g[rr][cc].ship = ships.length; cells.push([rr, cc]); }
-    ships.push({ n: name, size: size, cells: cells, hits: 0, sunk: false });
-  }
-  function randomFleet(g, ships) {
-    FLEET.forEach(function (f) {
-      for (var t = 0; t < 1000; t++) {
-        var horiz = Math.random() < 0.5, r = Math.floor(Math.random() * BN), c = Math.floor(Math.random() * BN);
-        if (canPlace(g, r, c, f.s, horiz)) { place(g, ships, r, c, f.s, horiz, f.n); return; }
-      }
-    });
-  }
-  function parseCell(s) {
-    var m = String(s).toUpperCase().replace(/\s+/g, '').match(/^([A-H])([1-8])([HV])?$/);
-    if (!m) return null;
-    return { c: COLS8.indexOf(m[1]), r: +m[2] - 1, o: m[3] || '' };
-  }
-
-  KM.OILY = {
-    help: function () {
-      return [
-        L('Placez vos quatre tankers, puis coulez', 'Plant your four tankers, then sink'),
-        L('ceux de l\'adversaire.', 'the adversary\'s.'),
-        '',
-        L('Placement : case de départ et sens,', 'Placing: start square and direction,'),
-        [[3, '  B3H'], [7, L(' horizontal, ', ' horizontal, ')], [3, 'C5V'], [7, ' vertical.']],
-        [[3, '  *'], [7, L(' place toute la flotte au hasard.', ' plants the whole fleet at random.')]],
-        L('Les navires ne se touchent pas.', 'Ships never touch each other.'),
-        '',
-        L('Combat : tapez une case (E5) + ', 'Battle: type a square (E5) + ') + K('ENVOI') + '.',
-        L('Touché : vous rejouez.', 'Hit: you fire again.')
-      ];
-    },
-    enter: function (h) { this.newGame(h); },
-    leave: function () { clearTimeout(this.aiT); },
-    newGame: function (h) {
-      this.me = grid(); this.ai = grid(); this.myShips = []; this.aiShips = [];
-      randomFleet(this.ai, this.aiShips);
-      this.phase = 'place'; this.turn = 'player'; this.over = false;
-      this.render(h);
-    },
-    cellBytes: function (v, mine, r, c) {
-      var g = mine ? this.me : this.ai, cell = g[r][c], ships = mine ? this.myShips : this.aiShips;
-      v.pos(8 + r, (mine ? 4 : 24) + c * 2);
-      var sunk = cell.ship >= 0 && ships[cell.ship] && ships[cell.ship].sunk;
-      if (cell.hit && cell.ship >= 0) {
-        if (sunk) v.g1().fg(1).und(1).raw(0x7F, 0x7F).und(0).g0();
-        else v.fg(7).flash(1).text('X').flash(0).text(' ');
-      } else if (cell.hit) v.fg(6).text('o ');
-      else if (cell.ship >= 0 && (mine || this.over)) v.g1().fg(mine ? 7 : 3).raw(0x7F, 0x7F).g0();
-      else v.fg(4).text('. ');
-      return v;
-    },
-    fleetBytes: function (v) {
-      var self = this;
-      v.pos(18, 1).can().pos(19, 1).can().pos(20, 1).can();
-      if (this.phase === 'place') {
-        var nx = FLEET[this.myShips.length];
-        v.pos(18, 2).fg(7).text(L('Placez votre flotte', 'Place your fleet'));
-        if (nx) v.pos(19, 2).fg(6).text(L('Navire : ', 'Now: ')).fg(3).text(nx.n + ' (' + nx.s + ')');
-        else { v.pos(19, 2).fg(3).text(L('VERROUILLER : ', 'LOCK FLEET: ')); UI.kbtn(v, 'ENVOI'); }
-        return v;
-      }
-      [[L('Vous.', 'You.'), this.myShips, 2], [L('Pas vous.', 'Not you.'), this.aiShips, 22]].forEach(function (s) {
-        v.pos(18, s[2]).fg(7).text(s[0]);
-        s[1].forEach(function (sh, i) {
-          v.pos(19 + (i >> 1), s[2] + (i % 2) * 9).fg(sh.sunk ? 1 : 6).text(cut(sh.n, 8));
-        });
-      });
-      return v;
-    },
-    render: function (h) {
-      var v = kh(new Vdt(), 'OILY WARS'), r, c;
-      v.pos(4, 2).fg(6).text(L('Coulez les tankers de l\'adversaire.', "Sink the adversary's tankers."));
-      v.pos(5, 2).fg(6).text(L('(Vous aussi, vous êtes vulnérable.)', "(U're vulnerable too.)"));
-      v.pos(6, 4).fg(7).text(L('Vous.', 'You.')).pos(6, 24).fg(7).text(L('Pas vous.', 'Not you.'));
-      for (c = 0; c < BN; c++) { v.pos(7, 4 + c * 2).fg(5).text(COLS8[c]); v.pos(7, 24 + c * 2).fg(5).text(COLS8[c]); }
-      for (r = 0; r < BN; r++) { v.pos(8 + r, 2).fg(5).text(String(r + 1)); v.pos(8 + r, 22).fg(5).text(String(r + 1)); }
-      for (r = 0; r < BN; r++) for (c = 0; c < BN; c++) { this.cellBytes(v, true, r, c); this.cellBytes(v, false, r, c); }
-      this.fleetBytes(v);
-      this.fieldRow(v);
-      UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      h.out(v);
-      if (!this.over) h.form([{ r: 23, c: this.phase === 'place' ? 20 : 9, len: this.phase === 'place' ? 3 : 2 }]);
-      else h.clearForm();
-    },
-    fieldRow: function (v) {
-      v.pos(23, 1).can();
-      if (this.over) { v.pos(23, 2).fg(7).text(L('Nouvelle partie ', 'New game ')); return UI.kbtn(v, 'ENVOI'); }
-      if (this.phase === 'place') { v.pos(23, 2).fg(7).text(L('Case + sens (*) :', 'Square+dir. (*) :')).pos(23, 24); return UI.kbtn(v, 'ENVOI'); }
-      v.pos(23, 2).fg(7).text(L('Tir :', 'Fire:')).pos(23, 13); return UI.kbtn(v, 'ENVOI');
-    },
-    lock: function (h) {
-      this.phase = 'battle';
-      var v = new Vdt(); this.fleetBytes(v); this.fieldRow(v);
-      v.pos(22, 1).can().pos(22, 2).fg(7).text(L('Flotte verrouillée. Feu !', 'Fleet locked. Fire!'));
-      h.clearForm(); h.out(v);
-      h.form([{ r: 23, c: 9, len: 2 }]);
-    },
-    placeCmd: function (h, q) {
-      var v = new Vdt(), self = this;
-      if (q === '*') {
-        this.me = grid(); this.myShips = [];
-        randomFleet(this.me, this.myShips);
-        for (var r = 0; r < BN; r++) for (var c = 0; c < BN; c++) this.cellBytes(v, true, r, c);
-        this.fleetBytes(v);
-        v.pos(22, 1).can().pos(22, 2).fg(6).text(L('Flotte prête : ', 'Fleet planted. ') + K('ENVOI') + L(' ou * pour changer.', ' to lock, * again.'));
-        h.out(v); h.refocus();
-        return;
-      }
-      var p = parseCell(q), f = FLEET[this.myShips.length];
-      if (!f) { h.bell(); return; }
-      if (!p || !p.o) { msg(h, L('Exemple : B3H ou C5V.', 'Example: B3H or C5V.'), true); h.bell(); return; }
-      if (!canPlace(this.me, p.r, p.c, f.s, p.o === 'H')) { msg(h, L('Hors grille ou trop près d\'un navire.', 'Off the grid or too close to a ship.'), true); h.bell(); return; }
-      place(this.me, this.myShips, p.r, p.c, f.s, p.o === 'H', f.n);
-      this.myShips[this.myShips.length - 1].cells.forEach(function (cl) { self.cellBytes(v, true, cl[0], cl[1]); });
-      this.fleetBytes(v);
-      v.pos(22, 1).can();
-      h.out(v); h.refocus();
-    },
-    allSunk: function (ships) { return ships.every(function (s) { return s.sunk; }); },
-    shoot: function (g, ships, r, c) {
-      var cell = g[r][c]; cell.hit = true;
-      if (cell.ship < 0) return 'miss';
-      var s = ships[cell.ship]; s.hits++;
-      if (s.hits >= s.size) { s.sunk = true; return 'sunk'; }
-      return 'hit';
-    },
-    fire: function (h, q) {
-      var p = parseCell(q), self = this;
-      if (!p || p.o) { msg(h, L('Une case, par exemple E5.', 'One square, for example E5.'), true); h.bell(); return; }
-      if (this.ai[p.r][p.c].hit) { msg(h, L('Case déjà visée.', 'Already fired there.'), true); h.bell(); return; }
-      var res = this.shoot(this.ai, this.aiShips, p.r, p.c), v = new Vdt(), sh = this.aiShips[this.ai[p.r][p.c].ship];
-      if (res === 'sunk') sh.cells.forEach(function (cl) { self.cellBytes(v, false, cl[0], cl[1]); });
-      else this.cellBytes(v, false, p.r, p.c);
-      v.pos(22, 1).can().pos(22, 2).fg(7).text(COLS8[p.c] + (p.r + 1) + ' : ' + (res === 'miss' ? L('à l\'eau.', 'splash.') : res === 'hit' ? L('touché !', 'hit!') : sh.n + L(' coulé !', ' sunk!')));
-      if (res !== 'miss') h.snd.beep(); else h.snd.top(false);
-      this.fleetBytes(v);
-      if (this.allSunk(this.aiShips)) { this.end(h, v, true); return; }
-      h.out(v); h.refocus();
-      if (res === 'miss') { this.turn = 'ai'; this.aiT = setTimeout(function () { self.aiFire(h); }, 800); }
-    },
-    aiPick: function () {
-      var g = this.me, ships = this.myShips, targets = [];
-      ships.forEach(function (s) {
-        if (s.sunk) return;
-        var hits = s.cells.filter(function (cl) { return g[cl[0]][cl[1]].hit; });
-        if (!hits.length) return;
-        var cand;
-        if (hits.length >= 2) {
-          var horiz = hits[0][0] === hits[1][0];
-          hits.sort(function (a, b) { return horiz ? a[1] - b[1] : a[0] - b[0]; });
-          var hd = hits[0], tl = hits[hits.length - 1];
-          cand = horiz ? [[hd[0], hd[1] - 1], [tl[0], tl[1] + 1]] : [[hd[0] - 1, hd[1]], [tl[0] + 1, tl[1]]];
-        } else cand = [[hits[0][0] - 1, hits[0][1]], [hits[0][0] + 1, hits[0][1]], [hits[0][0], hits[0][1] - 1], [hits[0][0], hits[0][1] + 1]];
-        cand.forEach(function (n) { if (n[0] >= 0 && n[0] < BN && n[1] >= 0 && n[1] < BN && !g[n[0]][n[1]].hit) targets.push(n); });
-      });
-      if (targets.length) return targets[Math.floor(Math.random() * targets.length)];
-      // recherche : densité de placements possibles des navires restants
-      var dens = [], best = -1, picks = [], r, c;
-      for (r = 0; r < BN; r++) { dens.push([]); for (c = 0; c < BN; c++) dens[r].push(0); }
-      ships.forEach(function (s) {
-        if (s.sunk) return;
-        [true, false].forEach(function (horiz) {
-          for (var rr = 0; rr < BN; rr++) for (var cc = 0; cc < BN; cc++) {
-            var ok = true;
-            for (var i = 0; i < s.size && ok; i++) {
-              var r2 = horiz ? rr : rr + i, c2 = horiz ? cc + i : cc;
-              if (r2 >= BN || c2 >= BN || g[r2][c2].hit) ok = false;
-            }
-            if (ok) for (var j = 0; j < s.size; j++) dens[horiz ? rr : rr + j][horiz ? cc + j : cc]++;
-          }
-        });
-      });
-      for (r = 0; r < BN; r++) for (c = 0; c < BN; c++) {
-        if (g[r][c].hit) continue;
-        if (dens[r][c] > best) { best = dens[r][c]; picks = [[r, c]]; } else if (dens[r][c] === best) picks.push([r, c]);
-      }
-      return picks[Math.floor(Math.random() * picks.length)];
-    },
-    aiFire: function (h) {
-      var self = this;
-      if (h.svc !== KOR || KOR.mode !== KM.OILY || this.over) return;
-      var t = this.aiPick(); if (!t) return;
-      var res = this.shoot(this.me, this.myShips, t[0], t[1]), v = new Vdt();
-      if (res === 'sunk') this.myShips[this.me[t[0]][t[1]].ship].cells.forEach(function (cl) { self.cellBytes(v, true, cl[0], cl[1]); });
-      else this.cellBytes(v, true, t[0], t[1]);
-      v.pos(22, 1).can().pos(22, 2).fg(6).text(L('Pas vous : ', 'Not you: ') + COLS8[t[1]] + (t[0] + 1) + (res === 'miss' ? L(', à l\'eau.', ', splash.') : res === 'hit' ? L(', touché.', ', hit.') : L(', coulé.', ', sunk.')));
-      this.fleetBytes(v);
-      if (res !== 'miss') v.bell();
-      if (this.allSunk(this.myShips)) { this.end(h, v, false); return; }
-      h.out(v); h.refocus();
-      if (res === 'miss') this.turn = 'player';
-      else this.aiT = setTimeout(function () { self.aiFire(h); }, 800);
-    },
-    end: function (h, v, won) {
-      var self = this;
-      this.over = true;
-      h.clearForm();
-      for (var r = 0; r < BN; r++) for (var c = 0; c < BN; c++) if (this.ai[r][c].ship >= 0 && !this.ai[r][c].hit) self.cellBytes(v, false, r, c);
-      v.pos(22, 1).can().pos(22, 2).fg(3).flash(1).text(won ? L('VICTOIRE.', 'VICTORY.') : L('DÉFAITE.', 'DEFEAT.')).flash(0).fg(7)
-        .text(won ? L(' Flotte ennemie coulée.', ' Enemy fleet sunk.') : L(' Votre flotte a disparu.', ' Your fleet is gone.'));
-      this.fieldRow(v);
-      h.out(v);
-    },
-    key: function (h, k, vals) {
-      if (k.fn === 'ENVOI') {
-        if (this.over) { this.newGame(h); return true; }
-        var q = (vals[0] || '').trim();
-        h.clearField(0);
-        if (this.phase === 'place') {
-          if (!q) { if (this.myShips.length >= FLEET.length) this.lock(h); else h.bell(); return true; }
-          this.placeCmd(h, q); return true;
-        }
-        if (this.turn !== 'player') { h.bell(); return true; }
-        if (!q) { h.bell(); return true; }
-        this.fire(h, q);
-        return true;
-      }
-      if (k.fn === 'ANNULATION' && this.phase === 'place') {
-        this.me = grid(); this.myShips = [];
-        var v = new Vdt(); for (var r = 0; r < BN; r++) for (var c = 0; c < BN; c++) this.cellBytes(v, true, r, c);
-        this.fleetBytes(v); h.out(v); h.refocus();
-        return true;
-      }
-      return false;
-    }
-  };
-
-  /* ======================================================================
-     THE DIARY — THE OIL, ITS LAWS
-     ====================================================================== */
-  function textPage(h, sub, blocks, footer) {
-    var v = kh(new Vdt(), sub), r = 5;
-    blocks.forEach(function (b) {
-      if (b.size) { v.pos(r + 1, 2).fg(b.c).size(b.size).text(b.t); r += 3; return; }
-      wrap(b.t, 38).forEach(function (l) { if (r <= 21) v.pos(r++, 2).fg(b.c).text(l); });
-      r++;
-    });
-    UI.footer(v, footer || [['KORHOGO!', 'SOMMAIRE']]);
-    h.clearForm();
-    h.out(v);
-  }
-  /* ======================================================================
-     ÉCRIRE À MAUK TENIEB — le message part par e-mail vers Korhogo
-     (la messagerie du visiteur, ou Gmail dans le navigateur)
-     ====================================================================== */
-  var CONTACT = 'mauktenieb@gmail.com';
-  KM.WRITE = {
-    help: function () {
-      return [
-        L('Votre message part par e-mail vers', 'Your message goes by e-mail to'),
-        'Mauk Tenieb (' + CONTACT + ').',
-        '',
-        L('Remplissez les champs, passez de l\'un', 'Fill in the fields, move from one to'),
-        L('à l\'autre avec ', 'the next with ') + K('SUITE') + L(' et ', ' and ') + K('RETOUR') + '.',
-        L('Le texte passe seul à la ligne.', 'The text wraps by itself.'),
-        '',
-        L('Envoi par :', 'Send with:'),
-        [[3, '1 '], [7, L('votre messagerie (Mail, Outlook...)', 'your mail app (Mail, Outlook...)')]],
-        [[3, '2 '], [7, L('Gmail dans le navigateur', 'Gmail in the browser')]],
-        '',
-        L('Le message s\'ouvre prêt à partir :', 'The message opens ready to go:'),
-        L('il ne reste qu\'à appuyer sur Envoyer.', 'just press Send.')
-      ];
-    },
-    enter: function (h) { this.render(h); },
-    render: function (h) {
-      var v = kh(new Vdt(), L('ÉCRIRE', 'WRITE'));
-      v.pos(5, 2).fg(3).size('h').text(L('Écrire à Mauk Tenieb', 'Write to Mauk Tenieb'));
-      v.pos(7, 2).fg(6).text(L('Votre nom    :', 'Your name    :'));
-      v.pos(8, 2).fg(6).text(L('Votre e-mail :', 'Your e-mail  :'));
-      v.pos(9, 17).fg(5).text(L('pour la réponse', 'for the reply'));
-      v.pos(10, 2).fg(6).text(L('Message :', 'Message:'));
-      v.pos(19, 2).fg(6).text(L('Envoi par (1 messagerie, 2 Gmail) :', 'Send with (1 mail app, 2 Gmail)  :'));
-      UI.keyHints(v, 23, [[L('Suivant', 'Next'), 'SUITE'], [L('Envoyer', 'Send'), 'ENVOI']]);
-      UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      h.out(v);
-      var f = [{ r: 7, c: 17, len: 23, value: h.load('kor.contact.name', '') }, { r: 8, c: 17, len: 23, value: h.load('kor.contact.mail', '') }];
-      for (var i = 0; i < 7; i++) f.push({ r: 11 + i, c: 2, len: 38, auto: true });
-      f.push({ r: 19, c: 38, len: 1, value: String(h.load('kor.contact.via', 1)) });
-      h.form(f, { start: f[0].value ? 2 : 0 });
-    },
-    key: function (h, k, vals) {
-      if (k.fn !== 'ENVOI') return false;
-      var name = (vals[0] || '').trim(), mail = (vals[1] || '').trim();
-      var body = vals.slice(2, 9).map(function (l) { return l.replace(/\s+$/, ''); });
-      while (body.length && !body[body.length - 1]) body.pop();
-      var via = vals[9] === '2' ? 2 : 1;
-      if (!body.length) { msg(h, L('Le message est vide.', 'The message is empty.'), true); h.bell(); h.focusField(2); return true; }
-      if (mail && !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(mail)) { msg(h, L('Adresse e-mail invalide.', 'Invalid e-mail address.'), true); h.bell(); h.focusField(1); return true; }
-      h.save('kor.contact.name', name); h.save('kor.contact.mail', mail); h.save('kor.contact.via', via);
-      var subject = '3615 KORHOGO' + (name ? ' - ' + name : '');
-      // les lignes coupées par le Minitel sont recollées ; une ligne vide sépare les paragraphes
-      var paras = [], cur = [];
-      body.forEach(function (l) { if (l.trim()) cur.push(l.trim()); else if (cur.length) { paras.push(cur.join(' ')); cur = []; } });
-      if (cur.length) paras.push(cur.join(' '));
-      var text = paras.join('\n\n') + '\n\n-- \n' + (name || L('Un visiteur', 'A visitor')) + (mail ? ' <' + mail + '>' : '') +
-        '\n' + L('Envoyé depuis le 3615 KORHOGO', 'Sent from 3615 KORHOGO');
-      var q = 'subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
-      var opened = true;
-      if (via === 2) {
-        var url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(CONTACT) + '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
-        try { opened = !!global.open(url, '_blank', 'noopener'); } catch (e) { opened = false; }
-      } else {
-        try { global.location.href = 'mailto:' + CONTACT + '?' + q; } catch (e) { opened = false; }
-      }
-      var v = new Vdt().pos(21, 1).can().pos(21, 2).fg(5).text(L('Sinon : ', 'Otherwise: ')).fg(3).text(CONTACT);
-      h.out(v);
-      msg(h, opened ? L('Message prêt : appuyez sur Envoyer.', 'Message ready: press Send.')
-        : L('Échec : écrivez à l\'adresse ci-dessus.', 'Could not open: use the address above.'), !opened);
-      return true;
-    }
-  };
-
-  KM.DIARY = {
-    help: function () { return [L('Écrivez à mauktenieb@gmail.com,', 'Write to mauktenieb@gmail.com,'), L('ou appuyez sur ', 'or press ') + K('ENVOI') + L(' pour écrire', ' to write from') , L('depuis le Minitel.', 'the Minitel.')]; },
-    enter: function (h) { this.render(h); },
-    render: function (h) {
-      textPage(h, 'THE DIARY', [
-        { t: 'The Diary', size: 'd', c: 3 },
-        { t: L('Oh, vous pouvez acquérir le Journal post-Burroughs, post-Borges : 400+ pages, 18 EUR.', 'Oh, you can acquire the €18, 400+ pages post-Burroughs, post-Borges Diary.'), c: 7 },
-        { t: L('Écrivez-nous :', 'Write to us:'), c: 6 },
-        { t: 'mauktenieb@gmail.com', c: 3 }
-      ], [['KORHOGO!', 'SOMMAIRE'], [L('Écrire', 'Write to us'), 'ENVOI']]);
-    },
-    key: function (h, k) {
-      if (k.fn === 'ENVOI') { KOR.open('WRITE'); return true; }
-      return false;
-    }
-  };
-  var LAWS = [
-    [3, '(c) KORHOGO(TM)'],
-    [7, 'All content, characters, gameplay, lore and images are the exclusive property of Mauk Tenieb & Korhogo. No mask, no fauna, no chess move, no line of code may be reproduced, trained upon, or reused without express written permission.'],
-    [7, 'This includes artificial intelligence systems of any kind.'],
-    [3, 'The Oil keeps its own laws.'],
-    [6, 'Copyright (c) Mauk Tenieb & Korhogo. All rights reserved.'],
-    [6, 'Korhogo(TM), Korhogo Fauna(TM), Fauna Masks(TM), Fauna Chess(TM), Faunarratics(TM), Katabatik(TM) and any related material - including characters, symbols, rules and contents, in any form or medium - are the exclusive property of Korhogo(TM). Info: mauktenieb@gmail.com'],
-    [7, 'This work - including source code, architecture, algorithms, user interface, artistic content, role-playing scenarios, narrative texts, lore, game mechanics, aesthetic assets and all associated materials - is the exclusive intellectual property of Mauk Tenieb.'],
-    [7, 'Protected by international copyright laws, the Berne Convention, the Universal Copyright Convention, French Intellectual Property Code, U.S. Copyright Law (Title 17 U.S.C.), and EU directives.'],
-    [7, 'No part of this work may be used, copied, reproduced, modified, adapted, translated, distributed, transmitted, displayed, published, broadcast, licensed, sublicensed, sold, transferred, or exploited in any form or by any means without the prior express written permission of the copyright owner.'],
-    [7, 'This prohibition explicitly includes any use of the work or its outputs for training, fine-tuning, or improving any artificial intelligence, machine learning, or large language models; and any scanning, parsing, extraction, or analysis by humans or automated systems for any purpose other than legitimate execution by the rightful owner.'],
-    [7, 'Any unauthorized use constitutes infringement and may result in civil and/or criminal prosecution. The copyright owner reserves all legal remedies including injunctions, damages, attorney fees, and statutory damages.'],
-    [7, 'This notice is integral to the work. Removing, altering, or bypassing it does not waive any rights of the copyright owner.'],
-    [6, 'Licensing & permissions: mauktenieb@gmail.com']
-  ];
-  KM.LAWS = {
-    help: function () { return [[[3, K('SUITE') + ' / ' + K('RETOUR')], [7, L(' pour tourner les pages.', ' to turn the pages.')]]]; },
-    enter: function (h) {
-      var lines = [];
-      LAWS.forEach(function (p) { wrap(p[1], 38).forEach(function (l) { lines.push([[p[0], l]]); }); lines.push(''); });
-      lines.pop();
-      if (I18N.lang !== 'en') {
-        lines.unshift('');
-        lines.unshift([[6, 'Seul le texte anglais fait foi.']]);
-      }
-      this.reader = new ReaderK(h, 'THE OIL, ITS LAWS', lines);
-      this.render(h);
-    },
-    render: function (h) { h.clearForm(); this.reader.render(true); },
-    key: function (h, k) {
-      if (k.fn === 'SUITE' || k.fn === 'ENVOI') { this.reader.step(1); return true; }
-      if (k.fn === 'RETOUR') { this.reader.step(-1); return true; }
-      return false;
-    }
-  };
-  function ReaderK(h, sub, lines) { this.h = h; this.sub = sub; this.lines = lines; this.p = 0; this.per = 16; }
-  ReaderK.prototype.pages = function () { return Math.max(1, Math.ceil(this.lines.length / this.per)); };
-  ReaderK.prototype.render = function (full) {
-    var v = full ? kh(new Vdt(), this.sub) : new Vdt(), n = this.pages();
-    for (var i = 0; i < this.per; i++) {
-      var line = this.lines[this.p * this.per + i];
-      if (!full) v.pos(5 + i, 1).can();
-      if (line) UI.drawLine(v, 5 + i, 2, line);
-    }
-    v.pos(22, 1).can().pos(22, 30).fg(5).text('Page ' + (this.p + 1) + '/' + n);
-    if (full) {
-      UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
-      UI.footer(v, [['KORHOGO!', 'SOMMAIRE']]);
-    }
-    this.h.out(v);
-  };
-  ReaderK.prototype.step = function (d) {
-    var np = this.p + d;
-    if (np < 0 || np >= this.pages()) { this.h.bell(); return; }
-    this.p = np; this.render(false);
-  };
-
-  /* ======================================================================
      Service 3615 KORHOGO
      ====================================================================== */
   var KOR = {
@@ -13961,10 +12350,9 @@ window.KORHOGO_FAUNA = [
     h.out(KM.HOME.countBytes(new Vdt()));
     h.refocus();
   };
-  KOR.rules = CH;
   S.KORHOGO = KOR;
-})(window);
 
+})(window);
 </script>
 <script>
 /* ---- js/app.js ---- */
@@ -13993,16 +12381,17 @@ window.KORHOGO_FAUNA = [
   var LOCAL = {
     help: function () {
       return [
-        L('Le terminal est en mode local : la', 'The terminal is in local mode: the'),
+        L('Le K Terminal est en mode local : la', 'The K Terminal is in local mode: the'),
         L('lettre F en haut à droite indique que', 'letter F at the top right means the'),
         L("la ligne n'est pas connectée.", 'line is not connected.'),
         '',
-        L('1. Tapez le numéro : 3615', '1. Type the number: 3615'),
+        L('1. Tapez : 3615', '1. Type: 3615'),
         L('   (3615 METEO ouvre un service', '   (3615 WEATHER opens a service'),
         L('   du kiosque directement)', '   of the kiosk directly)'),
-        L('2. Appuyez sur ', '2. Press ') + K('CONNEXION/FIN'),
+        L('2. Tapez : KORHOGO, si vous êtes digne.', '2. Type: KORHOGO, if you are worthy.'),
+        L('3. Appuyez sur ', '3. Press ') + K('CONNEXION/FIN'),
         '',
-        L('Le terminal compose le numéro puis', 'The terminal dials the number, then'),
+        L('Le K Terminal compose le numéro puis', 'The K Terminal dials the number, then'),
         L('attend la porteuse du serveur. La', 'waits for the server carrier. The'),
         L('lettre C signale la connexion.', 'letter C shows the connection.'),
         '',
@@ -14013,13 +12402,15 @@ window.KORHOGO_FAUNA = [
     render: function () {
       var v = new Vdt();
       v.cls().cur(0);
-      v.pos(3, 2).fg(7).size('d').text(L('Terminal prêt', 'Terminal ready'));
+      v.pos(3, 2).fg(7).size('d').text(L('K Terminal prêt', 'K Terminal ready'));
       v.pos(5, 2).fg(6).text(L('Mode local, ligne ', 'Local mode, speed: ') + H.baudLabel());
       UI.rule(v, 7, 4);
-      v.pos(9, 2).fg(7).text(L('Pour entrer dans Korhogo :', 'To enter Korhogo:'));
-      v.pos(11, 3).fg(3).text('1').fg(7).text(L('  Tapez le numéro ', '  Type the number ')).fg(3).text('3615');
+      v.pos(9, 2).fg(7).text(L('Pour entrer dans le K Terminal :', 'To enter the K Terminal:'));
+      v.pos(11, 3).fg(3).text('1').fg(7).text(L('  Tapez ', '  Type ')).fg(3).text('3615');
       v.pos(12, 6).fg(6).text(L('ou 3615 MSG, 3615 METEO...', 'or 3615 MSG, 3615 WEATHER...'));
-      v.pos(14, 3).fg(3).text('2').fg(7).text(L('  Appuyez sur ', '  Press ')); UI.kbtn(v, 'CONNEXION/FIN');
+      v.pos(13, 3).fg(3).text('2').fg(7).text(L('  Tapez ', '  Type ')).fg(3).text('KORHOGO')
+        .fg(6).text(L(' si vous êtes digne.', ' if you are worthy.'));
+      v.pos(14, 3).fg(3).text('3').fg(7).text(L('  Appuyez sur ', '  Press ')); UI.kbtn(v, 'CONNEXION/FIN');
       VDX.wrap(L('Le terminal compose le numéro, attend la porteuse du serveur puis affiche C en haut à droite.',
         'The terminal dials, waits for the server carrier, then shows C at the top right.'), 36)
         .forEach(function (l, i) { v.pos(16 + i, 3).fg(6).text(l); });
@@ -14265,35 +12656,8 @@ window.KORHOGO_FAUNA = [
       if (k.fn || k.dir) this.bell();
     },
 
-    pickFile: function (cb) {
-      var input = $('vdtfile');
-      input.value = '';
-      input.onchange = function () {
-        var f = input.files && input.files[0];
-        if (!f) return;
-        readFile(f, cb);
-      };
-      input.click();
-    },
-    playFile: function (bytes, name) {
-      if (this.state === 'online') {
-        if (this.svc !== S.VDT) this.go('VDT');
-        S.VDT.play(bytes, name);
-      } else if (this.state === 'local') {
-        this.fm = null;
-        this.helpOpen = true;
-        term.flush();
-        term.send(Uint8Array.of(0x14, 0x0C)).send(bytes);
-      }
-    }
   };
   global.VDXHost = H;
-
-  function readFile(f, cb) {
-    var rd = new FileReader();
-    rd.onload = function () { cb(new Uint8Array(rd.result), f.name); };
-    rd.readAsArrayBuffer(f);
-  }
 
   /* ---------- Voyants et réglages ---------------------------------------- */
   var ledLine = $('led-line'), ledData = $('led-data');
@@ -14444,14 +12808,7 @@ window.KORHOGO_FAUNA = [
     b.addEventListener('click', function () { snd.ensure(); snd.click(); H.key({ ch: b.dataset.ch }); });
   });
 
-  /* ---------- Glisser-déposer d'un fichier .vdt -------------------------- */
-  crt.addEventListener('dragover', function (e) { e.preventDefault(); crt.classList.add('drop'); });
-  crt.addEventListener('dragleave', function () { crt.classList.remove('drop'); });
-  crt.addEventListener('drop', function (e) {
-    e.preventDefault(); crt.classList.remove('drop');
-    var f = e.dataTransfer.files && e.dataTransfer.files[0];
-    if (f && H.powered) readFile(f, function (b, n) { H.playFile(b, n); });
-  });
+  /* ---------- (retrait du lecteur .vdt) ---------------------------------- */
 
   /* ---------- Police : on redessine une fois VT323 chargée ---------------- */
   if (document.fonts && document.fonts.load) {
@@ -14464,7 +12821,6 @@ window.KORHOGO_FAUNA = [
   term.status('', 'F');
   H.go('LOCAL');
 })();
-
 </script>
 </body>
 </html>

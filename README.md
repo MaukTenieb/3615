@@ -1,10 +1,10 @@
-# 3615 KORHOGO
+# 3615 KORHOGO — K Terminal
 
 Le Minitel de [Korhogo Fauna](https://mauktenieb.github.io/korhogo), l'univers de Mauk Tenieb.
 
-**En ligne : https://mauktenieb.github.io/3615korhogo/**
+**En ligne : https://mauktenieb.github.io/3615/**
 
-Composez le 3615 : la Fauna (THE KAVE), écrire à Mauk Tenieb, la messagerie (tchat en direct, un salon par masque, boîte aux lettres), ERRATIC, FAUNA CHESS, FANATIC, OILY WARS, THE DIARY, et d'autres services (météo, encyclopédie, horloge parlante, jeux). En français ou en anglais.
+Le **K Terminal** ouvre le 3615 : entrez dans Korhogo (**Enter Korhogo**, les fiches de la Fauna), ouvrez le **Kalabass** — les **Direct Kaves** (on y parle en direct, un Kave par personnage), **Votre Kalabass** (messagerie personnelle chiffrée, reçus et envoyés), **Unkle Maukie** — et les autres services : météo, encyclopédie. En français ou en anglais.
 
 Tout le terminal tient dans `index.html`. `apercu.png` est l'image affichée quand le lien est partagé, `icone.png` l'icône de l'onglet.
 
@@ -14,7 +14,7 @@ Déposer le nouveau `index.html` dans le dépôt (Add file › Upload files, pui
 
 ## Droits
 
-Copyright © Mauk Tenieb & Korhogo, tous droits réservés, pour tout ce qui relève de Korhogo : personnages, textes, règles de jeu, portraits, noms (Korhogo™, Korhogo Fauna™, Fauna Masks™, Fauna Chess™, Faunarratics™, Katabatik™). Aucune reproduction ni réutilisation sans autorisation écrite, y compris pour l'entraînement ou l'usage par des systèmes d'intelligence artificielle. Contact : mauktenieb@gmail.com
+Copyright © Mauk Tenieb & Korhogo, tous droits réservés, pour tout ce qui relève de Korhogo : personnages, textes, règles de jeu, portraits, noms (Korhogo™, Korhogo Fauna™, Fauna Masks™, Katabatik™). Aucune reproduction ni réutilisation sans autorisation écrite, y compris pour l'entraînement ou l'usage par des systèmes d'intelligence artificielle. Contact : mauktenieb@gmail.com
 
 Le moteur du terminal (décodeur Vidéotex, sons, services généraux) est sous licence MIT : voir `LICENSE`. La messagerie utilise [nostr-tools](https://github.com/nbd-wtf/nostr-tools) (domaine public), la météo [Open-Meteo](https://open-meteo.com) (CC BY 4.0), les textes encyclopédiques [Wikipédia](https://fr.wikipedia.org) (CC BY-SA 4.0), la police d'écran [VT323](https://fonts.google.com/specimen/VT323) (SIL OFL).
 
