@@ -1476,7 +1476,6 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
   var LIST = [
     ['METEO', 'METEO', 'WEATHER', 'Météo en direct', 'Live weather'],
     ['ENCYCLO', 'ENCYCLO', 'ENCYCLO', 'Encyclopédie Wikipédia', 'Wikipedia encyclopedia'],
-    ['MSG', 'MSG', 'MSG', 'Kaves, Kalabass', 'Kaves, Kalabass'],
     ['KORHOGO', 'KORHOGO', 'KORHOGO', 'La Fauna, les fiches', 'The Fauna, the profiles']
   ];
   var ALIAS = {
@@ -1484,7 +1483,7 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
     ENCYCLOPEDIE: 'ENCYCLO', ENCYCLOPEDIA: 'ENCYCLO', MESSAGERIE: 'MSG', MESSAGE: 'MSG', MESSAGES: 'MSG',
     BAL: 'MSG', TCHAT: 'MSG', CHAT: 'MSG', MAIL: 'MSG', EMAIL: 'MSG', MAILBOX: 'MSG', ULLA: 'MSG',
     KIOSQUE: 'KIOSQUE', KIOSK: 'KIOSQUE', TELETEL: 'KIOSQUE', GUIDE: 'KIOSQUE',
-    KREW: 'MSG', KREWS: 'MSG',
+    KREW: 'MSG', KREWS: 'MSG', MSG: 'MSG', KALABASS: 'MSG',
     KAVE: 'MSG', KAVES: 'MSG', FAUNA: 'KORHOGO', MAUKTENIEB: 'KORHOGO'
   };
   S.resolve = function (q) {
@@ -9895,6 +9894,33 @@ var NostrTools = (() => {
   var LOG_TOP = 3, LOG_BOT = 20;
   function header(v, sub) { return UI.kheader(v, sub); }
 
+  /* Koins partagés avec l'Insert Koin (même origine, même localStorage) :
+     +1 par connexion au Kalabass, au plus une fois par heure */
+  var KOIN = {
+    HOUR: 3600000,
+    get: function () {
+      try {
+        var s = localStorage.getItem('ik.koins');
+        if (s == null) return 3;
+        var n = parseInt(s, 10);
+        return isNaN(n) || n < 0 ? 0 : n;
+      } catch (e) { return null; }
+    },
+    credit: function () {
+      try {
+        var now = Date.now(), last = parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0;
+        if (last && last <= now && now - last < this.HOUR) return false;
+        var n = this.get();
+        if (n === null) return false;
+        n += 1;
+        localStorage.setItem('ik.koins', String(n));
+        if (n >= 1) localStorage.setItem('ik.freeAt', '0');
+        localStorage.setItem('ik.kalabassAt', String(now));
+        return true;
+      } catch (e) { return false; }
+    }
+  };
+
   var MAUK = 'mauktenieb@gmail.com';
   var MAUK_NICK = 'UNKLE MAUKIE';
 
@@ -9950,6 +9976,7 @@ var NostrTools = (() => {
     },
     enter: function (h) {
       this.h = h;
+      this.koinPlus = KOIN.credit();
       if (!NET.ok) { this.view = 'nonet'; this.render(); return; }
       NET.identity(); NET.start();
       this.view = NET.nick() ? 'menu' : 'profile';
@@ -9966,6 +9993,7 @@ var NostrTools = (() => {
       var h = this.h, v = new Vdt(), un = NET.unread(), mk = maskByCode(NET.mask());
       this.stopChat();
       header(v, 'KALABASS');
+      this.koinLine(v);
       v.pos(6, 2).fg(6).text(L('Votre code : ', 'Your code: ')).fg(3).text(NET.nick() + '#' + NET.code().slice(0, 4));
       if (mk) v.pos(7, 2).fg(6).text(L('Votre masque : ', 'Your mask: ')).fg(maskColor(mk.code)).text(cut(mk.name, 20));
       var items = [
@@ -9988,6 +10016,14 @@ var NostrTools = (() => {
       UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
       h.form([{ r: 22, c: 17, len: 1 }]);
+    },
+    // Koins de l'Insert Koin (même origine) : KOINS, pièce, solde, +1 si crédité
+    koinLine: function (v) {
+      var n = KOIN.get();
+      if (n === null) return v;
+      v.pos(4, 2).fg(6).text('KOINS  ').g1().fg(3).raw(0x7F).g0().fg(3).text(' ' + n);
+      if (this.koinPlus) v.fg(2).text('  +1');
+      return v;
     },
     netLine: function (v) {
       var up = NET.relaysUp();
@@ -10050,6 +10086,7 @@ var NostrTools = (() => {
     r_profile: function () {
       var h = this.h, v = new Vdt(), mk = maskByCode(NET.mask()), f = fauna();
       header(v, L('VOTRE PROFIL', 'YOUR PROFILE'));
+      this.koinLine(v);
       v.pos(5, 3).fg(7).text(L('Pseudo (12 car.) :', 'Nickname (12 ch.):'));
       v.pos(7, 3).fg(7).text(L('Masque (0-18)    :', 'Mask (0-18)      :'));
       v.pos(7, 26).fg(mk ? maskColor(mk.code) : 5).text(mk ? cut(mk.name, 14) : L('aucun', 'none'));
@@ -10408,6 +10445,7 @@ var NostrTools = (() => {
     r_nonet: function () {
       var v = new Vdt();
       header(v, 'KALABASS');
+      this.koinLine(v);
       v.pos(8, 3).fg(7).text(L('Kalabass indisponible :', 'Kalabass unavailable:'));
       v.pos(9, 3).fg(7).text(L('module réseau non chargé.', 'network module not loaded.'));
       UI.footer(v, [['KORHOGO!', 'SOMMAIRE']]);
