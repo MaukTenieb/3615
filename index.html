@@ -12,7 +12,9 @@
 <meta property="og:description" content="Le Minitel de Korhogo Fauna. Composez le 3615.">
 <meta property="og:image" content="https://mauktenieb.github.io/3615/apercu.png">
 <meta property="og:url" content="https://mauktenieb.github.io/3615/">
-<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://mauktenieb.github.io/3615/">
+<link rel="alternate" type="text/markdown" href="llms.txt" title="Summary for language models">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "K Terminal — 3615", "url": "https://mauktenieb.github.io/3615/", "image": "https://mauktenieb.github.io/3615/apercu.png", "description": "K Terminal — le Minitel de Korhogo Fauna. Composez le 3615 : Enter Korhogo, le Kalabass, la météo et l'encyclopédie. Français / English.", "applicationCategory": "GameApplication", "operatingSystem": "Any", "inLanguage": ["fr", "en"], "isAccessibleForFree": true, "author": {"@type": "Person", "name": "Mauk Tenieb", "url": "https://github.com/MaukTenieb"}, "copyrightHolder": {"@type": "Person", "name": "Mauk Tenieb"}, "isPartOf": {"@type": "CreativeWorkSeries", "name": "Korhogo", "url": "https://mauktenieb.github.io/korhogo"}, "isRelatedTo": {"@type": "VideoGame", "name": "Insert Koin", "url": "https://mauktenieb.github.io/insertkoin/"}}</script>
 <link rel="icon" type="image/png" href="icone.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -375,12 +377,9 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
   color: var(--ink);
 }
 .manual p, .manual ol, .manual-p { margin: 0; color: var(--ink-dim); font-size: 14px; }
-/* traduction affichée sous le texte principal, en plus discret */
-.manual .alt { display: block; margin-top: 2px; color: var(--ink-dim); opacity: .62; font-size: 13px; font-style: italic; }
-.manual h2 .alt { display: inline; margin: 0 0 0 .6em; font: 600 12px/1 var(--display); letter-spacing: .14em; font-style: normal; }
-.manual dd .alt { display: inline; margin-left: .5em; font-size: 13px; }
-.manual li .alt, .manual .manual-p .alt { font-size: 13px; }
-.manual .alt b { color: inherit; font-weight: 500; }
+/* une seule langue affichée : celle de <html lang> ; l'autre reste dans la page, balisée lang */
+html[lang="fr"] [data-i18n-langs] [lang="en"], html[lang="en"] [data-i18n-langs] [lang="fr"] { display: none; }
+.manual-p + .manual-p { margin-top: 6px; }
 .manual ol { padding-left: 18px; display: grid; gap: 4px; }
 .manual b { color: var(--ink); font-weight: 500; }
 .map {
@@ -420,13 +419,16 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
 }
 .topline-kor { text-transform: none; letter-spacing: .08em; font-size: 16px; color: var(--ink-dim); text-decoration: none; border-bottom: 1px solid transparent; }
 .topline-kor:hover, .topline-kor:focus-visible { color: var(--ink); border-bottom-color: currentColor; outline: none; }
+/* inside Insert Koin the page frame already names the 3615: no second header */
+html.framed .topline { display: none; }
 </style>
 </head>
 <body>
+<script>try{if(window.top!==window)document.documentElement.classList.add('framed');}catch(e){document.documentElement.classList.add('framed');}</script>
 <main class="desk">
   <header class="topline">
     <span class="topline-name">K Terminal</span>
-    <a class="topline-sub topline-kor" href="https://mauktenieb.github.io/katabase" target="_blank" rel="noopener">katabase</a>
+    <a class="topline-sub topline-kor" href="https://mauktenieb.github.io/insertkoin/" rel="noopener">insert koin</a>
   </header>
 
   <section class="terminal" data-fr-label="Terminal Vidéotex" data-en-label="Videotex terminal" aria-label="Terminal Vidéotex">
@@ -511,31 +513,32 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
     </div>
   </section>
 
-  <section class="manual" data-fr-label="Mode d'emploi" data-en-label="How to use" aria-label="Mode d'emploi">
+  <section class="manual" data-i18n-langs data-fr-label="Mode d'emploi" data-en-label="How to use" aria-label="Mode d'emploi">
     <div class="manual-col">
-      <h2><span data-fr="Se connecter" data-en="Connecting">Se connecter</span><span class="alt" data-fr="Connecting" data-en="Se connecter">Connecting</span></h2>
+      <h2><span lang="fr">Se connecter</span> <span lang="en">Connecting</span></h2>
       <ol>
-        <li><span data-i18n-html data-fr="Le terminal démarre en local&amp;nbsp;: la lettre &lt;b&gt;F&lt;/b&gt; s&#x27;affiche en haut à droite." data-en="The terminal starts in local mode: the letter &lt;b&gt;F&lt;/b&gt; shows at the top right.">Le terminal démarre en local&nbsp;: la lettre <b>F</b> s'affiche en haut à droite.</span><span class="alt" data-i18n-html data-fr="The terminal starts in local mode: the letter &lt;b&gt;F&lt;/b&gt; shows at the top right." data-en="Le terminal démarre en local&amp;nbsp;: la lettre &lt;b&gt;F&lt;/b&gt; s&#x27;affiche en haut à droite.">The terminal starts in local mode: the letter <b>F</b> shows at the top right.</span></li>
-        <li><span data-i18n-html data-fr="Tapez &lt;b&gt;3615&lt;/b&gt; puis &lt;b&gt;Connexion / Fin&lt;/b&gt;&amp;nbsp;: le Minitel ouvre &lt;b&gt;KORHOGO&lt;/b&gt;." data-en="Type &lt;b&gt;3615&lt;/b&gt;, then &lt;b&gt;Connect / End&lt;/b&gt;: the Minitel opens &lt;b&gt;KORHOGO&lt;/b&gt;.">Tapez <b>3615</b> puis <b>Connexion / Fin</b>&nbsp;: le Minitel ouvre <b>KORHOGO</b>.</span><span class="alt" data-i18n-html data-fr="Type &lt;b&gt;3615&lt;/b&gt;, then &lt;b&gt;Connect / End&lt;/b&gt;: the Minitel opens &lt;b&gt;KORHOGO&lt;/b&gt;." data-en="Tapez &lt;b&gt;3615&lt;/b&gt; puis &lt;b&gt;Connexion / Fin&lt;/b&gt;&amp;nbsp;: le Minitel ouvre &lt;b&gt;KORHOGO&lt;/b&gt;.">Type <b>3615</b>, then <b>Connect / End</b>: the Minitel opens <b>KORHOGO</b>.</span></li>
-        <li><span data-i18n-html data-fr="Après la porteuse du serveur, la lettre &lt;b&gt;C&lt;/b&gt; confirme la connexion. Le nombre de connectés s&#x27;affiche en haut de l&#x27;accueil." data-en="After the server carrier, the letter &lt;b&gt;C&lt;/b&gt; confirms the connection. The number of people online shows at the top of the home page.">Après la porteuse du serveur, la lettre <b>C</b> confirme la connexion. Le nombre de connectés s'affiche en haut de l'accueil.</span><span class="alt" data-i18n-html data-fr="After the server carrier, the letter &lt;b&gt;C&lt;/b&gt; confirms the connection. The number of people online shows at the top of the home page." data-en="Après la porteuse du serveur, la lettre &lt;b&gt;C&lt;/b&gt; confirme la connexion. Le nombre de connectés s&#x27;affiche en haut de l&#x27;accueil.">After the server carrier, the letter <b>C</b> confirms the connection. The number of people online shows at the top of the home page.</span></li>
+        <li><span lang="fr">Le terminal démarre en local&nbsp;: la lettre <b>F</b> s'affiche en haut à droite.</span> <span lang="en">The terminal starts in local mode: the letter <b>F</b> shows at the top right.</span></li>
+        <li><span lang="fr">Tapez <b>3615</b> puis <b>Connexion / Fin</b>&nbsp;: le Minitel ouvre <b>KORHOGO</b>.</span> <span lang="en">Type <b>3615</b>, then <b>Connect / End</b>: the Minitel opens <b>KORHOGO</b>.</span></li>
+        <li><span lang="fr">Après la porteuse du serveur, la lettre <b>C</b> confirme la connexion. Le nombre de connectés s'affiche en haut de l'accueil.</span> <span lang="en">After the server carrier, the letter <b>C</b> confirms the connection. The number of people online shows at the top of the home page.</span></li>
       </ol>
     </div>
     <div class="manual-col">
-      <h2><span data-fr="Au clavier" data-en="On the keyboard">Au clavier</span><span class="alt" data-fr="On the keyboard" data-en="Au clavier">On the keyboard</span></h2>
+      <h2><span lang="fr">Au clavier</span> <span lang="en">On the keyboard</span></h2>
       <dl class="map">
-        <dt data-fr="Entrée" data-en="Enter">Entrée</dt><dd><span data-fr="Envoi" data-en="Send">Envoi</span><span class="alt" data-fr="Send" data-en="Envoi">Send</span></dd>
-        <dt data-fr="⌫" data-en="⌫">⌫</dt><dd><span data-fr="Correction" data-en="Correct">Correction</span><span class="alt" data-fr="Correct" data-en="Correction">Correct</span></dd>
-        <dt data-fr="Suppr" data-en="Del">Suppr</dt><dd><span data-fr="Annulation" data-en="Cancel">Annulation</span><span class="alt" data-fr="Cancel" data-en="Annulation">Cancel</span></dd>
-        <dt data-fr="Échap" data-en="Esc">Échap</dt><dd><span data-fr="Sommaire" data-en="Index">Sommaire</span><span class="alt" data-fr="Index" data-en="Sommaire">Index</span></dd>
-        <dt data-fr="Page ↓ / Tab" data-en="PgDn / Tab">Page ↓ / Tab</dt><dd><span data-fr="Suite" data-en="Next">Suite</span><span class="alt" data-fr="Next" data-en="Suite">Next</span></dd>
-        <dt data-fr="Page ↑" data-en="PgUp">Page ↑</dt><dd><span data-fr="Retour" data-en="Back">Retour</span><span class="alt" data-fr="Back" data-en="Retour">Back</span></dd>
-        <dt data-fr="F1 · F2" data-en="F1 · F2">F1 · F2</dt><dd><span data-fr="Guide · Répétition" data-en="Guide · Repeat">Guide · Répétition</span><span class="alt" data-fr="Guide · Repeat" data-en="Guide · Répétition">Guide · Repeat</span></dd>
-        <dt data-fr="F9" data-en="F9">F9</dt><dd><span data-fr="Connexion / Fin" data-en="Connect / End">Connexion / Fin</span><span class="alt" data-fr="Connect / End" data-en="Connexion / Fin">Connect / End</span></dd>
+        <dt><span lang="fr">Entrée</span> <span lang="en">Enter</span></dt><dd><span lang="fr">Envoi</span> <span lang="en">Send</span></dd>
+        <dt>⌫</dt><dd><span lang="fr">Correction</span> <span lang="en">Correct</span></dd>
+        <dt><span lang="fr">Suppr</span> <span lang="en">Del</span></dt><dd><span lang="fr">Annulation</span> <span lang="en">Cancel</span></dd>
+        <dt><span lang="fr">Échap</span> <span lang="en">Esc</span></dt><dd><span lang="fr">Sommaire</span> <span lang="en">Index</span></dd>
+        <dt><span lang="fr">Page ↓ / Tab</span> <span lang="en">PgDn / Tab</span></dt><dd><span lang="fr">Suite</span> <span lang="en">Next</span></dd>
+        <dt><span lang="fr">Page ↑</span> <span lang="en">PgUp</span></dt><dd><span lang="fr">Retour</span> <span lang="en">Back</span></dd>
+        <dt>F1 · F2</dt><dd><span lang="fr">Guide · Répétition</span> <span lang="en">Guide · Repeat</span></dd>
+        <dt>F9</dt><dd><span lang="fr">Connexion / Fin</span> <span lang="en">Connect / End</span></dd>
       </dl>
     </div>
     <div class="manual-col">
-      <h2><span data-fr="Au 3615" data-en="On 3615">Au 3615</span><span class="alt" data-fr="On 3615" data-en="Au 3615">On 3615</span></h2>
-      <div class="manual-p"><span data-i18n-html data-fr="&lt;b&gt;KORHOGO&lt;/b&gt;&amp;nbsp;: entrez, feuilletez les fiches de la Fauna (Enter Korhogo), puis ouvrez &lt;b&gt;Kalabass&lt;/b&gt;&amp;nbsp;: les Direct Kaves (on y parle, en direct) et les boîtes aux lettres. Le n°&amp;nbsp;3 ouvre les &lt;b&gt;autres services&lt;/b&gt;&amp;nbsp;: météo et encyclopédie." data-en="&lt;b&gt;KORHOGO&lt;/b&gt;: enter, browse the Fauna profiles (Enter Korhogo), then open &lt;b&gt;Kalabass&lt;/b&gt;: the Direct Kaves (live chat) and the mailboxes. No.&amp;nbsp;3 opens the &lt;b&gt;other services&lt;/b&gt;: weather and the encyclopedia."><b>KORHOGO</b>&nbsp;: entrez, feuilletez les fiches de la Fauna (Enter Korhogo), puis ouvrez <b>Kalabass</b>&nbsp;: les Direct Kaves (on y parle, en direct) et les boîtes aux lettres. Le n°&nbsp;3 ouvre les <b>autres services</b>&nbsp;: météo et encyclopédie.</span><span class="alt" data-i18n-html data-fr="&lt;b&gt;KORHOGO&lt;/b&gt;: enter, browse the Fauna profiles (Enter Korhogo), then open &lt;b&gt;Kalabass&lt;/b&gt;: the Direct Kaves (live chat) and the mailboxes. No.&amp;nbsp;3 opens the &lt;b&gt;other services&lt;/b&gt;: weather and the encyclopedia." data-en="&lt;b&gt;KORHOGO&lt;/b&gt;&amp;nbsp;: entrez, feuilletez les fiches de la Fauna (Enter Korhogo), puis ouvrez &lt;b&gt;Kalabass&lt;/b&gt;&amp;nbsp;: les Direct Kaves (on y parle, en direct) et les boîtes aux lettres. Le n°&amp;nbsp;3 ouvre les &lt;b&gt;autres services&lt;/b&gt;&amp;nbsp;: météo et encyclopédie."><b>KORHOGO</b>: enter, browse the Fauna profiles (Enter Korhogo), then open <b>Kalabass</b>: the Direct Kaves (live chat) and the mailboxes. No.&nbsp;3 opens the <b>other services</b>: weather and the encyclopedia.</span></div>
+      <h2><span lang="fr">Au 3615</span> <span lang="en">On 3615</span></h2>
+      <div class="manual-p"><span lang="fr"><b>KORHOGO</b>&nbsp;: entrez, feuilletez les fiches de la Fauna (Enter Korhogo), puis ouvrez <b>Kalabass</b>&nbsp;: les Direct Kaves (on y parle, en direct) et les boîtes aux lettres. Le n°&nbsp;3 ouvre les <b>autres services</b>&nbsp;: météo et encyclopédie.</span> <span lang="en"><b>KORHOGO</b>: enter, browse the Fauna profiles (Enter Korhogo), then open <b>Kalabass</b>: the Direct Kaves (live chat) and the mailboxes. No.&nbsp;3 opens the <b>other services</b>: weather and the encyclopedia.</span></div>
+      <div class="manual-p"><span lang="fr">1 Koin par connexion, au plus une fois par heure (3615, 3615 KALABASS, 3615 KOINS).</span> <span lang="en">1 Koin per connection, at most once an hour (3615, 3615 KALABASS, 3615 KOINS).</span></div>
     </div>
   </section>
 
@@ -558,6 +561,7 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
       ((navigator.language || 'fr').slice(0, 2).toLowerCase() === 'fr' ? 'fr' : 'en');
   } catch (e) { /* rien */ }
   if (lang !== 'en') lang = 'fr';
+  try { document.documentElement.lang = lang; } catch (e) { /* rien */ }
 
   var KEYS_EN = {
     'SOMMAIRE': 'INDEX', 'ANNULATION': 'CANCEL', 'RETOUR': 'BACK', 'REPETITION': 'REPEAT',
@@ -602,6 +606,9 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
         var t = el.getAttribute('data-' + lang);
         if (t === null) return;
         if (el.hasAttribute('data-i18n-html')) el.innerHTML = t; else el.textContent = t;
+      });
+      (root || document).querySelectorAll('[data-i18n-langs] [lang]').forEach(function (el) {
+        el.hidden = el.getAttribute('lang') !== lang;
       });
       (root || document).querySelectorAll('[data-fr-label]').forEach(function (el) {
         el.setAttribute('aria-label', el.getAttribute('data-' + lang + '-label'));
@@ -1483,7 +1490,7 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
     ENCYCLOPEDIE: 'ENCYCLO', ENCYCLOPEDIA: 'ENCYCLO', MESSAGERIE: 'MSG', MESSAGE: 'MSG', MESSAGES: 'MSG',
     BAL: 'MSG', TCHAT: 'MSG', CHAT: 'MSG', MAIL: 'MSG', EMAIL: 'MSG', MAILBOX: 'MSG', ULLA: 'MSG',
     KIOSQUE: 'KIOSQUE', KIOSK: 'KIOSQUE', TELETEL: 'KIOSQUE', GUIDE: 'KIOSQUE',
-    KREW: 'MSG', KREWS: 'MSG', MSG: 'MSG', KALABASS: 'MSG',
+    KREW: 'MSG', KREWS: 'MSG', MSG: 'MSG', KALABASS: 'MSG', KOINS: 'KORHOGO', KOIN: 'KORHOGO',
     KAVE: 'MSG', KAVES: 'MSG', FAUNA: 'KORHOGO', MAUKTENIEB: 'KORHOGO'
   };
   S.resolve = function (q) {
@@ -1499,6 +1506,42 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
     return name;
   };
   S.LIST = LIST;
+
+  /* Koins partagés avec l'Insert Koin (même origine, même localStorage) :
+     +1 par connexion au 3615 (accueil KORHOGO!, kiosque, Kalabass), au plus une fois par heure */
+  var KOIN = {
+    HOUR: 3600000,
+    get: function () {
+      try {
+        var s = localStorage.getItem('ik.koins');
+        if (s == null) return 3;
+        var n = parseInt(s, 10);
+        return isNaN(n) || n < 0 ? 0 : n;
+      } catch (e) { return null; }
+    },
+    credit: function () {
+      try {
+        var now = Date.now(), last = parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0;
+        if (last && last <= now && now - last < this.HOUR) return false;
+        var n = this.get();
+        if (n === null) return false;
+        n += 1;
+        localStorage.setItem('ik.koins', String(n));
+        if (n >= 1) localStorage.setItem('ik.freeAt', '0');
+        localStorage.setItem('ik.kalabassAt', String(now));
+        return true;
+      } catch (e) { return false; }
+    },
+    // KOINS, pièce (mosaïque dorée), solde, +1 si crédité à cette connexion
+    line: function (v, r, c, plus) {
+      var n = this.get();
+      if (n === null) return v;
+      v.pos(r, c).fg(6).text('KOINS  ').g1().fg(3).raw(0x7F).g0().fg(3).text(' ' + n);
+      if (plus) v.fg(2).text('  +1');
+      return v;
+    }
+  };
+  S.KOIN = KOIN;
 
   S.KIOSQUE = {
     help: function () {
@@ -1520,7 +1563,7 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
         hk('CONNEXION', L('raccrocher (FIN)', 'hang up (END)'), 'hang up (END)')
       ];
     },
-    enter: function (h) { this.h = h; this.render(); },
+    enter: function (h) { this.h = h; this.koinPlus = KOIN.credit(); this.render(); },
     render: function () {
       var h = this.h, v = new Vdt();
       v.cls().cur(0);
@@ -1534,6 +1577,7 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
       });
       v.pos(17, 2).fg(7).text(L('Code ou n° :', 'Code or no.:'));
       v.pos(17, 29); kbtn(v, 'ENVOI');
+      KOIN.line(v, 20, 2, this.koinPlus);
       footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
       h.form([{ r: 17, c: 15, len: 12 }]);
@@ -9894,32 +9938,7 @@ var NostrTools = (() => {
   var LOG_TOP = 3, LOG_BOT = 20;
   function header(v, sub) { return UI.kheader(v, sub); }
 
-  /* Koins partagés avec l'Insert Koin (même origine, même localStorage) :
-     +1 par connexion au Kalabass, au plus une fois par heure */
-  var KOIN = {
-    HOUR: 3600000,
-    get: function () {
-      try {
-        var s = localStorage.getItem('ik.koins');
-        if (s == null) return 3;
-        var n = parseInt(s, 10);
-        return isNaN(n) || n < 0 ? 0 : n;
-      } catch (e) { return null; }
-    },
-    credit: function () {
-      try {
-        var now = Date.now(), last = parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0;
-        if (last && last <= now && now - last < this.HOUR) return false;
-        var n = this.get();
-        if (n === null) return false;
-        n += 1;
-        localStorage.setItem('ik.koins', String(n));
-        if (n >= 1) localStorage.setItem('ik.freeAt', '0');
-        localStorage.setItem('ik.kalabassAt', String(now));
-        return true;
-      } catch (e) { return false; }
-    }
-  };
+  var KOIN = S.KOIN;
 
   var MAUK = 'mauktenieb@gmail.com';
   var MAUK_NICK = 'UNKLE MAUKIE';
@@ -9993,7 +10012,7 @@ var NostrTools = (() => {
       var h = this.h, v = new Vdt(), un = NET.unread(), mk = maskByCode(NET.mask());
       this.stopChat();
       header(v, 'KALABASS');
-      this.koinLine(v);
+      this.koinLine(v, 20);
       v.pos(6, 2).fg(6).text(L('Votre code : ', 'Your code: ')).fg(3).text(NET.nick() + '#' + NET.code().slice(0, 4));
       if (mk) v.pos(7, 2).fg(6).text(L('Votre masque : ', 'Your mask: ')).fg(maskColor(mk.code)).text(cut(mk.name, 20));
       var items = [
@@ -10018,13 +10037,7 @@ var NostrTools = (() => {
       h.form([{ r: 22, c: 17, len: 1 }]);
     },
     // Koins de l'Insert Koin (même origine) : KOINS, pièce, solde, +1 si crédité
-    koinLine: function (v) {
-      var n = KOIN.get();
-      if (n === null) return v;
-      v.pos(4, 2).fg(6).text('KOINS  ').g1().fg(3).raw(0x7F).g0().fg(3).text(' ' + n);
-      if (this.koinPlus) v.fg(2).text('  +1');
-      return v;
-    },
+    koinLine: function (v, r) { return KOIN.line(v, r, 3, this.koinPlus); },
     netLine: function (v) {
       var up = NET.relaysUp();
       v.pos(23, 1).can().pos(23, 3);
@@ -10086,7 +10099,7 @@ var NostrTools = (() => {
     r_profile: function () {
       var h = this.h, v = new Vdt(), mk = maskByCode(NET.mask()), f = fauna();
       header(v, L('VOTRE PROFIL', 'YOUR PROFILE'));
-      this.koinLine(v);
+      this.koinLine(v, 21);
       v.pos(5, 3).fg(7).text(L('Pseudo (12 car.) :', 'Nickname (12 ch.):'));
       v.pos(7, 3).fg(7).text(L('Masque (0-18)    :', 'Mask (0-18)      :'));
       v.pos(7, 26).fg(mk ? maskColor(mk.code) : 5).text(mk ? cut(mk.name, 14) : L('aucun', 'none'));
@@ -10445,7 +10458,7 @@ var NostrTools = (() => {
     r_nonet: function () {
       var v = new Vdt();
       header(v, 'KALABASS');
-      this.koinLine(v);
+      this.koinLine(v, 11);
       v.pos(8, 3).fg(7).text(L('Kalabass indisponible :', 'Kalabass unavailable:'));
       v.pos(9, 3).fg(7).text(L('module réseau non chargé.', 'network module not loaded.'));
       UI.footer(v, [['KORHOGO!', 'SOMMAIRE']]);
@@ -12204,6 +12217,7 @@ window.KORHOGO_FAUNA = [
       v.pos(16, 11).fg(7).text('>');
       v.pos(16, 17); UI.kbtn(v, 'ENVOI');
       v.pos(19, 14).fg(5).text(L('Lure, Lore, More', 'Lure, Lore, More'));
+      S.KOIN.line(v, 21, 14, KOR.koinPlus);
       UI.footer(v, [[L('Aide', 'Help'), 'GUIDE'], [L('Quitter', 'Quit'), 'CONNEXION/FIN']]);
       h.out(v);
       h.form([{ r: 16, c: 13, len: 1 }]);
@@ -12352,7 +12366,7 @@ window.KORHOGO_FAUNA = [
      ====================================================================== */
   var KOR = {
     get help() { var x = (this.mode && this.mode.help) || KM.HOME.help; return typeof x === 'function' ? x() : x; },
-    enter: function (h) { this.h = h; this.mode = KM.HOME; KM.HOME.render(h); },
+    enter: function (h) { this.h = h; this.koinPlus = S.KOIN.credit(); this.mode = KM.HOME; KM.HOME.render(h); },
     open: function (name) {
       var h = this.h;
       if (this.mode && this.mode.leave) this.mode.leave(h);

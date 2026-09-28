@@ -1,0 +1,18 @@
+# K Terminal — 3615
+
+> K Terminal — le Minitel de Korhogo Fauna, l'univers de Mauk Tenieb. Composez le 3615 : Enter Korhogo, le Kalabass, la météo et l'encyclopédie. Français / English.
+
+## Services
+- 3615 KORHOGO — Enter Korhogo (les fiches de la Fauna), le Kalabass (Direct Kaves, Votre Kalabass, Unkle Maukie).
+- 3615 KALABASS — la Kalabass.
+- Koins : 1 Koin par connexion au 3615 (3615, 3615 KALABASS, 3615 KOINS), au plus une fois par heure, partagé avec Insert Koin.
+- 3615 METEO, 3615 ENCYCLO (Wikipédia).
+
+## Links
+- [K Terminal](https://mauktenieb.github.io/3615/)
+- [Insert Koin](https://mauktenieb.github.io/insertkoin/)
+- [Korhogo](https://mauktenieb.github.io/korhogo)
+- [Mauk Tenieb — GitHub](https://github.com/MaukTenieb)
+
+## Rights
+Copyright © Mauk Tenieb & Korhogo, all rights reserved for everything Korhogo: characters, texts, game rules, portraits, names (Korhogo™, Korhogo Fauna™, Fauna Masks™, Katabatik™, Insert Koin™). The terminal engine is MIT (see LICENSE). Minitel is a trademark of Orange; independent project.
