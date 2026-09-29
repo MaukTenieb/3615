@@ -1538,6 +1538,12 @@ html.framed .topline { display: none; }
       if (n === null) return v;
       v.pos(r, c).fg(6).text('KOINS  ').g1().fg(3).raw(0x7F).g0().fg(3).text(' ' + n);
       if (plus) v.fg(2).text('  +1');
+      else {
+        // pas de pièce à cette connexion : dans combien de minutes la suivante
+        var last = 0; try { last = parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0; } catch (e) {}
+        var left = last ? this.HOUR - (Date.now() - last) : 0;
+        if (left > 0) v.fg(4).text('  +1 · ' + Math.ceil(left / 60000) + ' min');
+      }
       return v;
     }
   };
