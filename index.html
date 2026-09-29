@@ -5,16 +5,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>K Terminal</title>
-<meta name="description" content="K Terminal — le Minitel de Korhogo Fauna. Composez le 3615 : Enter Korhogo, le Kalabass, la météo et l'encyclopédie. Français / English.">
+<meta name="description" content="K Terminal — le Minitel de Korhogo Fauna. Composez le 3615 : Enter Korhogo, le Kalabass, la météo et l'encyclopédie. / K Terminal — the Minitel of Korhogo Fauna. Dial 3615: Enter Korhogo, the Kalabass, the weather and the encyclopedia.">
 <meta name="theme-color" content="#191613">
 <meta property="og:type" content="website">
 <meta property="og:title" content="K Terminal">
-<meta property="og:description" content="Le Minitel de Korhogo Fauna. Composez le 3615.">
+<meta property="og:description" content="Le Minitel de Korhogo Fauna. Composez le 3615. / The Minitel of Korhogo Fauna. Dial 3615.">
 <meta property="og:image" content="https://mauktenieb.github.io/3615/apercu.png">
 <meta property="og:url" content="https://mauktenieb.github.io/3615/">
 <link rel="canonical" href="https://mauktenieb.github.io/3615/">
 <link rel="alternate" type="text/markdown" href="llms.txt" title="Summary for language models">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "K Terminal — 3615", "url": "https://mauktenieb.github.io/3615/", "image": "https://mauktenieb.github.io/3615/apercu.png", "description": "K Terminal — le Minitel de Korhogo Fauna. Composez le 3615 : Enter Korhogo, le Kalabass, la météo et l'encyclopédie. Français / English.", "applicationCategory": "GameApplication", "operatingSystem": "Any", "inLanguage": ["fr", "en"], "isAccessibleForFree": true, "author": {"@type": "Person", "name": "Mauk Tenieb", "url": "https://github.com/MaukTenieb"}, "copyrightHolder": {"@type": "Person", "name": "Mauk Tenieb"}, "isPartOf": {"@type": "CreativeWorkSeries", "name": "Korhogo", "url": "https://mauktenieb.github.io/korhogo"}, "isRelatedTo": {"@type": "VideoGame", "name": "Insert Koin", "url": "https://mauktenieb.github.io/insertkoin/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "K Terminal — 3615", "url": "https://mauktenieb.github.io/3615/", "image": "https://mauktenieb.github.io/3615/apercu.png", "description": "K Terminal — le Minitel de Korhogo Fauna. Composez le 3615 : Enter Korhogo, le Kalabass, la météo et l'encyclopédie. / K Terminal — the Minitel of Korhogo Fauna. Dial 3615: Enter Korhogo, the Kalabass, the weather and the encyclopedia.", "applicationCategory": "GameApplication", "operatingSystem": "Any", "inLanguage": ["fr", "en"], "isAccessibleForFree": true, "author": {"@type": "Person", "name": "Mauk Tenieb", "url": "https://github.com/MaukTenieb"}, "copyrightHolder": {"@type": "Person", "name": "Mauk Tenieb"}, "isPartOf": {"@type": "CreativeWorkSeries", "name": "Korhogo", "url": "https://mauktenieb.github.io/korhogo"}, "isRelatedTo": {"@type": "VideoGame", "name": "Insert Koin", "url": "https://mauktenieb.github.io/insertkoin/"}}</script>
 <link rel="icon" type="image/png" href="icone.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -203,6 +203,11 @@ body {
 .led.blink i { animation: ledblink .5s steps(2) infinite; }
 .led-data i { background: #2f4a28; }
 .led-data.on i { background: var(--led-green); box-shadow: 0 0 8px var(--led-green); animation: ledflicker .12s steps(2) infinite; }
+.led-koin i { background: #e0b43a; box-shadow: 0 0 6px rgba(224, 180, 58, .7), inset 0 -1px 2px rgba(0, 0, 0, .3); }
+.led-koin b { font: 700 12px/1 var(--display); letter-spacing: .06em; color: #3b3226; }
+.led-koin em { font: 700 12px/1 var(--display); font-style: normal; color: #2e7d32; }
+.led-koin.on b { color: #8a5a00; }
+.led.led-koin.on i { background: #f1c84b; box-shadow: 0 0 10px #f1c84b, inset 0 -1px 2px rgba(0, 0, 0, .3); }
 @keyframes ledblink { 50% { background: var(--led); box-shadow: 0 0 8px var(--led); } }
 @keyframes ledflicker { 50% { opacity: .45; } }
 
@@ -451,6 +456,7 @@ html.framed .topline { display: none; }
         <div class="leds" aria-live="polite">
           <span class="led" id="led-line"><i></i><span data-fr="En ligne" data-en="On line">En ligne</span></span>
           <span class="led led-data" id="led-data"><i></i><span data-fr="Données" data-en="Data">Données</span></span>
+          <span class="led led-koin" id="led-koin"><i></i><span>KOINS</span><b id="koin-n">3</b><em id="koin-plus" hidden></em></span>
         </div>
 
         <div class="controls">
@@ -538,11 +544,11 @@ html.framed .topline { display: none; }
     <div class="manual-col">
       <h2><span lang="fr">Au 3615</span> <span lang="en">On 3615</span></h2>
       <div class="manual-p"><span lang="fr"><b>KORHOGO</b>&nbsp;: entrez, feuilletez les fiches de la Fauna (Enter Korhogo), puis ouvrez <b>Kalabass</b>&nbsp;: les Direct Kaves (on y parle, en direct) et les boîtes aux lettres. Le n°&nbsp;3 ouvre les <b>autres services</b>&nbsp;: météo et encyclopédie.</span> <span lang="en"><b>KORHOGO</b>: enter, browse the Fauna profiles (Enter Korhogo), then open <b>Kalabass</b>: the Direct Kaves (live chat) and the mailboxes. No.&nbsp;3 opens the <b>other services</b>: weather and the encyclopedia.</span></div>
-      <div class="manual-p"><span lang="fr">1 Koin par connexion, au plus une fois par heure (3615, 3615 KALABASS, 3615 KOINS).</span> <span lang="en">1 Koin per connection, at most once an hour (3615, 3615 KALABASS, 3615 KOINS).</span></div>
+      <div class="manual-p"><span lang="fr"><b>Koins</b>&nbsp;: 3 à la première connexion du jour, puis 1 par connexion, au plus une fois par heure&nbsp;; 1 par fiche de la Fauna lue jusqu'au bout&nbsp;; 1 par message envoyé (5 par jour). 10 Koins par jour au plus. Le solde s'affiche sur le boîtier (KOINS).</span> <span lang="en"><b>Koins</b>: 3 on the first connection of the day, then 1 per connection, at most once an hour; 1 per Fauna profile read to the end; 1 per message sent (5 a day). 10 Koins a day at most. The balance shows on the casing (KOINS).</span></div>
     </div>
   </section>
 
-  <textarea id="kbd" class="kbd-sink" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Saisie clavier du terminal"></textarea>
+  <textarea id="kbd" class="kbd-sink" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" data-fr-label="Saisie clavier du terminal" data-en-label="Terminal keyboard input" aria-label="Saisie clavier du terminal"></textarea>
 </main>
 
 <script>
@@ -1047,6 +1053,7 @@ html.framed .topline { display: none; }
   // Ligne de service (rangée 0) écrite directement par le terminal
   Terminal.prototype.status = function (text, flag, flash, textFlash) {
     var s = this.screen;
+    this.st = [text, flag, flash, textFlash];
     s.clear(0, 0);
     text = text || '';
     for (var c = 0; c < text.length && c < COLS - 2; c++) {
@@ -1057,7 +1064,22 @@ html.framed .topline { display: none; }
       var j = s.idx(0, COLS);
       s.ch[j] = flag; s.fg[j] = 7; s.fl[j] = flash ? F_FLASH : 0;
     }
+    // Koins : « +n ■ n » à droite, avant la lettre C/F, sans toucher au texte (MESSAGE)
+    if (flag && this.koin !== null && this.koin !== undefined) {
+      var num = ' ' + this.koin, plus = this.koinPlus ? '+' + this.koinPlus + ' ' : '';
+      if (text.length + 2 + plus.length + num.length + 3 > COLS) plus = '';
+      var c0 = COLS - 1 - (plus.length + 1 + num.length), k;
+      for (k = 0; k < plus.length; k++) { var ip = s.idx(0, c0 + k); s.ch[ip] = plus[k]; s.fg[ip] = 2; s.fl[ip] = 0; }
+      var im = s.idx(0, c0 + plus.length);
+      s.ch[im] = ' '; s.code[im] = 0x7F; s.fg[im] = 3; s.fl[im] = F_MOS;
+      for (k = 0; k < num.length; k++) { var iq = s.idx(0, c0 + plus.length + 1 + k); s.ch[iq] = num[k]; s.fg[iq] = 3; s.fl[iq] = 0; }
+    }
     this.dirty = true;
+  };
+  // Solde de Koins affiché en rangée 0 (null : rien), et « +n » quand on en gagne
+  Terminal.prototype.koins = function (n, plus) {
+    this.koin = n; this.koinPlus = plus || 0;
+    if (this.st) this.status.apply(this, this.st);
   };
   Terminal.prototype.reset = function () { this.flush(); this.dec.fullReset(); this.dirty = true; };
 
@@ -1454,7 +1476,7 @@ html.framed .topline { display: none; }
       header(v, o.title, sub);
       if (o.heading) v.pos(5, 2).size('h').fg(3).text(cut(o.heading, 38));
       keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
-      footer(v, o.footer || [[L('Kiosque', 'Kiosk'), 'SOMMAIRE']]);
+      footer(v, o.footer || [[L('Autres services', 'Other services'), 'SOMMAIRE']]);
     } else {
       v.pos(3, 40 - sub.length - 1).bg(4).can().pos(3, 40 - sub.length).pbg(4).fg(6).text(sub);
     }
@@ -1508,9 +1530,13 @@ html.framed .topline { display: none; }
   S.LIST = LIST;
 
   /* Koins partagés avec l'Insert Koin (même origine, même localStorage) :
-     +1 par connexion au 3615 (accueil KORHOGO!, kiosque, Kalabass), au plus une fois par heure */
+     - 3 Koins à la première connexion du jour, puis 1 par connexion, au plus une fois par heure ;
+     - 1 Koin par fiche de la Fauna lue jusqu'à sa dernière page (une fois par fiche) ;
+     - 1 Koin par message envoyé (Kave ou privé), 5 par jour au plus ;
+     - 10 Koins par jour au plus en tout (ik.day = { d: date, n: gagnés, m: messages, b: bonus }). */
   var KOIN = {
-    HOUR: 3600000,
+    HOUR: 3600000, CAP: 10, DAILY: 3, MSGS: 5,
+    subs: [],
     get: function () {
       try {
         var s = localStorage.getItem('ik.koins');
@@ -1519,32 +1545,67 @@ html.framed .topline { display: none; }
         return isNaN(n) || n < 0 ? 0 : n;
       } catch (e) { return null; }
     },
-    credit: function () {
-      try {
-        var now = Date.now(), last = parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0;
-        if (last && last <= now && now - last < this.HOUR) return false;
-        var n = this.get();
-        if (n === null) return false;
-        n += 1;
-        localStorage.setItem('ik.koins', String(n));
-        if (n >= 1) localStorage.setItem('ik.freeAt', '0');
-        localStorage.setItem('ik.kalabassAt', String(now));
-        return true;
-      } catch (e) { return false; }
+    today: function () {
+      var d = new Date();
+      return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
     },
-    // KOINS, pièce (mosaïque dorée), solde, +1 si crédité à cette connexion
-    line: function (v, r, c, plus) {
+    day: function () {
+      var t = this.today(), o = null;
+      try { o = JSON.parse(localStorage.getItem('ik.day')); } catch (e) { o = null; }
+      if (!o || typeof o !== 'object' || o.d !== t) o = { d: t, n: 0, m: 0, b: 0 };
+      o.n = +o.n || 0; o.m = +o.m || 0; o.b = +o.b || 0;
+      return o;
+    },
+    saveDay: function (o) { try { localStorage.setItem('ik.day', JSON.stringify(o)); } catch (e) { /* rien */ } },
+    // Ajoute jusqu'à k Koins dans la limite du jour ; renvoie ce qui a été gagné
+    add: function (k, o) {
+      var n = this.get();
+      if (n === null) return 0;
+      o = o || this.day();
+      var g = Math.min(k, this.CAP - o.n);
+      if (g <= 0) { this.saveDay(o); return 0; }
+      try {
+        localStorage.setItem('ik.koins', String(n + g));
+        if (n + g >= 1) localStorage.setItem('ik.freeAt', '0');
+      } catch (e) { return 0; }
+      o.n += g; this.saveDay(o);
+      this.emit(g);
+      return g;
+    },
+    // Connexion au 3615 : bonus du jour, sinon 1 Koin par heure
+    connect: function () {
+      try {
+        var o = this.day(), now = Date.now(), last = parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0;
+        if (!o.b) { o.b = 1; localStorage.setItem('ik.kalabassAt', String(now)); return this.add(this.DAILY, o); }
+        if (last && last <= now && now - last < this.HOUR) return 0;
+        localStorage.setItem('ik.kalabassAt', String(now));
+        return this.add(1, o);
+      } catch (e) { return 0; }
+    },
+    // Fiche de la Fauna lue jusqu'au bout : une fois par fiche
+    read: function (id) {
+      try {
+        var r = JSON.parse(localStorage.getItem('ik.read') || '[]');
+        if (!Array.isArray(r)) r = [];
+        if (r.indexOf(id) >= 0) return 0;
+        r.push(id); localStorage.setItem('ik.read', JSON.stringify(r));
+        return this.add(1);
+      } catch (e) { return 0; }
+    },
+    // Message envoyé (Kave ou privé) : 5 par jour au plus
+    sent: function () {
+      var o = this.day();
+      if (o.m >= this.MSGS) return 0;
+      o.m++;
+      return this.add(1, o);
+    },
+    on: function (fn) { this.subs.push(fn); },
+    emit: function (g) { var n = this.get(); this.subs.forEach(function (fn) { try { fn(n, g); } catch (e) { /* rien */ } }); },
+    // KOINS, pièce (mosaïque dorée), solde
+    line: function (v, r, c) {
       var n = this.get();
       if (n === null) return v;
-      v.pos(r, c).fg(6).text('KOINS  ').g1().fg(3).raw(0x7F).g0().fg(3).text(' ' + n);
-      if (plus) v.fg(2).text('  +1');
-      else {
-        // pas de pièce à cette connexion : dans combien de minutes la suivante
-        var last = 0; try { last = parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0; } catch (e) {}
-        var left = last ? this.HOUR - (Date.now() - last) : 0;
-        if (left > 0) v.fg(4).text('  +1 · ' + Math.ceil(left / 60000) + ' min');
-      }
-      return v;
+      return v.pos(r, c).fg(6).text('KOINS  ').g1().fg(3).raw(0x7F).g0().fg(3).text(' ' + n);
     }
   };
   S.KOIN = KOIN;
@@ -1552,7 +1613,7 @@ html.framed .topline { display: none; }
   S.KIOSQUE = {
     help: function () {
       return [
-        L('Bienvenue sur le kiosque 3615.', 'Welcome to the 3615 kiosk.'),
+        L('3615 : les autres services.', '3615: the other services.'),
         '',
         L('Tapez le nom du service (METEO) ou son', 'Type the service name (WEATHER) or its'),
         L('numéro dans la liste, puis ' + K('ENVOI') + '.', 'number in the list, then ' + K('ENVOI') + '.'),
@@ -1563,19 +1624,19 @@ html.framed .topline { display: none; }
         hk('ANNULATION', 'effacer la ligne', 'clear the field'),
         hk('SUITE', 'page ou champ suivant', 'next page or field'),
         hk('RETOUR', 'page ou champ précédent', 'previous page or field'),
-        hk('SOMMAIRE', 'kiosque, puis KORHOGO', 'kiosk, then KORHOGO'),
+        hk('SOMMAIRE', 'autres services, KORHOGO', 'other services, KORHOGO'),
         hk('REPETITION', 'réafficher la page', 'redraw the page'),
         hk('GUIDE', "afficher l'aide", 'show help'),
         hk('CONNEXION', L('raccrocher (FIN)', 'hang up (END)'), 'hang up (END)')
       ];
     },
-    enter: function (h) { this.h = h; this.koinPlus = KOIN.credit(); this.render(); },
+    enter: function (h) { this.h = h; this.render(); },
     render: function () {
       var h = this.h, v = new Vdt();
       v.cls().cur(0);
       v.big(2, 3, '3615', 7);
       v.pos(4, 21).fg(7).size('d').text('TELETEL');
-      v.pos(6, 21).fg(6).text(L('Kiosque des services', 'Service kiosk'));
+      v.pos(6, 21).fg(6).text(L('AUTRES SERVICES', 'OTHER SERVICES'));
       v.pos(7, 21).fg(5).text(L('Ligne ', 'Speed: ') + h.baudLabel());
       rule(v, 10, 4);
       LIST.forEach(function (s, i) {
@@ -1583,7 +1644,6 @@ html.framed .topline { display: none; }
       });
       v.pos(17, 2).fg(7).text(L('Code ou n° :', 'Code or no.:'));
       v.pos(17, 29); kbtn(v, 'ENVOI');
-      KOIN.line(v, 20, 2, this.koinPlus);
       footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
       h.form([{ r: 17, c: 15, len: 12 }]);
@@ -1683,7 +1743,7 @@ html.framed .topline { display: none; }
         L('Les données viennent du service libre', 'Data comes live from the free'),
         L('Open-Meteo, interrogé en direct.', 'Open-Meteo service.'),
         '',
-        L(K('SOMMAIRE') + ' revient au kiosque.', K('SOMMAIRE') + ' returns to the kiosk.')
+        L(K('SOMMAIRE') + ' : les autres services.', K('SOMMAIRE') + ': the other services.')
       ];
     },
     enter: function (h) { this.h = h; this.data = null; this.render(); },
@@ -1722,7 +1782,7 @@ html.framed .topline { display: none; }
       }
       v.pos(23, 2).fg(7).text(L('Ville :', 'City :'));
       v.pos(23, 33); kbtn(v, 'ENVOI');
-      footer(v, [[L('Kiosque', 'Kiosk'), 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+      footer(v, [[L('Autres services', 'Other services'), 'SOMMAIRE'], ['', 'GUIDE']]);
       h.out(v);
       h.form([{ r: 23, c: 10, len: 22, value: this.lastQuery || '' }]);
     },
@@ -1830,7 +1890,7 @@ html.framed .topline { display: none; }
       v.pos(16, 5).fg(3).text(L('Jean-Paul Sartre', 'Philip K. Dick'));
       v.pos(21, 3).fg(7).text(L('Mot-clé :', 'Keyword :'));
       v.pos(21, 34); kbtn(v, 'ENVOI');
-      footer(v, [[L('Kiosque', 'Kiosk'), 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+      footer(v, [[L('Autres services', 'Other services'), 'SOMMAIRE'], ['', 'GUIDE']]);
       h.out(v);
       h.form([{ r: 21, c: 13, len: 20, value: this.query || '' }]);
     },
@@ -9691,7 +9751,7 @@ var NostrTools = (() => {
     return lpad(d.getDate(), 2, '0') + '/' + lpad(d.getMonth() + 1, 2, '0') + '/' + d.getFullYear() + ' ' +
       lpad(d.getHours(), 2, '0') + ':' + lpad(d.getMinutes(), 2, '0');
   }
-  function cleanNick(s) { return norm(s).toUpperCase().replace(/[^A-Z0-9_\-]/g, '').slice(0, 12); }
+  function cleanNick(s) { s = String(s || ''); if (s.normalize) s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); return norm(s).toUpperCase().replace(/[^A-Z0-9_\-]/g, '').slice(0, 12); }
 
   /* ----- Les masques de la Fauna (données de KORHOGO) ----- */
   function fauna() { return global.KORHOGO_FAUNA || []; }
@@ -9771,7 +9831,7 @@ var NostrTools = (() => {
     // Démarre dès la connexion au 3615, même sans pseudo : on compte parmi les connectés
     start: function () {
       if (this.started || !this.identity()) return;
-      this.started = true;
+      this.started = true; this.t0 = Date.now();
       var self = this;
       try { this.pool = new NT.SimplePool(); } catch (e) { this.ok = false; this.started = false; return; }
       // présence de tous les terminaux
@@ -9822,11 +9882,18 @@ var NostrTools = (() => {
         if (++tries < 30) self.upT = setTimeout(up, 500);
       };
       this.upT = setTimeout(up, 300);
+      // aucun relais au bout de 6 s : les écrans passent en « Kalabass indisponible »
+      this.downT = setTimeout(function () { if (self.started) self.emit('presence'); }, 6100);
+    },
+    // Réseau absent : module non chargé, ou aucun relais au bout de 6 s
+    down: function () {
+      if (!this.ok) return true;
+      return this.started && !this.relaysUp() && Date.now() - (this.t0 || 0) > 6000;
     },
     // Raccrochage : on signale son départ, puis on ferme les relais
     stop: function () {
       var pool = this.pool, subs = this.subs;
-      clearInterval(this.beatT); clearInterval(this.ageT); clearTimeout(this.upT);
+      clearInterval(this.beatT); clearInterval(this.ageT); clearTimeout(this.upT); clearTimeout(this.downT);
       if (pool && this.sk) this.beat(true);
       this.subs = []; this.pool = null; this.started = false;
       this.inbox = {}; this.plain = {}; this.pres = {}; this.room = '';
@@ -9959,7 +10026,7 @@ var NostrTools = (() => {
         [[3, '/s NOM   '], [7, L('entrer dans un Kave', 'enter another Kave')]],
         [[3, '/s 0     '], [7, L('Kave général', 'the general Kave')]],
         [[3, '/p       '], [7, L('les présents', 'who is here')]],
-        [[3, '/m NOM   '], [7, L('laisser un message (BAL)', 'leave a message (mailbox)')]],
+        [[3, '/m NOM   '], [7, L('écrire (Votre Kalabass)', 'write (Your Kalabass)')]],
         '',
         L('Le fil défile en page, comme sur un', 'The log wraps page by page, as on a'),
         L('Minitel : la ligne vide suit le', 'Minitel: the blank line follows the'),
@@ -9980,31 +10047,31 @@ var NostrTools = (() => {
         L('numéro d\'un personnage, ou un nom', "character's number, or a name")
       ];
       return [
-        L('Direct Kaves : on entre, on parle, en direct.', 'Direct Kaves: step in, talk, live.'),
+        L('Direct Kaves : on y parle, en direct.', 'Direct Kaves: step in, talk, live.'),
+        '',
         L('Votre Kalabass : votre messagerie.', 'Your Kalabass: your own mailbox.'),
         L('Vos messages reçus et vos messages', 'Received messages and sent ones'),
         L('envoyés s\'y lisent, réponse directe.', 'read in one thread, one-press reply.'),
+        L('Pour écrire : ' + K('ENVOI') + ', champ vide.', 'To write: ' + K('ENVOI') + ', empty field.'),
         L('MESSAGE clignote en haut de l\'écran', 'MAIL blinks at the top of the screen'),
         L('quand un message vous attend.', 'when one is waiting.'),
         '',
-        L('Chaque usager a un pseudo, un code', 'Each user has a nickname, a code'),
-        L('(DUPONT#A1B2) et peut porter un', '(SMITH#A1B2) and may wear a mask'),
-        L('masque de la Fauna.', 'of the Fauna.'),
+        L('Lire ne demande rien ; le pseudo', 'Reading asks for nothing; your'),
+        L('est demandé au premier envoi.', 'nickname is asked at the first send.'),
         '',
         L('Votre identité est gardée dans ce', 'Your identity is kept in this'),
         L('navigateur : notez la clé de secours', 'browser: write down the backup key'),
         L('(Votre profil) pour la retrouver.', '(Your profile) to recover it.'),
         '',
-        L('Le n° 5 est la boîte d\'Unkle Maukie.', 'No. 5 is the box of Unkle Maukie.'),
-
+        L('Le n° 3 est la boîte d\'Unkle Maukie.', 'No. 3 is the box of Unkle Maukie.')
       ];
     },
     enter: function (h) {
       this.h = h;
-      this.koinPlus = KOIN.credit();
+      this.pending = null; this.draft = null;
       if (!NET.ok) { this.view = 'nonet'; this.render(); return; }
       NET.identity(); NET.start();
-      this.view = NET.nick() ? 'menu' : 'profile';
+      this.view = 'menu';
       this.render();
     },
     leave: function () { this.view = ''; this.stopChat(); },
@@ -10018,43 +10085,38 @@ var NostrTools = (() => {
       var h = this.h, v = new Vdt(), un = NET.unread(), mk = maskByCode(NET.mask());
       this.stopChat();
       header(v, 'KALABASS');
-      this.koinLine(v, 20);
-      v.pos(6, 2).fg(6).text(L('Votre code : ', 'Your code: ')).fg(3).text(NET.nick() + '#' + NET.code().slice(0, 4));
-      if (mk) v.pos(7, 2).fg(6).text(L('Votre masque : ', 'Your mask: ')).fg(maskColor(mk.code)).text(cut(mk.name, 20));
+      if (NET.nick()) v.pos(5, 2).fg(6).text(L('Pseudo : ', 'Nickname: ')).fg(3).text(NET.nick());
+      if (mk) v.pos(6, 2).fg(6).text(L('Votre masque : ', 'Your mask: ')).fg(maskColor(mk.code)).text(cut(mk.name, 20));
       var items = [
         [L('Direct Kaves', 'Direct Kaves'), L('on y parle', 'talk, live')],
-        [L('Votre Kalabass', 'Your Kalabass'), un ? un + L(' non lu' + (un > 1 ? 's' : ''), ' unread') : ''],
-        [L('Écrire', 'Write'), L('à un autre Krew', 'to another Krew')],
-        [L('Annuaire', 'Directory'), Object.keys(NET.dir).length + L(' usagers', ' users')],
+        [L('Votre Kalabass', 'Your Kalabass'), un ? un + L(' non lu' + (un > 1 ? 's' : ''), ' unread') : L('messagerie', 'mailbox')],
         [L('Unkle Maukie', 'Unkle Maukie'), L('laisser un mot', 'leave a word')],
         [L('Votre profil', 'Your profile'), L('pseudo, masque', 'nickname, mask')]
       ];
       items.forEach(function (it, i) {
-        var num = i === 5 ? 7 : i + 1;          // le 6 n'existe pas
-        v.pos(8 + i * 2, 3).fg(3).text(num + '  ').fg(7).text(pad(it[0], 19)).fg(i === 1 && un ? 3 : 6);
+        v.pos(9 + i * 2, 3).fg(3).text((i + 1) + '  ').fg(7).text(pad(it[0], 19)).fg(i === 1 && un ? 3 : 6);
         if (i === 1 && un) v.flash(1);
         v.text(it[1]).flash(0);
       });
-      v.pos(22, 3).fg(7).text(L('Votre choix :', 'Your choice:'));
-      v.pos(22, 20); kbtn(v, 'ENVOI');
+      v.pos(20, 3).fg(7).text(L('Votre choix :', 'Your choice:'));
+      v.pos(20, 20); kbtn(v, 'ENVOI');
       this.netLine(v);
       UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
-      h.form([{ r: 22, c: 17, len: 1 }]);
+      h.form([{ r: 20, c: 17, len: 1 }]);
     },
-    // Koins de l'Insert Koin (même origine) : KOINS, pièce, solde, +1 si crédité
-    koinLine: function (v, r) { return KOIN.line(v, r, 3, this.koinPlus); },
     netLine: function (v) {
       var up = NET.relaysUp();
       v.pos(23, 1).can().pos(23, 3);
+      if (!up && NET.down()) return v.fg(1).text(L('Kalabass indisponible.', 'Kalabass unavailable.'));
       if (!up) return v.fg(1).text(L('Réseau : connexion aux relais...', 'Network: reaching relays...'));
       return v.fg(2).text(onlineText(NET.online())).fg(5).text('   ' + up + L(' relais', up > 1 ? ' relays' : ' relay'));
     },
     k_menu: function (k, vals) {
       if (k.fn !== 'ENVOI') return false;
-      var go = { '1': 'rooms', '2': 'inbox', '3': 'write', '4': 'dir', '5': 'mauk', '7': 'profile' }[vals[0]];
+      var go = { '1': 'rooms', '2': 'inbox', '3': 'mauk', '4': 'profile', '9': 'profile' }[vals[0]];
       if (!go) { this.h.clearField(0); this.h.bell(); return true; }
-      this.view = go; this.page = 0; this.to = ''; this.render();
+      this.view = go; this.page = 0; this.to = ''; this.toPk = null; this.draft = null; this.render();
       return true;
     },
 
@@ -10097,7 +10159,7 @@ var NostrTools = (() => {
       if (!opened) {
         try { global.location.href = 'mailto:' + MAUK + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text); } catch (e) { /* rien */ }
       }
-      UI.message(h, L('Déposé.', 'Posted.'));
+      UI.message(h, L('Scellé.', 'Sealed.'));
       return true;
     },
 
@@ -10105,7 +10167,6 @@ var NostrTools = (() => {
     r_profile: function () {
       var h = this.h, v = new Vdt(), mk = maskByCode(NET.mask()), f = fauna();
       header(v, L('VOTRE PROFIL', 'YOUR PROFILE'));
-      this.koinLine(v, 21);
       v.pos(5, 3).fg(7).text(L('Pseudo (12 car.) :', 'Nickname (12 ch.):'));
       v.pos(7, 3).fg(7).text(L('Masque (0-18)    :', 'Mask (0-18)      :'));
       v.pos(7, 26).fg(mk ? maskColor(mk.code) : 5).text(mk ? cut(mk.name, 14) : L('aucun', 'none'));
@@ -10131,11 +10192,11 @@ var NostrTools = (() => {
     k_profile: function (k, vals) {
       var h = this.h;
       if (k.fn === 'REPETITION') { this.showKey = !this.showKey; this.render(); return true; }
-      if (k.fn === 'SOMMAIRE') { if (!NET.nick()) { h.bell(); return true; } this.showKey = false; this.view = 'menu'; this.render(); return true; }
+      if (k.fn === 'SOMMAIRE') { this.showKey = false; this.view = 'menu'; this.render(); return true; }
       if (k.fn !== 'ENVOI') return false;
       var key = ((vals[2] || '') + (vals[3] || '')).replace(/\s+/g, '').toLowerCase();
       var nick = cleanNick(vals[0]);
-      if (nick.length < 2) { UI.message(h, L('Pseudo : 2 à 12 lettres ou chiffres.', 'Nickname: 2 to 12 letters or digits.'), true); h.focusField(0); return true; }
+      if (nick && nick.length < 2) { UI.message(h, L('Pseudo : 2 à 12 lettres ou chiffres.', 'Nickname: 2 to 12 letters or digits.'), true); h.focusField(0); return true; }
       var mq = String(vals[1] || '').trim(), mask = '';
       if (mq && mq !== '0') {
         var m = maskByQuery(mq);
@@ -10147,7 +10208,8 @@ var NostrTools = (() => {
         catch (e) { UI.message(h, L('Clé invalide.', 'Invalid key.'), true); h.focusField(2); return true; }
       }
       store('nick', nick); store('mask', mask);
-      NET.publishProfile(); NET.beat();
+      if (nick) NET.publishProfile();
+      NET.beat();
       this.showKey = false;
       this.view = 'menu'; this.render();
       return true;
@@ -10197,6 +10259,7 @@ var NostrTools = (() => {
       sha256hex(TAG + ':' + room).then(function (rid) {
         if (self.view !== 'chat' || self.room !== room || h.svc !== M || !NET.pool) return;
         self.rid = rid;
+        if (self.pending && self.pending.chat) { var q0 = self.pending.chat; self.pending = null; self.post(q0); }
         var since = now() - 6 * 3600, loaded = false, backlog = [];
         self.sub = NET.pool.subscribe(RELAYS, { kinds: [42], '#e': [rid], since: since, limit: 60 }, {
           onevent: function (ev) {
@@ -10239,6 +10302,15 @@ var NostrTools = (() => {
       v.cls().cur(0);
       v.pos(1, 1).fg(7).inv(1).text(L(' KAVE ', ' KAVE ')).inv(0).fg(m ? maskColor(m.code) : 3).text(' ' + cut(lbl, 18));
       v.pos(2, 1).g1().fg(3).rep(0x70, 40).g0();
+      // aucun relais : pas de saisie, SOMMAIRE ramène aux Kaves
+      this.dead = NET.down();
+      if (this.dead) {
+        v.pos(4, 2).fg(1).text(L('Kalabass indisponible.', 'Kalabass unavailable.'));
+        UI.footer(v, [['Kaves', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+        h.clearForm(); h.out(v);
+        this.status();
+        return;
+      }
       v.pos(21, 1).g1().fg(3).rep(0x23, 40).g0();
       v.pos(23, 1).fg(3).text('>');
       v.pos(24, 1).fg(6).text(' ' + L('Envoyer', 'Send') + ' '); kbtn(v, 'ENVOI');
@@ -10252,6 +10324,7 @@ var NostrTools = (() => {
     },
     status: function () {
       if (this.view !== 'chat') return;
+      if (!!NET.down() !== !!this.dead) { this.r_chat(); return; }
       var n = NET.inRoom(this.room).length, up = NET.relaysUp();
       var t = up ? n + L(n > 1 ? ' présents' : ' présent', ' here') + ' / ' + NET.online() : L('hors ligne', 'offline');
       t = cut(t, 14);
@@ -10309,11 +10382,50 @@ var NostrTools = (() => {
         return true;
       }
       if (!this.rid) { h.bell(); return true; }
+      // premier envoi : le pseudo est demandé maintenant, le message part ensuite
+      if (!NET.nick()) { this.pending = { chat: q }; this.askNick('chat'); return true; }
+      this.post(q);
+      return true;
+    },
+    post: function (q) {
+      var h = this.h, self = this;
       var tags = [['e', this.rid, RELAYS[0], 'root'], ['t', TAG], ['nick', NET.nick()]];
       if (NET.mask()) tags.push(['mask', NET.mask()]);
       NET.publish({ kind: 42, created_at: now(), tags: tags, content: q })
-        .then(function (ev) { if (!self.seen[ev.id] && self.view === 'chat') { self.seen[ev.id] = 1; self.show(ev); } })
-        .catch(function () { self.sys(L('Message non transmis : réseau injoignable.', 'Message not sent: network unreachable.')); h.bell(); });
+        .then(function (ev) { KOIN.sent(); if (!self.seen[ev.id] && self.view === 'chat') { self.seen[ev.id] = 1; self.show(ev); } })
+        .catch(function () { if (self.view === 'chat') { self.sys(L('Message non transmis : réseau injoignable.', 'Message not sent: network unreachable.')); h.bell(); } });
+    },
+
+    /* ----- pseudo, demandé au premier envoi ----- */
+    askNick: function (back) {
+      if (back === 'chat') { var room = this.room; this.stopChat(); this.room = room; }
+      this.back = back; this.view = 'nick'; this.render();
+    },
+    r_nick: function () {
+      var h = this.h, v = new Vdt(), mk = maskByCode(NET.mask());
+      header(v, L('VOTRE PROFIL', 'YOUR PROFILE'));
+      v.pos(6, 3).fg(7).text(L('Pseudo (12 car.) :', 'Nickname (12 ch.):'));
+      v.pos(8, 3).fg(5).text(L('Pseudo : 2 à 12 lettres ou chiffres.', 'Nickname: 2 to 12 letters or digits.'));
+      UI.footer(v, [[L('Enregistrer', 'Save'), 'ENVOI'], [L('Abandon', 'Cancel'), 'SOMMAIRE']]);
+      h.out(v);
+      h.form([{ r: 6, c: 22, len: 12, value: mk ? cleanNick(mk.name) : '' }]);
+    },
+    k_nick: function (k, vals) {
+      var h = this.h, back = this.back;
+      if (k.fn === 'SOMMAIRE') {
+        this.pending = null;
+        if (back === 'chat') this.joinRoom(this.room);
+        else { this.view = back || 'menu'; this.render(); }
+        return true;
+      }
+      if (k.fn !== 'ENVOI') return false;
+      var nick = cleanNick(vals[0]);
+      if (nick.length < 2) { UI.message(h, L('Pseudo : 2 à 12 lettres ou chiffres.', 'Nickname: 2 to 12 letters or digits.'), true); h.focusField(0); return true; }
+      store('nick', nick);
+      NET.publishProfile(); NET.beat();
+      if (back === 'chat') { this.joinRoom(this.room); return true; }
+      this.view = 'write'; this.render();
+      if (this.draft) this.doSend(this.draft);
       return true;
     },
 
@@ -10335,7 +10447,8 @@ var NostrTools = (() => {
           .fg(maskColor(NET.maskOf(m.ev.pubkey), m.ev.pubkey)).text(pad(NET.label(m.ev.pubkey), 17)).fg(5).text(fmtWhen(m.ev.created_at));
         v.pos(r + 1, 6).fg(6).text(cut(p.subj || (m.text || L('(illisible)', '(unreadable)')).replace(/\s+/g, ' '), 34));
       });
-      if (list.length) v.pos(20, 2).fg(5).text(L('< recu   > envoye', '< received   > sent'));
+      if (list.length) v.pos(19, 2).fg(5).text(L('< reçu   > envoyé', '< received   > sent'));
+      UI.keyHints(v, 20, [[L('Écrire (champ vide)', 'Write (empty field)'), 'ENVOI']]);
       v.pos(21, 2).fg(7).text(L('N° du message :', 'Message no.  :'));
       v.pos(21, 22); kbtn(v, 'ENVOI');
       UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
@@ -10349,6 +10462,7 @@ var NostrTools = (() => {
       if (k.fn === 'RETOUR') { if (this.page > 0) { this.page--; this.render(); } else h.bell(); return true; }
       if (k.fn === 'SOMMAIRE') { this.view = 'menu'; this.render(); return true; }
       if (k.fn !== 'ENVOI') return false;
+      if (!String(vals[0] || '').trim()) { this.to = ''; this.toPk = null; this.draft = null; this.view = 'write'; this.render(); return true; }
       var n = parseInt(vals[0], 10);
       if (!(n >= 1 && n <= list.length)) { h.clearField(0); h.bell(); return true; }
       this.cur = list[n - 1].ev; this.view = 'read'; this.render();
@@ -10378,57 +10492,71 @@ var NostrTools = (() => {
         var p = splitSubject(out ? m.text : NET.plain[ev.id]);
         this.to = NET.label(ev.pubkey); this.toPk = ev.pubkey;
         this.subj = p.subj ? (/^re:/i.test(p.subj) ? p.subj : 'Re: ' + p.subj) : '';
-        this.view = 'write'; this.render();
+        this.draft = null; this.view = 'write'; this.render();
         return true;
       }
       return false;
     },
 
-    /* ----- écrire à un usager ----- */
+    /* ----- écrire à un usager (depuis Votre Kalabass) ----- */
     r_write: function () {
-      var h = this.h, v = new Vdt();
-      header(v, L('MESSAGE DIFFÉRÉ', 'DEFERRED MESSAGE'));
-      v.pos(5, 3).fg(6).text(L('A     :', 'To   :'));
-      v.pos(6, 11).fg(5).text(L('PSEUDO ou PSEUDO#CODE', 'NICK or NICK#CODE'));
+      var h = this.h, v = new Vdt(), d = this.draft;
+      header(v, L('ÉCRIRE', 'WRITE'));
+      v.pos(5, 3).fg(6).text(L('À     :', 'To   :'));
+      v.pos(6, 11).fg(5).text(L('PSEUDO#CODE ou n°', 'NICK#CODE or no.'));
+      v.pos(7, 11).fg(5).text(L('vide : l\'annuaire', 'empty: the directory'));
       v.pos(8, 3).fg(6).text(L('Objet :', 'Subj.:'));
       v.pos(10, 3).fg(6).text(L('Texte :', 'Text :'));
       UI.keyHints(v, 18, [[L('Suivant', 'Next field'), 'SUITE'], [L('Précédent', 'Previous'), 'RETOUR']]);
       UI.keyHints(v, 19, [[L('Corriger', 'Delete'), 'CORRECTION']]);
       UI.keyHints(v, 20, [[L('Effacer le champ', 'Clear the field'), 'ANNULATION']]);
-      UI.footer(v, [[L('Déposer', 'Post'), 'ENVOI'], [L('Abandon', 'Cancel'), 'SOMMAIRE']]);
+      UI.footer(v, [[L('Envoyer', 'Send'), 'ENVOI'], [L('Abandon', 'Cancel'), 'SOMMAIRE']]);
       h.out(v);
-      var f = [{ r: 5, c: 11, len: 18, value: this.to || '' }, { r: 8, c: 11, len: 28, value: this.subj || '' }];
-      for (var i = 0; i < 6; i++) f.push({ r: 11 + i, c: 2, len: 38, auto: true });
-      h.form(f, { start: this.to ? (this.subj ? 2 : 1) : 0 });
+      var to = d && d.who !== undefined ? d.who : (this.to || ''), subj = d ? d.subj : (this.subj || '');
+      var f = [{ r: 5, c: 11, len: 18, value: to }, { r: 8, c: 11, len: 28, value: subj }];
+      for (var i = 0; i < 6; i++) f.push({ r: 11 + i, c: 2, len: 38, auto: true, value: (d && d.body[i]) || '' });
+      h.form(f, { start: to ? (subj ? 2 : 1) : 0 });
       this.subj = '';
     },
     k_write: function (k, vals) {
-      var h = this.h, self = this;
-      if (k.fn === 'SOMMAIRE') { this.to = ''; this.toPk = null; this.view = 'menu'; this.render(); return true; }
+      var h = this.h;
+      if (k.fn === 'SOMMAIRE') { this.to = ''; this.toPk = null; this.draft = null; this.view = 'inbox'; this.render(); return true; }
       if (k.fn !== 'ENVOI') return false;
       var who = (vals[0] || '').trim(), subj = (vals[1] || '').trim();
       var body = vals.slice(2).map(function (l) { return l.replace(/\s+$/, ''); });
+      this.draft = { who: who, subj: subj, body: body.slice() };
+      // « À » vide : l'annuaire, le brouillon est gardé
+      if (!who) { this.page = 0; this.view = 'dir'; this.render(); return true; }
       while (body.length && !body[body.length - 1]) body.pop();
       if (!body.length) { UI.message(h, L('Le message est vide.', 'The message is empty.'), true); h.focusField(2); return true; }
-      var to = this.toPk && NET.label(this.toPk) === who ? [this.toPk] : NET.find(who);
-      if (!to.length) { UI.message(h, L('Usager inconnu : voyez l\'annuaire.', 'Unknown user: see the directory.'), true); h.focusField(0); return true; }
-      if (to.length > 1) { UI.message(h, L('Homonymes : précisez PSEUDO#CODE.', 'Namesakes: use NICK#CODE.'), true); h.focusField(0); return true; }
-      var text = (subj ? subj + '\n\n' : '') + body.join('\n');
+      if (!NET.nick()) { this.askNick('write'); return true; }
+      this.doSend(this.draft);
+      return true;
+    },
+    doSend: function (d) {
+      var h = this.h, self = this, who = d.who, body = d.body.slice();
+      while (body.length && !body[body.length - 1]) body.pop();
+      var to;
+      if (/^\d{1,4}$/.test(who)) { var dl = this.dirKeys(), n = +who; to = n >= 1 && n <= dl.length ? [dl[n - 1]] : []; }
+      else to = this.toPk && NET.label(this.toPk) === who ? [this.toPk] : NET.find(who);
+      if (!to.length) { UI.message(h, L('Usager inconnu : voyez l\'annuaire.', 'Unknown user: see the directory.'), true); h.focusField(0); return; }
+      if (to.length > 1) { UI.message(h, L('Homonymes : précisez PSEUDO#CODE.', 'Namesakes: use NICK#CODE.'), true); h.focusField(0); return; }
+      var text = (d.subj ? d.subj + '\n\n' : '') + body.join('\n');
       UI.message(h, L('Dépôt en cours...', 'Posting...'));
       NET.sendDm(to[0], text).then(function () {
+        KOIN.sent();
         if (h.svc !== M) return;
         h.clearForm();
         UI.message(h, L('Message déposé pour ', 'Message posted for ') + NET.label(to[0]) + '.');
-        self.to = ''; self.toPk = null;
-        setTimeout(function () { if (h.svc === M && self.view === 'write') { self.view = 'menu'; self.render(); } }, 1600);
+        self.to = ''; self.toPk = null; self.draft = null;
+        setTimeout(function () { if (h.svc === M && self.view === 'write') { self.view = 'inbox'; self.render(); } }, 1600);
       }, function () { UI.message(h, L('Échec : réseau injoignable.', 'Failed: network unreachable.'), true); });
-      return true;
     },
 
     /* ----- annuaire ----- */
     r_dir: function () {
       var h = this.h, v = new Vdt(), per = 13, self = this;
-      var list = Object.keys(NET.dir).sort(function (a, b) { return NET.dir[b].t - NET.dir[a].t; });
+      var list = this.dirKeys();
       var alive = NET.alive();
       this.dirList = list;
       var pages = Math.max(1, Math.ceil(list.length / per));
@@ -10444,19 +10572,25 @@ var NostrTools = (() => {
       v.pos(21, 2).fg(7).text(L('Écrire au n° :', 'Write to no.:'));
       v.pos(21, 22); kbtn(v, 'ENVOI');
       UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
-      UI.footer(v, [['Menu', 'SOMMAIRE']]);
+      UI.footer(v, [[L('Écrire', 'Write'), 'SOMMAIRE']]);
       h.out(v);
       h.form([{ r: 21, c: 17, len: 3 }]);
+    },
+    // Annuaire, du plus récent au plus ancien (les n° servent aussi dans « À »)
+    dirKeys: function () {
+      return Object.keys(NET.dir).sort(function (a, b) { return NET.dir[b].t - NET.dir[a].t; });
     },
     k_dir: function (k, vals) {
       var h = this.h, list = this.dirList || [], pages = Math.max(1, Math.ceil(list.length / 13));
       if (k.fn === 'SUITE') { if (this.page < pages - 1) { this.page++; this.render(); } else h.bell(); return true; }
       if (k.fn === 'RETOUR') { if (this.page > 0) { this.page--; this.render(); } else h.bell(); return true; }
-      if (k.fn === 'SOMMAIRE') { this.view = 'menu'; this.render(); return true; }
+      if (k.fn === 'SOMMAIRE') { this.view = 'write'; this.render(); return true; }
       if (k.fn !== 'ENVOI') return false;
       var n = parseInt(vals[0], 10);
       if (!(n >= 1 && n <= list.length)) { h.clearField(0); h.bell(); return true; }
-      this.toPk = list[n - 1]; this.to = NET.label(this.toPk); this.view = 'write'; this.render();
+      this.toPk = list[n - 1]; this.to = NET.label(this.toPk);
+      if (this.draft) this.draft.who = this.to;
+      this.view = 'write'; this.render();
       return true;
     },
 
@@ -10464,7 +10598,6 @@ var NostrTools = (() => {
     r_nonet: function () {
       var v = new Vdt();
       header(v, 'KALABASS');
-      this.koinLine(v, 11);
       v.pos(8, 3).fg(7).text(L('Kalabass indisponible :', 'Kalabass unavailable:'));
       v.pos(9, 3).fg(7).text(L('module réseau non chargé.', 'network module not loaded.'));
       UI.footer(v, [['KORHOGO!', 'SOMMAIRE']]);
@@ -12196,14 +12329,14 @@ window.KORHOGO_FAUNA = [
   var MENU = [
     ['KAVE', 'ENTER KORHOGO', 'ENTER KORHOGO'],
     ['@MSG', 'KALABASS', 'KALABASS'],
-    ['@KIOSQUE', 'AUTRES SERVICES', 'OTHER']
+    ['@KIOSQUE', 'AUTRES SERVICES', 'OTHER SERVICES']
   ];
   KM.HOME = {
     help: function () {
       return [
-        [[3, ' 1 '], [7, 'ENTER KORHOGO     '], [6, L('la Fauna', 'the Fauna')]],
-        [[3, ' 2 '], [7, pad('KALABASS', 18)], [6, L('Kaves, BAL', 'Kaves, mailbox')]],
-        [[3, ' 3 '], [7, pad(L('AUTRES SERVICES', 'OTHER'), 18)], [6, L('météo, encyclopédie', 'weather, encyclopedia')]],
+        [[3, '1 '], [7, pad('ENTER KORHOGO', L(16, 15))], [6, L('la Fauna', 'the Fauna')]],
+        [[3, '2 '], [7, pad('KALABASS', L(16, 15))], [6, L('Kaves, messagerie', 'Kaves, mailbox')]],
+        [[3, '3 '], [7, pad(L('AUTRES SERVICES', 'OTHER SERVICES'), L(16, 15))], [6, L('météo, encyclopédie', 'weather, encyclopedia')]],
         '',
         L('Numéro puis ', 'Number, then ') + K('ENVOI') + '.',
         L('En haut : le nombre de connectés,', 'At the top: how many people are'),
@@ -12223,7 +12356,7 @@ window.KORHOGO_FAUNA = [
       v.pos(16, 11).fg(7).text('>');
       v.pos(16, 17); UI.kbtn(v, 'ENVOI');
       v.pos(19, 14).fg(5).text(L('Lure, Lore, More', 'Lure, Lore, More'));
-      S.KOIN.line(v, 21, 14, KOR.koinPlus);
+      S.KOIN.line(v, 21, 14);
       UI.footer(v, [[L('Aide', 'Help'), 'GUIDE'], [L('Quitter', 'Quit'), 'CONNEXION/FIN']]);
       h.out(v);
       h.form([{ r: 16, c: 13, len: 1 }]);
@@ -12234,6 +12367,7 @@ window.KORHOGO_FAUNA = [
     countBytes: function (v) {
       var NET = S.NET, t;
       if (!NET || !NET.ok) t = '';
+      else if (NET.down()) t = L('hors réseau', 'offline');
       else if (!NET.started || !NET.relaysUp()) t = L('connexion au réseau...', 'reaching the network...');
       else t = UI.onlineText(NET.online());
       v.pos(1, 1).can();
@@ -12259,7 +12393,7 @@ window.KORHOGO_FAUNA = [
   KM.KAVE = {
     help: function () {
       return [
-        L('Numéro d\'un personnage, puis ', 'Type the number of a character, then ') + K('ENVOI') + '.',
+        L('Numéro d\'un personnage, puis ', 'Character number, then ') + K('ENVOI') + '.',
         '',
         L('Sur une fiche :', 'On a profile:'),
         UI.hk('SUITE', 'page ou personnage suivant', 'next page, next character'),
@@ -12337,6 +12471,8 @@ window.KORHOGO_FAUNA = [
       if (idx !== this.cur) this.lines = null;
       this.cur = idx; this.page = page;
       this.renderProf(h, full);
+      // fiche lue jusqu'à sa dernière page : 1 Koin, une fois par fiche
+      if (page === Math.ceil(secsToLines(FAUNA[idx]).length / 15)) S.KOIN.read(FAUNA[idx].code || FAUNA[idx].name);
     },
     repeat: function (h) {
       if (this.cur >= 0 && this.page === 0) { speakMotto(h, FAUNA[this.cur].motto); return true; }
@@ -12372,7 +12508,7 @@ window.KORHOGO_FAUNA = [
      ====================================================================== */
   var KOR = {
     get help() { var x = (this.mode && this.mode.help) || KM.HOME.help; return typeof x === 'function' ? x() : x; },
-    enter: function (h) { this.h = h; this.koinPlus = S.KOIN.credit(); this.mode = KM.HOME; KM.HOME.render(h); },
+    enter: function (h) { this.h = h; this.mode = KM.HOME; KM.HOME.render(h); },
     open: function (name) {
       var h = this.h;
       if (this.mode && this.mode.leave) this.mode.leave(h);
@@ -12443,11 +12579,9 @@ window.KORHOGO_FAUNA = [
         L('lettre F en haut à droite indique que', 'letter F at the top right means the'),
         L("la ligne n'est pas connectée.", 'line is not connected.'),
         '',
-        L('1. Tapez : 3615', '1. Type: 3615'),
-        L('   (3615 METEO ouvre un service', '   (3615 WEATHER opens a service'),
-        L('   du kiosque directement)', '   of the kiosk directly)'),
-        L('2. Tapez : KORHOGO, si vous êtes digne.', '2. Type: KORHOGO, if you are worthy.'),
-        L('3. Appuyez sur ', '3. Press ') + K('CONNEXION/FIN'),
+        L('Appuyez sur ', 'Press ') + K('ENVOI') + L(' ou ', ' or ') + K('CONNEXION/FIN') + '.',
+        L('(3615 METEO ouvre un service', '(3615 WEATHER opens a service'),
+        L('directement)', 'directly)'),
         '',
         L('Le K Terminal compose le numéro puis', 'The K Terminal dials the number, then'),
         L('attend la porteuse du serveur. La', 'waits for the server carrier. The'),
@@ -12464,11 +12598,8 @@ window.KORHOGO_FAUNA = [
       v.pos(5, 2).fg(6).text(L('Mode local, ligne ', 'Local mode, speed: ') + H.baudLabel());
       UI.rule(v, 7, 4);
       v.pos(9, 2).fg(7).text(L('Pour entrer dans le K Terminal :', 'To enter the K Terminal:'));
-      v.pos(11, 3).fg(3).text('1').fg(7).text(L('  Tapez ', '  Type ')).fg(3).text('3615');
-      v.pos(12, 6).fg(6).text(L('ou 3615 MSG, 3615 METEO...', 'or 3615 MSG, 3615 WEATHER...'));
-      v.pos(13, 3).fg(3).text('2').fg(7).text(L('  Tapez ', '  Type ')).fg(3).text('KORHOGO')
-        .fg(6).text(L(' si vous êtes digne.', ' if you are worthy.'));
-      v.pos(14, 3).fg(3).text('3').fg(7).text(L('  Appuyez sur ', '  Press ')); UI.kbtn(v, 'CONNEXION/FIN');
+      v.pos(11, 3).fg(7).text(L('Appuyez sur ', 'Press ')); UI.kbtn(v, 'ENVOI'); v.fg(7).text(L(' ou ', ' or ')); UI.kbtn(v, 'CONNEXION/FIN');
+      v.pos(13, 3).fg(6).text(L('ou 3615 MSG, 3615 METEO...', 'or 3615 MSG, 3615 WEATHER...'));
       VDX.wrap(L('Le terminal compose le numéro, attend la porteuse du serveur puis affiche C en haut à droite.',
         'The terminal dials, waits for the server carrier, then shows C at the top right.'), 36)
         .forEach(function (l, i) { v.pos(16 + i, 3).fg(6).text(l); });
@@ -12668,6 +12799,8 @@ window.KORHOGO_FAUNA = [
       setLeds();
       // dès la connexion : on compte parmi les connectés, et les messages différés sont signalés
       if (S.NET && S.NET.ok) { S.NET.start(); this.notify(S.NET.unread()); }
+      // Koins : 3 à la première connexion du jour, puis 1 par heure
+      S.KOIN.connect();
       var name = code ? S.resolve(code) : null;
       this.go(name || 'KORHOGO');
       if (code && !name) UI.message(this, L('Service inconnu : ', 'Unknown service: ') + UI.cut(code, 18), true);
@@ -12873,9 +13006,33 @@ window.KORHOGO_FAUNA = [
     document.fonts.load('30px "VT323"').then(function () { term.rend.measure(); term.dirty = true; }, function () { });
   }
 
+  /* ---------- Koins : voyant du boîtier et rangée 0 ------------------------ */
+  var koinN = $('koin-n'), koinPlus = $('koin-plus'), koinT = null;
+  function showKoins(n, g) {
+    if (n === null || n === undefined) { $('led-koin').hidden = true; term.koins(null); return; }
+    $('led-koin').hidden = false;
+    koinN.textContent = String(n);
+    clearTimeout(koinT);
+    if (g > 0) {
+      koinPlus.textContent = '+' + g; koinPlus.hidden = false;
+      $('led-koin').classList.add('on');
+      term.koins(n, g);
+      koinT = setTimeout(function () { koinPlus.hidden = true; $('led-koin').classList.remove('on'); term.koins(S.KOIN.get(), 0); }, 4000);
+    } else {
+      koinPlus.hidden = true; $('led-koin').classList.remove('on');
+      term.koins(n, 0);
+    }
+  }
+  S.KOIN.on(showKoins);
+  // Koins dépensés ou gagnés dans l'Insert Koin (autre onglet ou page parente)
+  global.addEventListener('storage', function (e) {
+    if (!e || e.key === null || e.key === 'ik.koins') showKoins(S.KOIN.get(), 0);
+  });
+
   /* ---------- Démarrage -------------------------------------------------- */
   applyPrefs();
   applyLang();
+  showKoins(S.KOIN.get(), 0);
   term.status('', 'F');
   H.go('LOCAL');
 })();

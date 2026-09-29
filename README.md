@@ -8,7 +8,12 @@ Le **K Terminal** ouvre le 3615 : entrez dans Korhogo (**Enter Korhogo**, les fi
 
 ## Koins
 
-**1 Koin** par connexion au 3615 (**3615**, **3615 KALABASS**, **3615 KOINS**), au plus une fois par heure ; le solde s'affiche à l'écran (`KOINS`). Ce sont les Koins d'[Insert Koin](https://mauktenieb.github.io/insertkoin/), partagés par les deux sites (même adresse, `ik.koins` dans le navigateur).
+- **3 Koins** à la première connexion du jour au 3615, puis **1 Koin** par connexion, au plus une fois par heure.
+- **1 Koin** par fiche de la Fauna lue jusqu'à sa dernière page (une fois par fiche).
+- **1 Koin** par message envoyé, dans un Kave ou en privé (5 par jour au plus).
+- **10 Koins par jour** au plus en tout.
+
+Le solde s'affiche en permanence sur le boîtier (voyant `KOINS`) et en haut de l'écran. Ce sont les Koins d'[Insert Koin](https://mauktenieb.github.io/insertkoin/), partagés par les deux sites (même adresse, `ik.koins` dans le navigateur).
 
 ## Fichiers
 
@@ -25,3 +30,32 @@ Copyright © Mauk Tenieb & Korhogo, tous droits réservés, pour tout ce qui rel
 Le moteur du terminal (décodeur Vidéotex, sons, services généraux) est sous licence MIT : voir `LICENSE`. La messagerie utilise [nostr-tools](https://github.com/nbd-wtf/nostr-tools) (domaine public), la météo [Open-Meteo](https://open-meteo.com) (CC BY 4.0), les textes encyclopédiques [Wikipédia](https://fr.wikipedia.org) (CC BY-SA 4.0), la police d'écran [VT323](https://fonts.google.com/specimen/VT323) (SIL OFL).
 
 Projet indépendant, sans lien avec Orange. Minitel est une marque d'Orange.
+
+---
+
+## English
+
+The Minitel of [Korhogo Fauna](https://mauktenieb.github.io/korhogo), the universe of Mauk Tenieb. **Online: https://mauktenieb.github.io/3615/**
+
+The **K Terminal** opens 3615: enter Korhogo (**Enter Korhogo**, the Fauna profiles), open the **Kalabass** — the **Direct Kaves** (live chat, one Kave per character), **Your Kalabass** (encrypted personal mailbox, received and sent), **Unkle Maukie** — and the other services: weather, encyclopedia. In French or English.
+
+### Koins
+
+- **3 Koins** on the first 3615 connection of the day, then **1 Koin** per connection, at most once an hour.
+- **1 Koin** per Fauna profile read to its last page (once per profile).
+- **1 Koin** per message sent, in a Kave or privately (5 a day at most).
+- **10 Koins a day** at most in all.
+
+The balance always shows on the casing (`KOINS` light) and at the top of the screen. These are the Koins of [Insert Koin](https://mauktenieb.github.io/insertkoin/), shared by both sites (same address, `ik.koins` in the browser).
+
+### Files
+
+The whole terminal fits in `index.html`. `apercu.png` is the image shown when the link is shared, `icone.png` the tab icon. `robots.txt`, `sitemap.xml` and `llms.txt` serve search and answer engines (training crawlers are refused).
+
+### Rights
+
+Copyright © Mauk Tenieb & Korhogo, all rights reserved for everything Korhogo: characters, texts, game rules, portraits, names (Korhogo™, Korhogo Fauna™, Fauna Masks™, Katabatik™, Insert Koin™). No reproduction or reuse without written permission, including for training or use by artificial intelligence systems. Contact: mauktenieb@gmail.com
+
+The terminal engine (Videotex decoder, sounds, general services) is under the MIT licence: see `LICENSE`. Messaging uses [nostr-tools](https://github.com/nbd-wtf/nostr-tools) (public domain), weather [Open-Meteo](https://open-meteo.com) (CC BY 4.0), encyclopedic texts [Wikipedia](https://en.wikipedia.org) (CC BY-SA 4.0), the screen font [VT323](https://fonts.google.com/specimen/VT323) (SIL OFL).
+
+Independent project, not affiliated with Orange. Minitel is a trademark of Orange.
