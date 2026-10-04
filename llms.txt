@@ -1,9 +1,11 @@
 # K Terminal — 3615
 
-> K Terminal — le Minitel de Korhogo Fauna, l'univers de Mauk Tenieb. Composez le 3615 : Enter Korhogo, le Kalabass, la météo et l'encyclopédie. / The Minitel of Korhogo Fauna. Dial 3615: Enter Korhogo, the Kalabass, the weather and the encyclopedia.
+> K Terminal — le Minitel de Korhogo Fauna, l'univers de Mauk Tenieb. Composez le 3615 : KORHOGO (The Fauna, Kalabass, Koins), la météo et l'encyclopédie. / The Minitel of Korhogo Fauna. Dial 3615: KORHOGO (The Fauna, Kalabass, Koins), the weather and the encyclopedia.
 
 ## Services
-- 3615 KORHOGO — Enter Korhogo (les fiches de la Fauna), le Kalabass (Direct Kaves, Votre Kalabass, Unkle Maukie). / Enter Korhogo (the Fauna profiles), the Kalabass (Direct Kaves, Your Kalabass, Unkle Maukie).
+- 3615 — le kiosque : 1 KORHOGO, 2 METEO, 3 ENCYCLO. / the kiosk: 1 KORHOGO, 2 WEATHER, 3 ENCYCLO.
+- 3615 KORHOGO — 1 The Fauna (les fiches de la Fauna), 2 Kalabass (Direct Kaves, Votre Kalabass, Unkle Maukie), 3 Koins. / 1 The Fauna (the Fauna profiles), 2 Kalabass (Direct Kaves, Your Kalabass, Unkle Maukie), 3 Koins.
+- 3615 KOINS — le solde et les règles. / the balance and the rules.
 - 3615 KALABASS — la Kalabass. / the Kalabass.
 - Koins : 3 à la première connexion du jour, puis 1 par connexion (au plus une fois par heure) ; 1 par fiche de la Fauna lue jusqu'au bout ; 1 par message envoyé (5 par jour) ; 10 par jour au plus ; solde partagé avec Insert Koin. / Koins: 3 on the first connection of the day, then 1 per connection (at most once an hour); 1 per Fauna profile read to the end; 1 per message sent (5 a day); 10 a day at most; balance shared with Insert Koin.
 - 3615 METEO, 3615 ENCYCLO (Wikipédia). / 3615 WEATHER, 3615 ENCYCLO (Wikipedia).

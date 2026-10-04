@@ -4,7 +4,13 @@ Le Minitel de [Korhogo Fauna](https://mauktenieb.github.io/korhogo), l'univers d
 
 **En ligne : https://mauktenieb.github.io/3615/**
 
-Le **K Terminal** ouvre le 3615 : entrez dans Korhogo (**Enter Korhogo**, les fiches de la Fauna), ouvrez le **Kalabass** — les **Direct Kaves** (on y parle en direct, un Kave par personnage), **Votre Kalabass** (messagerie personnelle chiffrée, reçus et envoyés), **Unkle Maukie** — et les autres services : météo, encyclopédie. En français ou en anglais.
+Le **K Terminal** ouvre le 3615 : le kiosque des services propose **1 KORHOGO**, **2 METEO**, **3 ENCYCLO** (Wikipédia). Dans **KORHOGO** :
+
+1. **The Fauna** — les fiches de la Fauna ;
+2. **Kalabass** — les **Direct Kaves** (on y parle en direct, un Kave par personnage), **Votre Kalabass** (messagerie personnelle chiffrée, reçus et envoyés), **Unkle Maukie** ;
+3. **Koins** — le solde et les règles.
+
+Codes directs : 3615 KORHOGO, 3615 METEO, 3615 ENCYCLO, 3615 KALABASS, 3615 KOINS. En français ou en anglais.
 
 ## Koins
 
@@ -37,7 +43,13 @@ Projet indépendant, sans lien avec Orange. Minitel est une marque d'Orange.
 
 The Minitel of [Korhogo Fauna](https://mauktenieb.github.io/korhogo), the universe of Mauk Tenieb. **Online: https://mauktenieb.github.io/3615/**
 
-The **K Terminal** opens 3615: enter Korhogo (**Enter Korhogo**, the Fauna profiles), open the **Kalabass** — the **Direct Kaves** (live chat, one Kave per character), **Your Kalabass** (encrypted personal mailbox, received and sent), **Unkle Maukie** — and the other services: weather, encyclopedia. In French or English.
+The **K Terminal** opens 3615: the service kiosk offers **1 KORHOGO**, **2 WEATHER**, **3 ENCYCLO** (Wikipedia). In **KORHOGO**:
+
+1. **The Fauna** — the Fauna profiles;
+2. **Kalabass** — the **Direct Kaves** (live chat, one Kave per character), **Your Kalabass** (encrypted personal mailbox, received and sent), **Unkle Maukie**;
+3. **Koins** — the balance and the rules.
+
+Direct codes: 3615 KORHOGO, 3615 WEATHER, 3615 ENCYCLO, 3615 KALABASS, 3615 KOINS. In French or English.
 
 ### Koins
 
