@@ -1457,7 +1457,7 @@ html.framed .topline { display: none; }
   S.LIST = LIST;
 
   /* Koins partagés avec l'Insert Koin (même origine, même localStorage) :
-     +1 par connexion au 3615 (accueil KORHOGO!, kiosque, Kalabass), au plus une fois par heure */
+     +1 par connexion au 3615 KOINS, sans limite ; une victoire à l'arcade double le total */
   var KOIN = {
     HOUR: 3600000,
     get: function () {
@@ -1481,17 +1481,53 @@ html.framed .topline { display: none; }
         return true;
       } catch (e) { return false; }
     },
-    // +1 à chaque connexion au service 3615 KOINS (sans plafond) ; false si hors ligne
+    /* [IK] the ledger, as the KOINS screen says: every connection adds 1 Koin, a win in a game doubles
+       the total (in the arcade). Also 1 per profile read to its last page (once per profile) and
+       1 per message sent, 5 a day — the only limit, so the public relays are not flooded. */
+    day: function () {
+      var t = new Date(), d = t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate(), o = null;
+      try { o = JSON.parse(localStorage.getItem('ik.koinDay') || 'null'); } catch (e) { o = null; }
+      if (!o || o.d !== d) o = { d: d, n: 0, msg: 0, first: false };
+      return o;
+    },
+    add: function (n, o) {
+      try {
+        var cur = this.get(); if (cur === null) return 0;
+        o = o || this.day();
+        n = Math.max(0, n);
+        if (!n) return 0;
+        o.n += n;
+        localStorage.setItem('ik.koinDay', JSON.stringify(o));
+        localStorage.setItem('ik.koins', String(cur + n));
+        localStorage.setItem('ik.freeAt', '0');
+        try { koinDrop(n); } catch (e) {}
+        return n;
+      } catch (e) { return 0; }
+    },
+    // a connection to 3615 KOINS: 1 Koin, every time
     grant: function () {
       try {
-        var n = this.get();
-        if (n === null) return false;
-        localStorage.setItem('ik.koins', String(n + 1));
-        return true;
-      } catch (e) { return false; }
+        var n = this.add(1);
+        localStorage.setItem('ik.kalabassAt', String(Date.now()));
+        return n;
+      } catch (e) { return 0; }
+    },
+    fiche: function (name) {
+      try {
+        var seen = JSON.parse(localStorage.getItem('ik.koinFiches') || '[]');
+        if (seen.indexOf(name) >= 0) return 0;
+        var n = this.add(1);
+        if (n) { seen.push(name); localStorage.setItem('ik.koinFiches', JSON.stringify(seen)); }
+        return n;
+      } catch (e) { return 0; }
+    },
+    message: function () {
+      var o = this.day(); if (o.msg >= 5) return 0;
+      o.msg++; return this.add(1, o);
     },
     // secondes restant avant la prochaine connexion rémunérée
     wait: function () {
+      return 0;
       try {
         var last = parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0;
         if (!last) return 0;
@@ -1525,9 +1561,8 @@ html.framed .topline { display: none; }
     },
     enter: function (h) {
       this.h = h;
-      var before = KOIN.get();
       var credited = KOIN.grant();
-      this.balance = credited ? before + 1 : before;
+      this.balance = KOIN.get();
       this.won = credited;
       if (h.gateOnce) { h.gateOnce = false; h.go('KORHOGO'); return; }
       this.render();
@@ -1537,10 +1572,9 @@ html.framed .topline { display: none; }
       v.cls().cur(0);
       v.big(2, 3, '3615', 7);
       rule(v, 9, 4);
-      var line = L('Truce checks your balance: ', 'Truce checks your balance: ') + this.balance;
-      if (this.won) line += L('. You won 1 Koin!', '. You won 1 Koin!');
-      else line += '.';
-      v.pos(12, 3).fg(7).text(line.slice(0, 60));
+      var line = L('Truce vérifie ton solde : ', 'Truce checks your balance: ') + this.balance + '.';
+      v.pos(12, 3).fg(7).text(line.slice(0, 38));
+      if (this.won) v.pos(13, 3).fg(2).text('+' + this.won + ' Koin' + (this.won > 1 ? 's' : ''));
       v.pos(14, 3).fg(7).text(L('x2 quand tu gagnes une partie.', 'x2 when you win in a game.'));
       footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
@@ -9978,7 +10012,7 @@ var NostrTools = (() => {
       var self = this, sk = this.sk;
       return Promise.resolve().then(function () { return NT.nip04.encrypt(sk, to, text); }).then(function (ct) {
         return self.publish({ kind: 4, created_at: now(), tags: [['p', to]], content: ct });
-      }).then(function (ev) { self.inbox[ev.id] = ev; self.plain[ev.id] = text; return ev; });
+      }).then(function (ev) { self.inbox[ev.id] = ev; self.plain[ev.id] = text; if (S.KOIN && S.KOIN.message) S.KOIN.message(); return ev; });
     },
     received: function () {
       var self = this;
@@ -10166,7 +10200,7 @@ var NostrTools = (() => {
       if (!opened) {
         try { global.location.href = 'mailto:' + MAUK + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text); } catch (e) { /* rien */ }
       }
-      UI.message(h, L('Déposé.', 'Posted.'));
+      UI.message(h, '\u2709 \u2192 ' + MAUK);
       return true;
     },
 
@@ -10381,7 +10415,7 @@ var NostrTools = (() => {
       var tags = [['e', this.rid, RELAYS[0], 'root'], ['t', TAG], ['nick', NET.nick()]];
       if (NET.mask()) tags.push(['mask', NET.mask()]);
       NET.publish({ kind: 42, created_at: now(), tags: tags, content: q })
-        .then(function (ev) { if (!self.seen[ev.id] && self.view === 'chat') { self.seen[ev.id] = 1; self.show(ev); } })
+        .then(function (ev) { if (KOIN && KOIN.message) KOIN.message(); if (!self.seen[ev.id] && self.view === 'chat') { self.seen[ev.id] = 1; self.show(ev); } })
         .catch(function () { self.sys(L('Message non transmis : réseau injoignable.', 'Message not sent: network unreachable.')); h.bell(); });
       return true;
     },
@@ -10584,1430 +10618,6 @@ var NostrTools = (() => {
    ========================================================================== */
 window.KORHOGO_FAUNA = [
 {
-"name": "Honey Buzzard",
-"code": "HB",
-"hex": "#d32f2f",
-"vt": 1,
-"motto": "Even nothing is something that is nothing.",
-"faction": "Red / Sender / First Wave",
-"stats": {
-"STR": 6,
-"DEX": 8,
-"INT": 7,
-"WIS": 10,
-"CHA": 5,
-"CON": 8
-},
-"secs": [
-[
-"f",
-"D(t) = int[0..t] gamma * e^(-mu(t-s)) * R(s) ds"
-],
-[
-"i",
-"Buzzard head, black tux, red ring, tense, sharp, cryptic."
-],
-[
-"t",
-"Red / Sender / First Wave / Distance & Decay / G-Force & Entropy."
-],
-[
-"i",
-"White Bishop / Virgil / Member of The Invisible College of Sages / Amertume / Dark F(e)ather."
-],
-[
-"t",
-"Decaying entropist — a tense rot-bringer with red ring's pull. High WIS and DEX weave his cryptic rot."
-],
-[
-"t",
-"Powers: Buzzard's Oil Rot, Corrosive Cloud, Gear Decay. Red Ring's Oil Pull — gravity pull, disorienting force. His oil corrodes with entropic bite — a buzzard's feast on time's carcass."
-],
-[
-"i",
-"No-Name (XIII) / Keter / Mithraic Corax / Plato's Timaeus first cause / Plotinus' oil rot dead wells / Kabbalah's Buzzard in Ayin might fade new chants."
-],
-[
-"t",
-"Hexagram 18 — Work on What Has Been Spoiled / \"The past decays, Correct it with firmness.\""
-],
-[
-"t",
-"Mini-Stories: The City of Night / The Death of Joan / Vault of Lost Voices."
-],
-[
-"t",
-"Masks Krewsmatics: Red Ring + Pink Hand = Purpose."
-]
-],
-"face": [
-"DhtEKiMbUW8bUDUbUXc1f38bUH19fCgwICJ8",
-"DiAbRDZ+PRtRPT06KisbQX8bRHsbUH0oICAq",
-"DhtEKBtBahtRG0RvG1A9PxtUG0UoG1EbQix8G0ZwG0QuG1B+P3ZwcHA=",
-"DhtEaiQbQTcgG0Roa28bUjcbUxtFLRtSG0dsG1EbQjAbRG8bUDwwYCA=",
-"DhtEfyUgIHAbQXAbRGgbQSQjG0RjG1IyG1EbRjAbUBtENTUoIA==",
-"DhtEPyAgIGsbUXAbUH04cBtBcnEbUhtHIhtUG0Z9G1AbQXYbRGIg",
-"DhtEISAqNCAiLzAiKy8bUXwbUnxwG1AbRX0bRCE=",
-"DiAgIBtEKn18NCB4G0F8G1EbRGMbUHxzJhtBKxtEdQ==",
-"DiAgICAbRG0nIBtFaBtRG0IlG0F/G0R6fxtQNzUkIQ==",
-"DhtEInQgICAhIBtSNRtRG0YwG0R6en8bUDU1MSQ=",
-"DiAbQWsbRX0bQnAgIBtFeBtEPhtSfBtRG0YpG1R0G1EbRG8bUDU5IHg=",
-"DhtEIiIbUjAbUCMrIhtBIxtEYjt7G1J9G1AbRW8bRHl4fn8=",
-"DiAbRCEbQWobRDAbQXgbRXwbQXAgG0Q3NG8bQWobRD8rLj8=",
-"DiAbRCIiG1EbRWp/G1J5G1Q/G1AgG0Q1NWtqG1QbRSUoG1AbRH10"
-],
-"facec": [
-"DhtEaiMbUW8bUDV/f39/fX19KDAgIjw=",
-"DiAbRCYbUXsbUDUbUXt/f39/f38bUH0wISAq",
-"DiAbQWobRG81G1F7G1QbRigsfHFgG1AbRH4/dnBwcA==",
-"DhtFaBtEJBtBJSAbRDg+PxtUG0ZoehtHbRtGMBtEfxtQPDAwIA==",
-"DhtEfzEgIHB0aDQjYxtUG0ZtMBtQG0Q3NDIw",
-"DhtENyAgIGsbVBtGIhtQG0R9OHhycRtUG0Z7G1YbR2QbUBtEdmQg",
-"DhtEISAqdCAhLzAiK28bVBtGIiMvG1AbRH0h",
-"DiAgIBtEanx8NCB4fH98cyYrdQ==",
-"DhtEYCAgIG0lIWgbVBtGJRtEf39/G1A1NTEy",
-"DiAbRHQgICghIBtUG0ZqcBtEf39/G1A5OSgg",
-"DiAbRGsbRn0bRHAgIHg3G1QbRiMtdBtEfxtQNWUheA==",
-"DhtEIjIbVBtGbxtQG0QjKyIjYjt7G1QbRiIbUG8bRHN0fn8=",
-"DiAbRCRqMHh8cCA3NG9qPysuPw==",
-"DiAbRDIiG1QbRip3bzcbUCAbRDU1Ozp/f310"
-]
-},
-{
-"name": "C7H5N3O6",
-"code": "C7",
-"hex": "#4fc3f7",
-"vt": 6,
-"motto": "Efficiency is...",
-"faction": "Blue / Grey / Divisionist / First-Wave nature force",
-"stats": {
-"STR": 9,
-"DEX": 8,
-"INT": 10,
-"WIS": 6,
-"CHA": 4,
-"CON": 7
-},
-"secs": [
-[
-"f",
-"En = E(n-1) * (1 - alpha)"
-],
-[
-"i",
-"Chunky grey golem, bug in chest, blue gear, cold, calculated, executor."
-],
-[
-"t",
-"Blue / Grey / Divisionist / First-Wave nature force / Machine / Design & Reproduction / Adequation & Seriation."
-],
-[
-"i",
-"White Knight / Machine / Golem / Gear / Iode Anacréon / Hephaistos / Naphta's Husband / Member of The Invisible College of Sages."
-],
-[
-"t",
-"Mechanical churner — a cold grinder with bug-heart precision. High INT and STR crush with relentless blue-grey clank."
-],
-[
-"t",
-"Powers: Golem's Oil Crush, Smash, Crippling Force. Insect's Oil Swarm — swarm, poisonous sting. His oil drives a relentless grind — churning flesh to dust."
-],
-[
-"i",
-"The Magician (I) / Binah / Mithraic Persian / Plato's Timaeus form-receptacle / Plotinus' oil grind derrick automation / Kabbalah's Gear in Gimel might churn new forms."
-],
-[
-"t",
-"Hexagram 60 — Limitation / \"Water over lake, Limitation, Success.\""
-],
-[
-"t",
-"Mini-Stories: Freeland / Churn of Singing Iron / Den of Clicking Dolls."
-],
-[
-"t",
-"Masks Krewsmatics: Gear + White Hive = Work."
-]
-],
-"face": [
-"DhtEd39/fxtUG0UqG0R/G1E1G1AgPyUgYBtRe38bUG4y",
-"DhtEf38bVBtFYBtEfxtRPxtSbxtQPSxzICQiaxtRb38bUHY=",
-"DhtUG0V0G1I/G1R6G1F0MBtSG0QyfxtQczwwICAiG1QbRWAbURtEK38=",
-"DhtSG0U/G1A/LxtSG0YsG1AbRT8bRDYbRS8bRC8hIGAkIGIiIw==",
-"DhtSG0VhG1AbRDVhfyEbUTYbUCAwMGh1JHh1JTg=",
-"DhtRG0UlG1AbRDF6G1EbRXQbUBtEan4xaGF6eH8bUS1/G1B9JQ==",
-"DhtRG0QjG1A1G1F1G1QbRSMbUBtEextSG0ZgYBtQG0J9G1F8fBtUG0U0G1AbRD9vfylq",
-"DhtRG0R9G1AlfhtBfBtRG0J+dxtSG0cyM2QbURtCbxtSG0RiG1EvG1AbQX0bRHwibw==",
-"DhtEJ2gbURtFahtSNBtHYBtRG0I7G1IbR30bQzQbURtGMxtSG0dgMBtRG0J1G0RrG1A/MCA=",
-"DiAbRGobUTQbUhtFNRtWG0ciG1EbRi8bUhtDNxtRYBtEahtVG0crG1YhG1IbRGp/G1AlICA=",
-"DhtEfRtBahtUG0UwKhtSG0R4G1EbQjcbQycbQiMbUBtBPxtSG0QqdBtQPycgICA=",
-"DhtEPWobQXUbRHgbVBtFaDAbURtGdBtUcBtSG0RjJRtQfXgwJiAg",
-"DhtENSJ3b38bVBtFKRtSG0R1MBtUG0UoIRtEfxtQaWIiICA=",
-"DhtEMiB1ZW8vY2MrKzZmJCAgIA=="
-],
-"facec": [
-"DhtEe3t/fxtUG0YiG0R/fxtQJD8lIGB/f24y",
-"DhtEfX9/f38bVBtGMBtQG0Q9LGsgMiJrf392",
-"DhtUG0YweHp0OG0bRH8bUHN2KCAgIhtUG0ZgG0R/fw==",
-"DhtGfxtUJxtQG0QvG0Z/G0Q/Ni8vISBgJCBiIiM=",
-"DhtUG0Y/G1AbRDVgfyF/ICgwaD0ieHVlaA==",
-"DhtUG0YkG1AbRDV6G1QbRjQbUBtEbn4xaSB2fnt/fz0l",
-"DhtUG0YwG1AbRDV/G1QbRiEbUBtEextGf399G1R8fDAbUBtEP28/a2o=",
-"DhtEfyV+fBtUG0ZudxtWG0c6L2QbVBtGazVgG1AbRH18Im4=",
-"DhtEJWobVBtGaH8bVhtHYBtUG0Y2G1YbR30bUyQbRm8bVHobVhtHMBtUG0Z1G0R/G1A/MCA=",
-"DiAbRGp/G1QbRm8bVhtHKhtUG0ZvG1MbRzcbRnQbURtEaxtWG0crNRtUG0YlG0R/G1AlICA=",
-"DhtEfWp/G1QbRiojNxtTG0clG0Q0G1JqG1QbRmUjG1AbRD8nIDAg",
-"DhtEPWp9eBtUG0ZgG1IbRH0bVBtGdhtQfBtSPRtUKhtQG0R9eDBmICA=",
-"DhtENSJ3bn8bVBtGKCIvG1IbRH4bVBtGIRtQG0Q/PDIkICA=",
-"DhtEMiA1ZW8vY2Mra2kpMiAgIA=="
-]
-},
-{
-"name": "Silent Pact",
-"code": "SP",
-"hex": "#78909c",
-"vt": 7,
-"motto": "...",
-"faction": "Black / Sender / Second-Wave Offspring",
-"stats": {
-"STR": 7,
-"DEX": 6,
-"INT": 8,
-"WIS": 9,
-"CHA": 5,
-"CON": 8
-},
-"secs": [
-[
-"f",
-"V(t) = int[0..t] lambda * e^(-mu(t-s)) * L(s) ds"
-],
-[
-"i",
-"Veiled bloke, quiet, solid, trusty."
-],
-[
-"t",
-"Black / Sender / Second-Wave Offspring / Oath & Silence / Efficiency & Secrecy."
-],
-[
-"i",
-"Black Rook / De Profundis / Oath (Mitheta ra-Harpokrates) / Kaves Secret Chief / Bedtime Story Protagonist."
-],
-[
-"t",
-"Silent guardian — a solid oath-keeper with black veil's shroud. High WIS and CON hold his quiet strength."
-],
-[
-"t",
-"Powers: Oath's Oil Shroud, Shadows, Obscuring Veil. Silent Crude Strike — stealth blow, piercing quiet. His oil cloaks with silent strength — an oath carved in stillness."
-],
-[
-"i",
-"The Moon (XVIII) / Chokhmah / Mithraic Pater / Plato's Meno buried know-how / Plotinus' oil flow underground reserves / Kabbalah's Oath in Kaf might hush new depths."
-],
-[
-"t",
-"Hexagram 20 — Contemplation / \"Wind over earth, The tower watches.\""
-],
-[
-"t",
-"Mini-Stories: Trap of Shut Doors / The Control Room."
-],
-[
-"t",
-"Masks Krewsmatics: Black Veil + Purple Dagger = Analysis."
-]
-],
-"face": [
-"DiAbRDBkbRtRNxtGNRtQG0QnNCAgahtRKm9vJ2c=",
-"DiAbRGRpextSNRtRG0Y1G1AbRDA2ICAgG1EbRW10cDRg",
-"DhtEIjQ9G1E3G0NqG1IbRHobUGpiICAgG0FvG1IbRSEnG1F1fw==",
-"DhtEYmZ+G1ElG1IbQyobRH8bUGogYCAgG0EqG1IbRmQ0G0UiLw==",
-"DhtEaGkbUT8bRmo1G0R/G1BqICggICAbRW8bUhtGdTQbQn8=",
-"DhtEansbUz8bUhtDNhtRG0R+G1BveiBiICAgIBtCbxtSG0Y0G0J/",
-"DhtEZn8bURtGPhtQG0Q/NzV9IGIgICAgIhtRG0JvG1IbRSg=",
-"DhtEextSNRtQG0U/G0Q1NTU9IGogICAgIBtCaxtSG0U6",
-"DhtEfhtUG0ZqG1EbRH4bUGA1NTcgaiAgICAgahtSG0V+",
-"DhtEdxtRG0I+G1AbRD1qIDU1IGogICAgICAbVBtFJQ==",
-"DhtEbhtSahtQMWogNTUgaiAgICAgIGs=",
-"DhtEahtBPyAbRDUgNTUgaiAgICAgIHo=",
-"DhtEajEgJSAkNSBqICAgICAgag==",
-"DhtEahtBNRtEJCAgICAgICAgICAgIGo="
-],
-"facec": [
-"DhtEKCBmZn8bVBtGNxtQG0QnNCQgan9/f39/",
-"DhtEYmJmbhtUG0ZqNRtQG0QwNiAgIBtUG0ZlZWgbRH8bRmg=",
-"DhtEKDo6fxtUG0Z6IRtQG0RqYiAgIBtGb38bVH05OQ==",
-"DhtEYmZ/G1QbRmAbVhtHIhtEfxtQamAoICAqG0Z/f38bVHs=",
-"DhtEamp/G1QbR2gbRjcbRH8bUGsgYiAgIBtGb39/fw==",
-"DhtEansbVBtHYBtWJhtEfxtQb3ogaCAgICIbRm9/fw==",
-"DhtEOX8bVBtGPhtQG0Q/Nz17IGogICAgIhtUG0Zvfw==",
-"DhtEextUG0ZoJRtQG0QlNTU9IGogICAgIBtGa38=",
-"DhtEfhtUG0ZqG1AbRHdhNTU3IGogICAgIGobVBtGPQ==",
-"DhtEdxtUG0Y+G1AbRDtqIDU1IGogICAgICAbVBtGIQ==",
-"DhtEbhtUG0Y1G1AbRClqIDU1IGogICAgICBr",
-"DhtEej8wNSA1NSBqICAgICAgeg==",
-"DhtEajEgJWAhNSBqICAgICAgag==",
-"DhtEajUkICAgICAgICAgICAgag=="
-]
-},
-{
-"name": "Poisoned Well",
-"code": "PW",
-"hex": "#ab47bc",
-"vt": 5,
-"motto": "Words are venom. Honey is the pus of the real.",
-"faction": "Purple / Sender / Second-Wave Offspring",
-"stats": {
-"STR": 4,
-"DEX": 6,
-"INT": 9,
-"WIS": 10,
-"CHA": 8,
-"CON": 5
-},
-"secs": [
-[
-"f",
-"W(t) = P0 * e^(-alpha t)"
-],
-[
-"i",
-"Chubby bald kid, dark trousers, cigar, sly, sharp, luring."
-],
-[
-"t",
-"Purple / Sender / Second-Wave Offspring / Corruption & Assertivity."
-],
-[
-"i",
-"Black Bishop / Pharmakon / Insult / Baby Face / Viper / Blonde Warrior Ruler."
-],
-[
-"t",
-"Twisted whisperer — a sly venom-child with purple sting. High WIS and INT weave his cunning traps."
-],
-[
-"t",
-"Powers: Venom's Oil Whisper, Lie, Psychic Twist. Well's Crude Trap — oil puddle, slowing mire. His oil twists venom into whispers — a sly child's deadly game."
-],
-[
-"i",
-"The Tower (XVI) / Binah / Mithraic Serpent / Plato's Sophist twisted words / Plotinus' oil stain aquifer rot / Kabbalah's Insult in Pe might venom new cons."
-],
-[
-"t",
-"Hexagram 47 — Oppression / \"Water below a lake, Exhaustion, Hidden strength.\""
-],
-[
-"t",
-"Mini-Stories: The Word Hoard / Gash of Hissing Words / The Terminal Bar."
-],
-[
-"t",
-"Masks Krewsmatics: Purple Dagger + Black Veil = Analysis."
-]
-],
-"face": [
-"DhtEIiQgICBgG1E/G1QbRXwbUH0bUhtEIxtRG0Z4G1V2G1AbRTUbRCQgIA==",
-"DiAgIBtEYjV6G1FtG1AbQSczG1QbRWsbUDcbQXs1ICAg",
-"DiAgIBtEInZ/G1EbQmobRnR4G0JuG1QbRn0bVXgbUBtENSFgYA==",
-"DhtEMSAgICJrG1EhG1IbRmobQ3UbUBtFdxtUG0Z7G1U3G1AgIBtEaGk=",
-"DhtEISAgICB+bxtRG0UrG1UbRiMbUhtEfhtRG0JrG1AnIBtEcHB9",
-"DiAgICAgG0FvfRtEdxtFbxtUG0YvG1MbRH4bUD8bQX8bURtEYn9/",
-"DhtEfCcgICAbQWobUhtEYBtRG0YsG0R/G1N1G1AbRX0bRGs2OxtRO38=",
-"DiAgICAbRDAgG0Ftf3I5G1EbRHAbUCIkM2p/",
-"DiAgG0RhIDAoG0FoG0N4G1EbR34bVX0bUBtCfBtEaGggIhtRew==",
-"DiAgICAbRCkxYxtRG0dvG1J1G1MbRSEbRGobUGo6ICQbUXc=",
-"DiAgICAgG0QpIBtCaxtSG0M1G1MbRzUbVBtGNRtQG0QqNjQgZg==",
-"DiAgICAgG0QiICIbUhtDJRtTG0VwG1A3G0RiICAgKw==",
-"DiAgICAgICAgG0FvG1IbRXEbUBtBNSAgICAbRCo=",
-"DiAgICAgICAgG0QiG1FwG1AhICAgICA="
-],
-"facec": [
-"DhtEIiQgICAgfhtUG0Z4G1B9fBtUfH8bUBtENSggIA==",
-"DiAgIBtEYjR6fy8zG1QbRmMbUBtEN3s1ICAg",
-"DiAgIBtEInZ/G1QbRmp8fG59ehtQG0Q1IWBg",
-"DhtEMSAgICJrfxtGfxtWG0dlG1AbRncbVhtHcBtGfxtQG0QhIGhp",
-"DhtEJCAgICB+bxtUG0YrdyFrG1AnIBtEcHJ2",
-"DiAgG0QwICBvfXcbRm8bVC8bRyEbRH9/f39/",
-"DhtEfCcgICBqG0Y/G1FvG1IbRD8bUBtGLzUbRG03O39/",
-"DiAgG0QwIDAgNRtCdxtBYhtFKRtRG0JlG1AgG0QlKWp/",
-"DiAgG0RkIDAoYBtGeBtUG0d+G1Z9G1AbRjQbRGhqImJ/",
-"DiAgIBtEJCkxMxtWG0drNXobUBtGNxtEaGkgJH8=",
-"DiAgICAgG0QpMBtGaxtWG0clZRtQG0Y/G0RqMSQgZg==",
-"DiAgICAgIBtEJCIbRn8bVG8bUDUbRCggICAr",
-"DiAgICAgICAgG0RvG0Z/G0I1ICAgIBtEKg==",
-"DiAgICAgICAgG0QiG1I5G1AgICAgICA="
-]
-},
-{
-"name": "Hátra Lövés",
-"code": "HL",
-"hex": "#9e9e9e",
-"vt": 7,
-"motto": "Surviving is striking from behind.",
-"faction": "Grey / Divisionist / First Wave",
-"stats": {
-"STR": 6,
-"DEX": 10,
-"INT": 5,
-"WIS": 7,
-"CHA": 6,
-"CON": 8
-},
-"secs": [
-[
-"f",
-"P(t) = int[0..t] e^(-lambda(t-s)) * A(s) ds"
-],
-[
-"i",
-"Ragged tribal rider, cowboy edge, precise, exact."
-],
-[
-"t",
-"Grey / Divisionist / First Wave / Agility & Endurance / Reaction & Dexterity."
-],
-[
-"i",
-"Black Knight / Saint Sebastian / Archer / Ulysses / Lovas Hátralövő / Baku Military Chief / Blonde Warrior Ruler."
-],
-[
-"t",
-"Swift ambusher — a precise rider with grey arrow's edge. High DEX and CON track his ragged endurance."
-],
-[
-"t",
-"Powers: Archer's Crude Shot, Oil Arrow, Fiery Pierce. Rider's Oil Slick — slick trap, slowing snare. His oil ignites arrows with lethal aim — piercing the wild's gut."
-],
-[
-"i",
-"Strength (XI) / Netzach / Mithraic Soldier / Plato's Laches gutsy strategy / Plotinus' oil jab pipeline snipe / Kabbalah's Archer in Nun might snipe new survival arcs."
-],
-[
-"t",
-"Hexagram 40 — Release / \"Thunder over water, Deliverance.\""
-],
-[
-"t",
-"Mini-Stories: Span of Flying Stitch Ups."
-],
-[
-"t",
-"Masks Krewsmatics: Arrow + Anchor = Exploration."
-]
-],
-"face": [
-"DhtEMn8bVBtFMX4bUBtBPxtEY38bVBtFIhtVG0YifyYbVBtFKxtVG0YoG0V/f38=",
-"DhtEZn8bVBtFfRtQG0Q3OnY/f3NvG0F9G1QbRXgbVRtGfjkwG0V/",
-"DhtEbX8bURtFPxtQG0FlG0RvKyJ4PH8bVRtHahtWYBtGfxtVL2QbRX8=",
-"DhtEe38bQTcbRCYkICAbVBtFaHA+G1UbRyJ6G1AbQXcbRH8/G1QbRWs=",
-"DhtEan9iYiBoMGsbUTQbVBtFJRtQG0F7G1EbRyMbRiMbRSMjG1AbRD8=",
-"DhtEKnsbQXwbVBtGcBtQG0V9IBtEaSAmKi8bVRtHaBtQG0F3Ly8h",
-"DiAbRCobRX8bVRtGZRtRG0c1G1AgG0RqfXAwG0VqG1UbR28bVn0oG1EbRnwbUBtFdA==",
-"DhtEdCAjG0UqG0QhZCJsf3wbQW8bVBtGIhtVIyMrJQ==",
-"DhtEbTAgICAgYSx4ej47Zi9vfw==",
-"DhtEPyFiZCAgIClybT5gZiYiKA==",
-"DhtEISA/fzQwImQibzZ6aCQgMA==",
-"DiAbRHBoaCEpMCBkKDE2bH8bRX4bVHA=",
-"DiAgG0RmZCAqfzQgIShhYnsbRX9/",
-"DiAbRCRtIiAgMDQwICAgan8bRX9/"
-],
-"facec": [
-"DhtEKn5/G1QbRigbUBtEPzN+fxtUG0Zrfy8jb392ZA==",
-"DhtEOX8bVBtGJBtQG0Q3ZGc/dztvfRtUG0Z4f39/bQ==",
-"DhtEZn8bVBtGNRtQG0RlNzcmaDx/G1QbRm4bVhtHaBtGf39/fw==",
-"DhtEO383JiQgIBtUG0ZgcCQrG1YbR3AbUBtEdz8/G1QbRis=",
-"DhtEKn9iYiBoMGt/G1QbRiUbURtEPxtTG0ZjG1FjYxtEKxtQMw==",
-"DhtEKnt8G1QbRnAbUBtEfSBpICYqLxtRG0Z9G0R9G1AbQSsvIA==",
-"DiAbRCobVBtGbm8bRyUbUCAbRGp9cDBqG1YbR259KBtUG0Z8G1AbRHQ=",
-"DhtENCAzKiFkImxvfG8bVBtGIm9rL28=",
-"DhtEbTAgICAgaWh4ei47Zi9vPw==",
-"DhtEPyFiZCAgICxyLT5gZiYiIg==",
-"DhtEISBvbzQwImQibzZ6KDRgIA==",
-"DiAbRHBhaSEpMCBkKDE2bH1+G1QbRjA=",
-"DiAgG0RmZCAqfzAgIShhYnsbVBtGZiY=",
-"DiAbRCR5KCAgMDQwICAgYn8bVBtGKDE="
-]
-},
-{
-"name": "Plague of Justinian",
-"code": "PJ",
-"hex": "#546e7a",
-"vt": 7,
-"motto": "In contagion strength.",
-"faction": "Black / Sender / Second-Wave Offspring",
-"stats": {
-"STR": 7,
-"DEX": 6,
-"INT": 8,
-"WIS": 5,
-"CHA": 10,
-"CON": 8
-},
-"secs": [
-[
-"f",
-"M(t) = int[0..t] nu(s) * e^(-delta(t-s)) ds"
-],
-[
-"i",
-"Guy with a t-shirt, whose head is an exploding cloud."
-],
-[
-"t",
-"Black / Sender / Second-Wave Offspring / Surge & Contagion / Transformation."
-],
-[
-"i",
-"White Rook / Sultan / Aphrodite's Lover."
-],
-[
-"t",
-"Surging rot-bringer — a dark transformer with black miasma's rush. High CHA and CON spread his plague."
-],
-[
-"t",
-"Powers: Plague's Oil Miasma, Toxic Mist, Spreading Rot. Surge's Crude Rush — speed boost, chaotic surge. His oil spreads a dark scourge — a plague's wild gift."
-],
-[
-"i",
-"The Wheel (X) / Gevurah / Mithraic Soldier / Plato's Timaeus wild motion / Plotinus' oil spill historic mess / Kabbalah's Sultan in Aleph might flood new plagues."
-],
-[
-"t",
-"Hexagram 43 — Breakthrough / \"Lake rising to heaven, One must speak out.\""
-],
-[
-"t",
-"Mini-Stories: Flow of Black Reflections."
-],
-[
-"t",
-"Masks Krewsmatics: Black Cloud + Orange Flame = Intensity."
-]
-],
-"face": [
-"DhtEbm4/fHh4eBtUG0VwG1B6G0Q8OTkoMCAg",
-"DiAbRHs1OhtBfRtUG0ZwG1F6G1InG1EbQnEbRHobUHZ2IiAgIA==",
-"DhtEMH4gG1I3G1UbRn4bVhtHMikmG1UbRnEbVBtFNCIhG1AbRHQwICA=",
-"DhtEdRtBeRtCfBtUG0Z6G1J3G0doG1Z+G1IbRi0bURtFNxtEMBtUG0V4G1IbRGt/G1A2JCA=",
-"DhtFeBtRG0Z6G1I4G1EvbxtSG0clG0R8fhtQb28bUXx+f38bUHUg",
-"DhtFbxtUIyMbRH8bUD9/G1QbRnAbURtHeBtSG0RjG1B+anhjZ25s",
-"DiAbRCEqLy8bVBtFMGIbURtHJRtQG0RvbmcbUWUbUG9hISE=",
-"DhtBYBtEYCAgG0FuYRtSG0R9G1QbRjUbUBtEfSl7G0EnG0QiICAg",
-"DhtRG0Q1G1B+KXw/dxtSdRtUG0UlG1AbRCcgIiBhISQg",
-"DhtEI2B6JTs8NSQgICAgICUgIA==",
-"DhtEaHk3IDcmNDkxISAgICkgIA==",
-"DhtEahtBahtEdSAiJCQkIiAgICAiICA=",
-"DiAbVBtFeiUbUCAgICAgICB8G0F8G0QwICAg",
-"DhtFfhtEdyEwICAgICAgG1QbRW8bUBtEPyAgICA="
-],
-"facec": [
-"DhtELn4/bHh4eH16NBtCJCQwICAg",
-"DhtEIm41On0bVBtGcBtQfhtWG0ckG1QbRnEbRH8bUHY0ICAgIA==",
-"DhtEMH8gG1QbRmgbVhtHODooNhtUG0Z9NBtEfxtGIRtQG0R0MCAg",
-"DhtEdXkbRn0bVHp/G1YbR2h+G0Z/G1QnG0R/G0Z4MBtEfxtQNiAg",
-"DhtEeBtUG0Z+fz9vG1YbRyUbVBtGIyEbUBtEb29/b39/dSA=",
-"DhtEbxtUG0YjIRtEfxtQP38bVBtGcBtHcBtGLBtQG0Q9NnZma2ps",
-"DhtEMCEqLy8bVBtGMCI3G1AbRG9md39vISEh",
-"DiAbQmAgIBtEbnEbVBtGIjUbUBtEfSl6JyIiICA=",
-"DhtCextRG0R5G1AofD93G1QbRiolG1AbRCcgIiBpISAg",
-"DhtEI2B6JTs8NzAwIDAgICUgIA==",
-"DhtEaHk3IDU1NGZiICAgIGEgIA==",
-"DhtEKnp1ICIkIiQhICAgICAgIA==",
-"DhtEIhtGfhtEfyAgICAgICB8fDAgICA=",
-"DhtEfnchMCAgICAgIBtUG0YiG1AbRHcgICAg"
-]
-},
-{
-"name": "Maiden Call",
-"code": "MC",
-"hex": "#42a5f5",
-"vt": 4,
-"motto": "I'll come if you come.",
-"faction": "Blue / White / Sender / Second-Wave Offspring",
-"stats": {
-"STR": 5,
-"DEX": 7,
-"INT": 6,
-"WIS": 8,
-"CHA": 10,
-"CON": 6
-},
-"secs": [
-[
-"f",
-"I(t) = int[0..t] phi(s) * e^(lambda(t-s)) ds"
-],
-[
-"i",
-"Dark-haired, maybe Asian, old phone or glowing anchor in hands, curious, haunting, sweet."
-],
-[
-"t",
-"Blue / White / Sender / Second-Wave Offspring / Innocence & Relationship / Authenticity & Warmth."
-],
-[
-"i",
-"Black Bishop / Echo (Siren) / Mermaid / Marie / Aube's Sister."
-],
-[
-"t",
-"Haunting binder — a sweet whisperer with anchor's grasp. High CHA and WIS lure with fragile grace."
-],
-[
-"t",
-"Powers: Siren's Oil Lure, Call, Psychic Pull. Anchor's Crude Grasp — roots, oily grip. Her oil weaves haunting whispers — binding souls with fragile grace."
-],
-[
-"i",
-"The Lovers (VI) / Yesod / Mithraic Nymphus / Plotinus' oil whisper pipe signals / Kabbalah's Echo in Dalet might ring new lures."
-],
-[
-"t",
-"Hexagram 6 — Conflict / \"Heaven and water move apart, Conflict, But with inner truth.\""
-],
-[
-"t",
-"Mini-Stories: Pit of Broken Calls."
-],
-[
-"t",
-"Masks Krewsmatics: Anchor + Arrow = Exploration."
-]
-],
-"face": [
-"DhtEaXlvPzhkIG1+O38bVBtFNRtEf38bUSobQX8=",
-"DhtEOGlnfiQ5NCh2G1E3G1JzG1EbQm0bRH9/LRtFKQ==",
-"DhtEYDB5fzA1NShmextRextUG0UqG0R/G1E3G0U1cA==",
-"DiAbRG1rbyB1LS8bQS9vfRtUG0VgG0dwG0Z8G1F8G0U+",
-"DiAbRHx7P2JlcCBwcBtUG0YqG1AbQXcbURtEfHBwG1AbQTc=",
-"DiAgIBtEMTUgIiBgICEbQW8bRH5/fyk=",
-"DiAbRCkueSUgIBtBeBtFdHwbQXx+G0Q5f2Zo",
-"DiAbRCp+fyAgIBtSG0coG1R8G1J+G1F8G0Y2G0MlG1AbRDkhG0Fq",
-"DiAbRDBrPiAgIBtRG0JiG1IbR2swG0NrG1AbQW0bURtCbhtQG0F1G0QhJQ==",
-"DiAbRCImJSAgIBtBPxtSG0MiG1FwG1AbQT8bRGobVBtFbxtGNRtQG0QoYA==",
-"DiAbRGB8ICAgIH9+G0UjG0F6G1EbRnwbVBtFNBtGNRtQG0QiIA==",
-"DhtEeidxfDAgICpmMC8bQW8bRG8bVBtFfRtQG0QpLA==",
-"DhtEMSg3fzUgYH99fzljdxtUG0UqG1AbQXUg",
-"DhtENWp7KjUgIG9/G1QbRTAbUBtENWIvehtUG0VrG1AbQTQ="
-],
-"facec": [
-"DhtEaWlvPzhkKGl+O39/f39/fw==",
-"DhtEOGtjfiQ1NCh2fxtUG0YsbRtEf39/G0Yh",
-"DhtEKDB5fyQ1NSJme38bVBtGKBtEf38bRjEy",
-"DhtEKGlrb2BlLS8vb31/G1QbRnh8fD4=",
-"DiAbRD19P2hpYGBgcBtUG0YqG1AbRHd/G1QbRiEbRH8bUDU=",
-"DiAbRGAiMDUgIyBhICFvf39/IA==",
-"DiAbRCkueSUgIHh8G0Z4G0R8fjk/NhtBYA==",
-"DiAbRCp+fyAgIBtUG0ZvG0d0G1Z+eBtUG0Y2NRtQG0Q7MBtBKg==",
-"DiAbRDRrPiAgIBtUG0ZiG1YbR2sbVBtGdxtWG0drG1AbRG0bVBtGbhtQG0Q9MBtCJA==",
-"DiAbRCImJSAgID8bVBtGb3EbUBtEP2obVBtGKzUbUBtEKGA=",
-"DiAbRGB8ICAgIG9+I2kbVBtGfDQ1G1AbRCIg",
-"DhtEeidhdDAgIBtCIhtELDAvb28bVBtGZRtQG0QpLA==",
-"DhtEMSA2fxtGNCAgG1IbRHsbUBtGPhtEdhtCJBtEaz0bVBtGIhtQG0R1IA==",
-"DhtENRtCKBtEOSI1ICAbQmkbRD8bUnYbUDEoamobVBtGKBtQG0Q0"
-]
-},
-{
-"name": "Truce",
-"code": "TR",
-"hex": "#ffd54f",
-"vt": 3,
-"motto": "Do we have an agreement?",
-"faction": "Grey / Yellow / Factualist / Second-Wave Offspring",
-"stats": {
-"STR": 6,
-"DEX": 8,
-"INT": 8,
-"WIS": 7,
-"CHA": 8,
-"CON": 6
-},
-"secs": [
-[
-"f",
-"B(t) = int[0..t] alpha(t-s) * phi(s) ds"
-],
-[
-"i",
-"Twin blokes, synced moves, keen, balancer."
-],
-[
-"t",
-"Grey / Yellow / Factualist / Second-Wave Offspring / Deals & Symmetry / Consent & Trade."
-],
-[
-"i",
-"White Knight / Scales / Anal Market / The Two Cheeks."
-],
-[
-"t",
-"Harmonious balancers — keen twins with grey-yellow equilibrium. High DEX and INT sync their scales."
-],
-[
-"t",
-"Powers: Scales' Oil Equilibrium, Stat Shift, Balanced Flow. Twin's Oil Concord — shared strength, allied bond. Their oil weighs fate in tandem — a twin-born harmony trembling under strain."
-],
-[
-"i",
-"Temperance (XIV) / Tiferet / Mithraic Heliodromus / Plato's Phaedo soul balance / Plotinus' oil tweak flow control / Kabbalah's Scales in Lamed might weigh new pacts."
-],
-[
-"t",
-"Hexagram 12 — Standstill / \"Heaven blocks earth, Stagnation Temporary.\""
-],
-[
-"t",
-"Mini-Stories: Souk of Red Dreams."
-],
-[
-"t",
-"Masks Krewsmatics: Scales + Red Gun = Alternative."
-]
-],
-"face": [
-"DiAbRGAgICAgICAgICAgICAgNQ==",
-"DiAbRGAgJCAoICAgIBtBcBtEPCQgIGY=",
-"DiAgIBtEJCBiIGIgPxtBISAgICAbRCk=",
-"DiAgIBtEMSAoICggG1QbR2gbUnwbUxtFIxtQG0F3ICAbRGA=",
-"DiAgIBtEJCBiIGIgG1EbRyIbUiMbURtCIxtEJhtQNDAo",
-"DiAgIBtEMSAoICggG1IbR2glG1EbRn4bQjcbUBtEfTdi",
-"DiAgIBtEJCBiIGIgG0JrG1E8G1IbRiUbURtFNRtEfhtQICg=",
-"DiAgIBtEISAoICggG0EqG1EbRywbUBtFPxtBdxtEPzAi",
-"DiAgICAgG0QiIGJgG0dwG0Z8G1IbRG4bUX4bUD96ZA==",
-"DiAgIBtEMCBgIGAbVBtHfhtWNxtSG0Y/G0QiG1EbQnAbVBtFJHwbRH8=",
-"DhtFeHR8G0J4fHx8fhtSG0ZyczMbRXQbURtCLBtUG0UnG1EbRHwbUC8=",
-"DhtBKy8/G0RvG1F4G1QbRSMbUhtEfBtUG0UrG1IbRHQbURtFJxtEYHp/G1A/NSU=",
-"DiAgIBtEIiMnJ2cvPzc3KWEiIA==",
-"DiAgICAgIBtEaBtBPX0bRHx8dH0wICA="
-],
-"facec": [
-"DiAbRCggICBgICAgICAgICAgNQ==",
-"DiAbRGIgMSAoICggIHA8JCAgZg==",
-"DiAbRGAgJCBiIGIgPyMgISAgKQ==",
-"DiAgIBtEMSAoIGQgG1QbR2gbVnw0G1AbRncgIBtEIg==",
-"DiAgIBtEJCAqIGggG1QbRiMbVhtHIxtUG0YjYBtQG0Q0MGI=",
-"DiAgIBtEMSBiIGggG1YbR2olLBtUG0Y3G1AbRH03KA==",
-"DiAgIBtEJCAoICggG0ZrG1Q8G1YbRyQbVBtGNRtEfxtQICk=",
-"DiAgIBtEMSBiIGIgKhtUG0csG0YnG1AbRHc/MGI=",
-"DiAgG0RgICAoIChgG0Z4fhtUIRtEfxtQb3pk",
-"DiAgG0RgIGAiIGgbVBtHPhtWNyYbVBtGfHAkOBtEfw==",
-"DhtEeBtGdBtEfHwbRnx8fH5/f38bVG8sJxtEfxtQZw==",
-"DhtEJy8/bxtUG0YiIiMjKykhG0R/fxtQPzYm",
-"DiAgIBtEIiMnZ2cvb2dnJjJiIA==",
-"DiAgICAgIBtEaD0bVBtGYBtQG0R8fHx8MCAg"
-]
-},
-{
-"name": "Ts'ui Pên",
-"code": "TP",
-"hex": "#ff7043",
-"vt": 1,
-"motto": "Infinity breathes wisdom.",
-"faction": "Orange / Pink / Liquefactionist / First Wave",
-"stats": {
-"STR": 5,
-"DEX": 6,
-"INT": 9,
-"WIS": 10,
-"CHA": 7,
-"CON": 6
-},
-"secs": [
-[
-"f",
-"K(t) = int[0..t] kappa(s) * e^(-alpha(t-s)) ds"
-],
-[
-"i",
-"Old Asian geezer, slick butterfly vibe, visionary, tangled, coded."
-],
-[
-"t",
-"Orange / Pink / Liquefactionist / First Wave / Knowledge & Mystery / Intricacy & Adventure."
-],
-[
-"i",
-"White Bishop / Borges / Butterfly / Member of The Invisible College of Sages / D(e)ad Alus / Bedtime Storyteller."
-],
-[
-"t",
-"Cryptic weaver — a tangled sage with butterfly's haze. High WIS and INT spin his coded visions."
-],
-[
-"t",
-"Powers: Butterfly's Oil Haze, Mist, Blinding Veil. Konklave's Oil Whisper — suggestion, coded will. His oil unveils cryptic veils — a butterfly's dance through fate."
-],
-[
-"i",
-"The Pope (V) / Chokhmah / Mithraic Heliodromus / Plato's Timaeus demiurgic spark / Plotinus' oil haze refinery fumes / Kabbalah's Butterfly in Kuf might weave new tales."
-],
-[
-"t",
-"Hexagram 29 — The Abyss / \"Water flows into itself, Repetition deepens.\""
-],
-[
-"t",
-"Mini-Stories: Minraud II / Interzone."
-],
-[
-"t",
-"Masks Krewsmatics: Wall + Orange Panther = Wisdom."
-]
-],
-"face": [
-"DhtRG0Q/G1QbRXAbURtEb38bUHVlJBtSG0VqG0YqG1QbRTUbUWsbUnwbUT9/G1Q1G1AbRG0=",
-"DhtUG0VqG1E3bRtUNBtEfxtQbjYbUX4bUGsbQW8bVBtFJzsbUSwrG0R/G1A9",
-"DhtUG0VqG1EqfXkbRG8bQmgbVBtFNRtQG0R7G0F+b34bRH0bVBtFMBtReBtQG0R7Zw==",
-"DhtRG0R9G0VsG1UbRjAbUhtFMy8bQygbVBtFdRtQG0E3G0QqfRtSfG8bURtGIRtQG0Q/OTs=",
-"DhtRG0Q/G0V8G1UbRmAbUhtDfn0bURtGLxtQG0F3G1EbRCMbUHobQTobURtFaRtCMHwbVBtGcBtQG0RkZw==",
-"DhtRG0R1G0VqG1NtG1AbQj8bUSE4G1AbQXcbURtFIhtQG0F9G0RvZ2MbURtCLxtVG0ciG1AbRX0bRGs=",
-"DhtRG0IvG0YvG1AbRTcbRH4bUX04G1B9G0FzG0Q8G1EbQiQ0G1AbQX58G1EbQjQbRmsbUBtEdw==",
-"DhtEf29hbxtRfRtQNxtROxtDcBtCcBtQG0F2b3sbURtCPBtEahtQG0FvG0V9",
-"DhtEZiRgG1ElG1AbQn0bRCUbQWsbURtDYBtTG0V1G1EbQiQbRH8bQiobVBtFPxtQG0F9fRtRG0Ui",
-"DiAbRCEbQWp+G1EbRG8bUDVrG0FvG1IbRH0bUT0bUG8bUTgbVBtFKhtRG0RqaHA=",
-"DiAgG0EiG0R/G0F7G0Qxan8bURtFKhtCIhtQG0F+G1EbRS8bRH4bUDdrG1F9",
-"DhtEMCAhMxtBe3F6fhtSG0QjG1EbRScbRH4bUHsvYDEv",
-"DhtBNSAbRCp+G1QbRSMrG1EjG1AbQS8bRCdhMHhuIiIm",
-"DhtBNRtEMCAlISEgIBtBbmQbRCRvG0E3G0QwICA="
-],
-"facec": [
-"DhtEfxtUG0ZwG0R/fxtQdWUkG1QbRndvNCo/NW8bRH8bUDk=",
-"DhtUG0ZoI20bRH8bUH1tdX9rbxtUG0YiMSQrG0R/G1A7",
-"DhtEfxtUG0YrfGkbRH8bRmgwG1AbRG5+b359G1QbRjBoG1AbRHtr",
-"DhtEfxtUG0Zpf311f3UbUBtENyp9G1QbRiMwJRtQG0Q/ODk=",
-"DhtEfxtUG0Y0fxtWG0c4NRtRG0ZnG0QrNhtQejobVBtGaTB+G1AbRH4pOQ==",
-"DhtEfxtUG0ZqPhtQLxtRNxtTG0RyG1JuG1EbQnYbUhtELhtQL2VrG1QbRisbUj8bUH0bRGs=",
-"DhtUG0YvLxtQNxtBdhtRG0Z2G0J9G1BtG1EbRD4bUBtCNBtSG0Q7G1QbRjQbUhtEJRtQeBtRG0Y/G1RrG1AbRD0=",
-"DhtEPz8bRmEbQms+G0Q2G1EbQm1zaxtQdhtSG0Q/JhtTG0YnG1IbRHwbUG8bRn0=",
-"DhtEayAgG1FlG1AbRn0bQiFrG1EbR2AbUyobRDobUBtCeRtTG0Z9G0R5G1B9G1J+fw==",
-"DiAbRCEbQWIbURtEORtSMRtQG0YlG0JiG1MbRDYbUisbURtCPRtQG0Y7G1IbRHIbUHsbUXt/fw==",
-"DiAgG0IiG1IbRCwbUBtCextBMBtCKj4bURtGKhtEehtQfhtUG0YvG0R/G1A3a3s=",
-"DhtEMCAgG0YyG1EbRHwbUBtGcHgbRH4bVBtGfCUbRH8bUHsvYDEv",
-"DhtENSAqPhtUG0YjIyMbUBtELycbRmEgG0IwdCAbRCEn",
-"DhtEdSAgIyYgISAbQSwbRGQkbBtRbRtQICAg"
-]
-},
-{
-"name": "Aube",
-"code": "AU",
-"hex": "#f48fb1",
-"vt": 1,
-"motto": "Light dawns anew.",
-"faction": "Pink / Liquefactionist / Second-Wave Offspring",
-"stats": {
-"STR": 6,
-"DEX": 9,
-"INT": 7,
-"WIS": 10,
-"CHA": 7,
-"CON": 8
-},
-"secs": [
-[
-"f",
-"L(t) = L0 * e^(gamma t)"
-],
-[
-"i",
-"Pale-haired lass, sheer gown, barefoot, bright, gutsy, visionary — progressively seen in full thick armour, short-haired."
-],
-[
-"t",
-"Pink / Liquefactionist / Second-Wave Offspring / Faith & Colours / Courage & Way Opening."
-],
-[
-"i",
-"White Queen / Joan of Arc / Gorge (Throat) / Rosy Fingers / Beatrice Portinari / Bedtime Story Protagonist / Maiden Call's Sister."
-],
-[
-"t",
-"Armoured dawnbreaker — a gutsy visionary wielding oil-slick wrath with pink-handed resolve. High WIS and DEX carve her as a ritual blade, slicing light through shadow."
-],
-[
-"t",
-"Powers: Oil of the Wrathful Dawn, Prismatic Slash, Chromatic Damage. Hand's Anointed Guidance — allies gain STR, shrugs off pain. Her anointed touch drives through blood — a consecration on doubt's edge."
-],
-[
-"i",
-"The Sun (XIX) / Chesed / Mithraic Lion / Plato's Republic cave-light / Plotinus' oil dawn flare-stack glow / Kabbalah's Gorge in Zayin might dawn a new light."
-],
-[
-"t",
-"Hexagram 24 — Return / \"Return on the seventh day, Going out and coming in without trouble.\""
-],
-[
-"t",
-"Mini-Stories: The Garden of Delight / Slab of Raw Colours."
-],
-[
-"t",
-"Masks Krewsmatics: Pink Hand + Red Ring = Purpose."
-]
-],
-"face": [
-"DhtEfxtFf38bVRtGNH0/G0V/G1AbQT8bRHcbQWt3G0RjahtUG0Vrf38=",
-"DhtEfxtFfxtVG0Z2fn91G0V/G1AbQTcbURtFbz8bRHobVBtFNBtQG0FqG0R/G1UbRjAbRX8=",
-"DhtEfxtVG0Zqfn8bVhtHMHUbURtGMBtFIRtQG0FvG0V3G0R7G0E3fhtUG0V6G1UbRmQbRX8=",
-"DhtUG0VoG1UbRmp/G1YbRyg6G1UbRjcbR28kG1AbQX03d2obVRtHPBtGI31h",
-"DhtUG0U0G1UbRm4bVhtHYBtVNxtGIRtRG0VhG1AbRDMbQSJvfxtRG0QiG1AbQTUbRCIiG1QbRSsbVRtGKQ==",
-"DhtUG0UqG1UbRmp/G1QbRT8bUSgbQyEbUBtEJXsbQXx3dRtEeDlgf28=",
-"DhtEfxtVG0ZuG0c1G1AbQTUbRGc3IRtRG0VwMBtEaX8hG1B3ICpq",
-"DhtUG0VqG1UbRmo1G1AbRHUgG0EwIBtRG0YqG1UbRzQbURtEahtQaxtRG0VoNBtQICAbRGA=",
-"DhtUG0UoG1UbRmolG1AbRCQbQWQ1IBtEKxtBLycgLycgKBtEKA==",
-"DhtEfxtVG0ZqG1QbRT0bUBtEJhtBcBtEcCAgIGB+ICBgcHA=",
-"DhtEfxtVG0YiJBtRG0UkG0RqG1UbRjAbUBtEJCAiYxtBcSAgextRG0Q1ag==",
-"DhtEfxtUG0U/bxtBfxtRG0QqG1UbRjUbUBtEMSAgazUgIBtFfhtUMBtQG0F7",
-"DhtEfxtUG0UhG1AbQWt/G1QbRWo3G1AbRCUgIBtBYhtEJSAgaxtUG0U1G1AbRHc=",
-"DhtEfz8wIxtUG0V+G1AbRHcgYCEsMSAgIBtUG0VpG1AbRDI="
-],
-"facec": [
-"DhtEfxtUG0Zqf39/f28bUBtFdRtEN3t3I2IbVBtGKnVl",
-"DhtEfxtUG0Zuf39/G1YbRzAbVBtGNxtQG0QxG1QbRm42G0R/fxtQG0FqG0R/G0Z/G1R5",
-"DhtEfxtGf38bVhtHYCk8G1EbRncbRHYbUG8bVBtGMRtQG0R7NxtRaRtUG0Z4f30=",
-"DhtEfxtGf38bVhtHNHcjbxtUG0Y8G1EbRDsbUDMnahtUG0Z+L39/",
-"DhtEfxtGfxtWG0cyJhtUG0Y/G1FvG1AbRTEgG1EbRHZmZxtQJCIiG1QbRiJv",
-"DhtEfxtUG0ZvG1YbRzIbVBtGNxtRG0RvG0ZvG1AbRCEbQWIbRDQbUX0bUGEbQmAbQSQgG1EbRHkbUG8=",
-"DhtEfxtGfxtUPxtQG0Q1YycgG1F7Oz57bm4bUCAbQigbRCo=",
-"DhtEfxtGfxtUfRtQG0Q1ICAgG1EbRm4bU3cbURtEbxtQLhtRe3cbUCAgYA==",
-"DhtEfxtGfxtUPRtQG0QkIBtBJSAbRCMrMSAmG0UlICAg",
-"DhtEfxtGfxtUNRtQIBtFcBtEcCAgIGA4ICAgG0FgG0Qw",
-"DhtEfxtUG0Z7PRtRG0R3dxtUG0Y0G1AbRCQgICowICB7G1E/fg==",
-"DhtEfxtUG0YqIhtRG0R2G1BuG0Z/G0QxICAbRSobQjUgIBtGfhtEfxtRPQ==",
-"DhtEf39rG1FuG1QbRmolG1AbRCUgICAxICBqG1QbRiQbUBtEMw==",
-"DhtEf28gIxtUG0Y6G1AbRHcgICAbQSggICAgG1QbRiEbUBtEMg=="
-]
-},
-{
-"name": "Grand Colonel",
-"code": "GC",
-"hex": "#90a4ae",
-"vt": 7,
-"motto": "",
-"faction": "Third-Wave eruption from Maukie's unconscious / Divisionist — Maukie's split shadow",
-"stats": {
-"STR": 10,
-"DEX": 6,
-"INT": 5,
-"WIS": 7,
-"CHA": 9,
-"CON": 8
-},
-"secs": [
-[
-"f",
-"N(t) = C(t) + M(t) + E(t)"
-],
-[
-"i",
-"Tall blond brute, grim, resolved, in uniform."
-],
-[
-"t",
-"Third-Wave eruption from Maukie's unconscious / Divisionist — Maukie's split shadow / Honour & Return of the Repressed."
-],
-[
-"i",
-"Blonde Warrior / Yellow King / Duke of Montebello / Tears in Rain / Death of Croisière Noire Witness / Hades."
-],
-[
-"t",
-"Iron enforcer — a grim warlord with wolfish slash. High STR and CHA command with brutal edge."
-],
-[
-"t",
-"Powers: Wolf's Crude Slash, Oil-Blade, Bloody Cut. Colonel's Oil Command — allies boost, iron will. His oil tears with iron fury — a warlord's unyielding edge."
-],
-[
-"i",
-"The Emperor (IV) / Malkuth / Mithraic Soldier / Plato's Republic ruler undone / Plotinus' oil tomb roughneck graves / Kabbalah's Blonde Warrior in Tav might bury new foes."
-],
-[
-"t",
-"Hexagram 44 — Coming to Meet / \"The feminine force rises uninvited.\""
-]
-],
-"face": [
-"DiAgICAgIBtEfxtRbxtQPTAgICAgICA=",
-"DiAgICAgG0F4G1QbRngbUhtEIxtQG0F9G0R0ICAgIGAg",
-"DiAgICAbRGgbUxtFNxtELy8bUBtFfBtEdmUgICAiNA==",
-"DiAgICAbRH4bVhtHfhtTLxtSG0M/G0J/G1EbRHobUG8gICAgNA==",
-"DiAgIBtEahtRYhtQG0YvG1UbRyMbUBtGLxtFbxtRG0Q/G1AzMjUgaH0=",
-"DiAgIBtBehtRG0U0G1IbR3w0G0QjG1UbR3gbUhtEahtQNWU1IH8h",
-"DiAgIBtEfxtRG0J3G1IbR28bUBtCdxtRejcbRC8bUCcbUW8bUCRoKSA=",
-"DiAbRDYgG1E3G1IbRSIbVRtHahtRG0J3cicbUBtBPxtEOxtRehtQMTVkIg==",
-"DhtEaHV5G1F9G1IbRWAbURtDIhtTG0R4G1AbQj8bQWcbRD4hG0FrG0R9ezQg",
-"DhtEanV+G1EbRWwbRGQbUBtBbz8bRD9zG0FwICBrG0QvfHo=",
-"DhtEfxtRNxtQG0E/dxtEeXcbQSEbRCQjIHAwMiNscw==",
-"DhtEf3x/f39/G0FqG0QsdnduZmYsMCA=",
-"DhtEf39+f3s1P3dtO3N1ZSUmIA==",
-"DhtEN39tbW1hd2c1ZyQkMSkgIQ=="
-],
-"facec": [
-"DiAgICAgIBtEf392JCAgICAgIA==",
-"DiAgICAbRGBoG1QbRnh8G1AbRH42ICAgICgg",
-"DiAgICAbRGgbVBtGeRtHcHAbUBtEfH5pICAgIjQ=",
-"DiAgICAbRH4bVhtHfn8nG0Z/G0R/G1BtITAgIDQ=",
-"DiAgIBtEan8bRj8bVhtHIxtQG0YvG1QjG0R/G1AzOjQgaH0=",
-"DiAgIBtEextUG0ZlG0d8G1Y0G1QbRnwbR3gbRjUbUBtENWU1KHsh",
-"DiAgIBtEfxtUG0Z1G1YbR28bUBtGdxtUejcbRH8bUDd/JGgpIA==",
-"DiAbRDYgfxtGfxtUG0dqG0Z3cicbUBtEPz5/JTUmIg==",
-"DhtEaHV5fxtGfxtUG0ciIxtQG0Y/G0RnPiFrfXsmIA==",
-"DhtEanV+G1QbRmwwG1AbRG8/P2MbQTAgIBtEay91fg==",
-"DhtEf38/dxtCeRtRG0R7G1AhIBtFIxtEIRtCYCAgG0QjbHI=",
-"DhtEf3wuG1I5G1FuG1AbQjcbRGg0G0J0NRtEZhtCamYoICA=",
-"DhtEf39zG1F7G1ArMWU2G0I1G0Q6dHkgG0EhICA=",
-"DhtEPX9xaXMgOXEpKTgoICAgIA=="
-]
-},
-{
-"name": "Malika",
-"code": "MA",
-"hex": "#bf360c",
-"vt": 1,
-"motto": "I am the debt of the fire.",
-"faction": "Third-Wave eruption from Grand Colonel's unconscious",
-"stats": {
-"STR": 7,
-"DEX": 5,
-"INT": 8,
-"WIS": 9,
-"CHA": 7,
-"CON": 9
-},
-"secs": [
-[
-"f",
-"Psi(t) = Eb(t) / (1 + D(t))"
-],
-[
-"i",
-"Brunette, rugged frame, wide hips, scars like burnt salt veins, banged-up, born from the rig's wild dance."
-],
-[
-"t",
-"Third-Wave eruption from Grand Colonel's unconscious / Costs & Transcendence."
-],
-[
-"i",
-"Slag / Grisette / Quintina / Ember / Caput Corvi / Beata Beatrix / Persephone."
-],
-[
-"t",
-"Tempered survivor — a scarred ember with smouldering grit. High CON and WIS endure with fiery scars."
-],
-[
-"t",
-"Powers: Ember's Oil Smoulder, Slick Burn, Fiery Renewal. Slag's Crude Shell — tough skin, enduring shield. Her oil smoulders with tempered radiance — a survivor's renewal through flame."
-],
-[
-"i",
-"The Empress (III) / Da'at / Mithraic Nymphus / Plato's Phaedo wisdom through ruin / Plotinus' oil haze flare-stack poison / Kabbalah's Ember in He might smolder new blooms."
-],
-[
-"t",
-"Hexagram 36 — Darkening of the Light / \"Injury, The light retreats to survive.\""
-]
-],
-"face": [
-"DhtFahtUJRtEfxtQbyNmZGYbRX4bQicbRDEhIi9ufw==",
-"DhtBahtEN3UpYSAkG1JhG1AbQSEgG0QpdDAgIGs=",
-"DhtEKjU5IiRgG0J+G0UlICAgG0QkG0FhG0V8G0FwIA==",
-"DiAbRHdkKSAbRX4bQT8gICAgG0RgG1EbRnobUjUbURtFfRtQIA==",
-"DiAbRG9oaRtBaRtRG0Y+G1AbRCEgYCBoLxtBJxtSG0Q0G1AbRS8g",
-"DhtEOnIxORtUG0Z6G1AbQX0bRCEgICAbQXsbUhtHZBtUG0Z8G1IbRWIbUBtEdCA=",
-"DhtEfn8bUWobVBtFYBtQPyAgICAbRGgbQX4bURtCfhtSG0MwG0R0G1AbQTUg",
-"DhtRG0QvG1QbRWAbURtCYBtUG0Z+G1AbRDUgICIgMhtSMxtFKBtQG0F3G0Q/IGA=",
-"DhtRG0V+G1I/G0RoG1AnICAgICAbUT8bUHYbRS8bQi8bRCUgIA==",
-"DhtFfxtUPxtQfRtCfBtBdBtEIjAgIBtRNWsbUCEgICAg",
-"DhtFfxtUPxtSNhtGdBtRG0I1G1AbRDAgICAbURtFYhtEKhtQNSAgIGo=",
-"DhtUG0U/G1FoG1J7G1EnG0RwG1A2YCBqG1EbRTIbQiwbRG8bUDQgIDA=",
-"DhtRG0R+G1QbRT8bURtEcH4bVBtFaBtQG0Q1JCBtG1QbRWsbUX4bRH4bUDUgIHs=",
-"DhtRG0RhfxtQbysbVBtFKhtQG0RgYSAbQXobVBtFNBtRJxtUahtQG0QlICB/"
-],
-"facec": [
-"DhtEahtUG0YlG0R/G1B3KypkZn4bRicbRDEhIi9ufw==",
-"DhtEaj90KSkiMBtUG0Y+G1AhG0QiKHQwICBr",
-"DhtEKjVkISRgG1QbRzgbUBtEJSAgIiBhfHAg",
-"DiAbRHdkKWAbRn4bRD8gICAgYBtUG0Z+fzUbUCA=",
-"DhtEYG9qamgbVBtGPhtQG0QhIGAgeC8nG1QbRmsbUBtELyA=",
-"DhtEZHMyNBtUG0Z+G0R/G1AkICAgfhtWG0dkG1QbRnx9G1AbRHQg",
-"DhtEfX9/G1QbRmAbUD8gICAgG0RoextUG0Z+dysbUBtENSA=",
-"DhtEfxtUG0ZgYBtWG0c4G1AbRDUgICIgMhtUG0ZqfxtQG0R3PyBg",
-"DhtUG0Y6fiYbUBtEJyAgICAgf3YvG0Y/G0QlICA=",
-"DhtUG0Z2NxtQfXwbRHQiMCAgG1QbRigwG1AbRCEgICAg",
-"DhtUG0Y2Pnt/NRtQG0QkICAgG1QbRmAkG1AbRDUgICBq",
-"DhtUG0YiaD8zIRtQG0Q1YCBqG1QbRjIkG0R/G1A0ICBk",
-"DhtEfxtUG0YqG0R/f38bUDUkIG0bVBtGK3YbRH8bUDUgIH0=",
-"DhtEf39vK39hYSBufxtUG0YhG0R/G1A1ICB/"
-]
-},
-{
-"name": "Auvergne",
-"code": "AV",
-"hex": "#66bb6a",
-"vt": 2,
-"motto": "Men become equal by covenant and right.",
-"faction": "Green / Factualist / Second-Wave Offspring",
-"stats": {
-"STR": 7,
-"DEX": 6,
-"INT": 8,
-"WIS": 9,
-"CHA": 9,
-"CON": 6
-},
-"secs": [
-[
-"f",
-"C(t) = int[0..t] P(s) * e^(-mu(t-s)) ds"
-],
-[
-"i",
-"Tall, sky-eyes, volcanic sprawl, gloomy, poetic, loud."
-],
-[
-"t",
-"Green / Factualist / Second-Wave Offspring / Tradition & Creation / Transmission."
-],
-[
-"i",
-"White Rook / Bard / Orpheus / Shepherd David."
-],
-[
-"t",
-"Volcanic hymnist — a loud poet chanting oil-fuelled resonance with green lyre's might. High CHA and WIS belt out his earthy roar."
-],
-[
-"t",
-"Powers: Lyre's Oil Resonance, Hymn, Psychic Force. Volcanic Crude Eruption — oil burst, fiery blast. His oil channels earth's fiery pulse — breaking foes with molten force."
-],
-[
-"i",
-"The Star (XVII) / Hod / Mithraic Nymphus / Plato's Republic rough wisdom / Plotinus' oil hum drillers' chants / Kabbalah's Bard in Mem might hum new lore."
-],
-[
-"t",
-"Hexagram 31 — Influence / \"Mutual influence, The superior person encourages harmony.\""
-],
-[
-"t",
-"Mini-Stories: The Factory / Ridge of Fading Chants."
-],
-[
-"t",
-"Masks Krewsmatics: Green Lyre + Mask = Expressivity."
-]
-],
-"face": [
-"DiAbRCQgJDAkKGAgMDAgICAgIA==",
-"DhtEYmJiKGJiamh5aiRkYCAgIA==",
-"DhtEZGRmZmZkbRtUG0VgG1EbRG8bUGAgICkxMCA=",
-"DhtEZGVtampmG1E/G1JpG1BicTAgIGIkMA==",
-"DhtENXVtOXt7G1I/bhtVG0d6G1MzG1AbQX1wICAbRDUk",
-"DhtEbTs+dnd/G1F9G1QbRWAbUBtCdxtRG0NjG1AbQXF+IBtEYDU5",
-"DhtEPX9uPz49fxtRNRtSG0d9G1MbRGAbURtGaiUbUBtEImo6OA==",
-"DhtEf31/P3c/fn8bVRtHKhtRG0IxG1AbQX4bRDcgPjY0",
-"DhtEP35/bj13fX8bURtGeBtSG0R9G1AbQScbRGA1Mikp",
-"DhtEd39+f39/G1MvG1JxG1UbR2obURtGNhtFZRtEPxtQNX0gIA==",
-"DhtEd31/fhtSL2EbVBtGIRtQG0Q7G0FrIhtRG0R5OBtQfSUgIA==",
-"DhtEdz1/G1QbRmgbUiUbURtCdRtEfxtQd281G1E/fRtQN344IA==",
-"DhtEPXd/G0V/G1UbRiEbURtFNxtQG0R3fzJ1G0FrfRtEKxtUG0VqG1AbRDUg",
-"DhtEP3obQW4bVBtFPzclG1AbRCF3bSIyG1QbRW8bUBtEfRtRfhtQNSA="
-],
-"facec": [
-"DiAbRCQwJCgwZGBgYCAgICAgIA==",
-"DhtEImRiJCk4aGg5bCkyMDAgIA==",
-"DhtEMTkyNmZmbn4bVBtGMBtQG0RgICApOGAg",
-"DhtEMjY2NnZmfxtUG0Y2G1AbRGJxMCAgYmQg",
-"DhtENnY2dnZ/G1QbRmAxG0d6G1Z3G1QbRnAbUBtEcCAgNSQ=",
-"DhtEdW1rdm57fxtUG0ZgG1B3G1QbRyMbUBtEc34gYGUp",
-"DhtEdj92d292b38bVhtHfS0bVBtGazUbUBtEImppKQ==",
-"DhtEfT9+dz92b38bVBtGazEbUBtEfjcgdmUp",
-"DhtEPX9vdj9+e38bVBtGfCIbUBtEJ2A1Mikp",
-"DhtEdz9/fn99G1QbRnAbUT8bVBtHahtGNmQbRH8bUDV9ICA=",
-"DhtEPXd9f30bRj8bQj82G0ZjG0Qif399JSAg",
-"DhtEdz1/G1QbRmh/dRtRG0Q+G1AbQjMbQW0xG0R/fzd+MCA=",
-"DhtEbTt9G0Z/G1RvORtQG0Q1G0J3JGUbRGp9K381IA==",
-"DhtEPTt+G1QbRjcxIRtQG0QhG0JmNSAbRCIbVBtGIhtQG0R9fzUg"
-]
-},
-{
-"name": "Cadaver Synod",
-"code": "CS",
-"hex": "#8d6e63",
-"vt": 7,
-"motto": "Judgement is stronger than death!",
-"faction": "Green / Purple / Divisionist / Second-Wave Offspring",
-"stats": {
-"STR": 8,
-"DEX": 7,
-"INT": 7,
-"WIS": 8,
-"CHA": 9,
-"CON": 6
-},
-"secs": [
-[
-"f",
-"J(t) = Sum[i=1..n] wi * Si(t)"
-],
-[
-"i",
-"Dusty stage, ointment stink, fierce, alert — more and more seen as a tall and muscled masked luchador in shiny tux, with long peacock feathers in the back, surrounded by red skeletons or headless elegant male dummies."
-],
-[
-"t",
-"Green / Purple / Divisionist / Second-Wave Offspring / Intensity & Verdict / Passion & Staging."
-],
-[
-"i",
-"Black Rook / Mummy / Boniface VI / Kafka / The Syncret / Speaker & Master of Ceremony."
-],
-[
-"t",
-"Theatrical arbiter — a fierce judge with peacock flair and oily verdicts. High CHA and STR stage his dusty reign."
-],
-[
-"t",
-"Powers: Synod's Oil Verdict, Mark, Psychic Judgement. Peacock's Crude Flash — dazzle, blinding flare. His oil marks the guilty — a theatrical stab at dusty souls."
-],
-[
-"i",
-"The Judgement (XX) / Tiferet / Mithraic Lion / Plato's Republic soul justice / Plotinus' oil ghost old rig bones / Kabbalah's ILLbient ILion in Mem might judge new pasts."
-],
-[
-"t",
-"Hexagram 49 — Revolution / \"Fire in the lake, The superior person changes like a Maukian leopard.\""
-],
-[
-"t",
-"Mini-Stories: The City of Night."
-],
-[
-"t",
-"Masks Krewsmatics: Mask + Green Lyre = Expressivity."
-]
-],
-"face": [
-"DiAgG0QkIBtBJGp8IDU0G1EbRD4bUDMbQWsbUhtFOxtQG0E3G0R7",
-"DiAgIBtBYCJqeiRlG0RtG0ErG1EbQnRwG1AbQXcbURtFaDQ=",
-"DiAgG0EwICAgKjJyG0QhIBtBZBtRG0I+G1AbQXwbURtCLhtQG0U1",
-"DiAgG0FuJCAgYigbRGAgIBtBan0bURtFYBtSG0QvG1AbQXU=",
-"DiAgIBtBNSAgICEbRGQgfTAbQisvG0F3Kg==",
-"DiAgICAbRGAoMnp4MBtRMxtCYBtELxtCeBtSG0RqG1Ag",
-"DiAgICAbRGkbQWlxG0RgcHEbQm8bUhtDdDUbRjIkG1AbRDU=",
-"DiAgG0QoMCJ7G0FmG0Q3fHtiG0JvG0N/G0Z/G1IbRGAbUCA=",
-"DiAgG0Q+PCAuG0E5G0R9az0yG0FlOxtRG0JvG1AbQWEbRGQ=",
-"DiAgG0QmJCBgcythbzBrG0FkG0RraBtBIQ==",
-"DiAbRGAhKSAgJmMtJjUoKSs0IQ==",
-"DiAbRCIgICAgIHV8OCEiICIgIQ==",
-"DiAgIBtEISAgIDtuNyAgICAgIA==",
-"DiAgG0QhICAgICs4KSAgICAgIA=="
-],
-"facec": [
-"DiAgICAbQSRqbCA0G0U0G1EbRG8bUDMvG0Z/G0Q3ew==",
-"DiAgICAbQSQqOigwG1EbRG4bUCobVBtGdBtQG0R+JxtRbz8=",
-"DiAgG0EwICAgKWFiG0QhIBtBZBtUG0Y6G1AbRHwbVBtGLhtQNA==",
-"DiAgG0EuNCAgYiggICAbRCp1G1F+fhtQdQ==",
-"DiAgG0EhNCAgICEbRGQgfDAbRisvG0R3Kg==",
-"DiAgICAgG0QoMHo4NH8bVBtGcBtEfxtGeDUbUCA=",
-"DiAgICAbRGkbRWEbRHEgcnEbRm8bVhtHcGUbRn9/G1AbRDU=",
-"DiAgG0FgIBtEInsbQWIbRDF8e2IbVBtHKxtWbRtGfxtUPxtQG0Qh",
-"DiAgG0QyG0U4IBtELjEbUW4bUGs9MRtBYRtEOxtUG0ZvG1AbRCEbQTA=",
-"DiAgG0EkG0QkIGBzG0UqG0RhbzBhG0ElG0QjJBtBJA==",
-"DiAbQWAgG0RiICAjYy0mNWQbRSobRCkbRTEbQSE=",
-"DiAbRCIgICAgIH18OCEoIiAgIQ==",
-"DiAgIBtEISAgYCtmNyAgIGAgIA==",
-"DiAgG0QhICAgICs5KSAgICAgMA=="
-]
-},
-{
-"name": "Croisière Noire",
-"code": "CN",
-"hex": "#bdbdbd",
-"vt": 7,
-"motto": "Shelter brings expansion.",
-"faction": "White / Liquefactionist / First Wave / Second Wave Genitor",
-"stats": {
-"STR": 9,
-"DEX": 6,
-"INT": 8,
-"WIS": 7,
-"CHA": 5,
-"CON": 10
-},
-"secs": [
-[
-"f",
-"G(t) = int[0..t] c(s) * e^(gamma s) ds"
-],
-[
-"i",
-"Hive or bull, endless, practical, cunning."
-],
-[
-"t",
-"White / Liquefactionist / First Wave / Second Wave Genitor / Shelter & Abundant Expansion."
-],
-[
-"i",
-"Black Knight / Bull / Bee / Hive / Baldr / Citroën's Expedition / Melanesian Cargo / Recreational Vehicle / Motel / Cardboard Box / Member of The Invisible College of Sages / Death of Croisière Noire Protagonist."
-],
-[
-"t",
-"Endless conjurer — a cunning swarm-master with white hive's sprawl. High CON and STR fuel his boundless grind."
-],
-[
-"t",
-"Powers: Hive's Crude Swarm, Drones, Relentless Assault. Bull's Oil Charge — charge, crushing rush. His oil conjures a boundless hive — drowning earth in cunning chaos."
-],
-[
-"i",
-"The Chariot (VII) / Chesed / Mithraic Bull / Plato's Timaeus living cosmos / Plotinus' oil gush raw field / Kabbalah's Bull in Bet might charge new realms."
-],
-[
-"t",
-"Hexagram 42 — Increase / \"Wind above thunder, The superior person follows the tide.\""
-],
-[
-"t",
-"Mini-Stories: Spire of Endless Echoes."
-],
-[
-"t",
-"Masks Krewsmatics: White Hive + Gear = Work."
-]
-],
-"face": [
-"DiAgICAbQXAbQnwbUhtGJhtRG0UnG0RuG1A1G0FgG0VwG0RwMCAg",
-"DiAbQWAbQnwbUhtEIXB8G1AbQW8bRHcbVBtGcBtQG0V+LxtEMzMrKDA=",
-"DhtBfhtSG0UxG1EbQjcbUBtEISAbQWAbRX4bUhtEKBtQG0FzG0RmPj52Zmgg",
-"DhtRG0RweBtQITgbQngbVBtHJhtQG0R5G0F7G1IbRGsbUHs7NmwgMzE=",
-"DhtEKSF6G0V+G1MbRH4bUDkpIRtCbxtRMBtQG0Q1MmgxZjQ=",
-"DhtFfBtBPxtFJxtBJxtEb2sbUhtHbDwsG0R6G1AlICAgZDE=",
-"DhtEJ3QgeiAgG0ErG0QrKyMgICAgNjI=",
-"DhtEYHckeX0wICAgKCAgIGpqZg==",
-"DhtEaiVxKidwICAgICAgIHU1NQ==",
-"DhtEKWltMSAwICAgICAgIGRiIA==",
-"DhtEMhtBfhtEZSUgICAgICAgICAgICA=",
-"DhtEan9pISAgICAgICAgICAgIA==",
-"DhtEei9/JyAgICAgICAgKiAgIA==",
-"DhtEPiAgIiAgICAgICAgISAgIA=="
-],
-"facec": [
-"DiAgICAbRHAbRnx/G1QnG0R/G1A1YBtGcBtEcDAgIA==",
-"DiAbRGAbRnwbVH4vIxtEfxtQd3t+LzMzKygw",
-"DhtEfhtUG0ZvJxtQG0QhIGAbVBtGODYbUBtEOzo+PnZlYSA=",
-"DhtEfxtUG0YhG1AbRCU4G0Z4G1QbRyYbUBtEd3sbVBtGNBtQG0R7OzZ0YWNh",
-"DhtEKSF6fhtUG0chG1AbRHMsIRtGbxtUNBtQG0Q1MWwxZjQ=",
-"DhtEfD8bRicbRGdvaxtWG0dsPCwbVBtGJRtQG0QlICAgZDE=",
-"DhtEJzoweCgiKysrIyAgICRxKQ==",
-"DhtEYD8wbX0wICAgKCAgIGpqOQ==",
-"DhtEaidkKSdwICAgICAgIHU1NQ==",
-"DhtEKXl3JCAoICAgICAgIGRiIA==",
-"DhtEZH9tISAgICAgICAgICAgIA==",
-"DhtEan9qYCAgICAgICAgICAgIA==",
-"DhtEeit/JzAgICAgICAgaiAgIA==",
-"DhtEPiAgIiAgICAgICAgJCAgIA=="
-]
-},
-{
-"name": "Naphta",
-"code": "NA",
-"hex": "#ef6c00",
-"vt": 3,
-"motto": "Presence is the essence of power.",
-"faction": "Orange / Factualist / First Wave",
-"stats": {
-"STR": 7,
-"DEX": 8,
-"INT": 9,
-"WIS": 7,
-"CHA": 8,
-"CON": 6
-},
-"secs": [
-[
-"f",
-"Phi(t) = 1 / (1 + e^(-alpha t))"
-],
-[
-"i",
-"Knockout African lass, reptile-draped, grounded, gut-led, steady."
-],
-[
-"t",
-"Orange / Factualist / First Wave / Chance & Consciousness / Presence."
-],
-[
-"i",
-"Black Queen / Shakti / Durga / Flame / Hephaistos' Spouse / Death of Croisière Noire Protagonist / Plague of Justinian's Lover."
-],
-[
-"t",
-"Fiery sovereign — a steady queen with reptilian blaze. High INT and DEX rule with orange fury."
-],
-[
-"t",
-"Powers: Reptilian Oil Blaze, Inferno, Fiery Surge. Kerema's Oil Gaze — truth, piercing clarity. Her oil ignites a primal blaze — empowering kin with steady might."
-],
-[
-"i",
-"The High Priestess (II) / Yesod / Mithraic Nymphus / Plato's Phaedo opposites in tune / Plotinus' oil flare conscious crude / Kabbalah's Flame in Resh might blaze new truths."
-],
-[
-"t",
-"Hexagram 34 — Great Power / \"Thunder in heaven, Great strength, Do not misuse it.\""
-],
-[
-"t",
-"Mini-Stories: The Garden of Delight / Husk of Shattered Gleams."
-],
-[
-"t",
-"Masks Krewsmatics: Orange Flame + Black Cloud = Intensity."
-]
-],
-"face": [
-"DhtEextRPXsbUGwbUX4bUGcgICAbQXg+LxtEKyggIA==",
-"DhtRG0RvP38bUCk3JCAgOhtBJSAgICAgIA==",
-"DhtRG0R0G0J0G0R/G1AqJCEgG0J6G0F9fXwbRCQgICAg",
-"DhtEbhtRG0JvG1IbRCsbUDkxKGAbURtDNRtEIRtCMRtQG0R3YSAgIGg=",
-"DhtEaXsbUjUbUBtBNRtENCBqG0E3NxtEKRtBLxtEaCAgIGI=",
-"DhtEKX4bVBtFJxtQG0Q3ZCBgG1EbRzAbQX8bUH4bRXwbQTUbRGEgIDQ=",
-"DhtEaWsbQT8bRHsoIBtBKhtCdxtEcxtRYBtQG0E/G0QhICQoIQ==",
-"DhtEImcbUXQbUH50IGAbQXMzOxtENGZgNTkw",
-"DiAbRCgbQWA/G0RhJCIrG0F8G0QtIiAwJSJm",
-"DiAbRCIbQX4bRDloISAgIBtBYH0bRGBqKDog",
-"DiAgG0FnG0QwaCUgG0F4G0J+G1EbQyMbUBtBPxtENTpoJRtBOQ==",
-"DhtEIjAmfWogG0FoG1EbQzcbQX9/G1AbRGk1anY2G0F2",
-"DiAbRHBwG0FyICAbQnobUSEbQX9/G1AbRGp7OTkbQWlt",
-"DhtUG0U+P28bUBtBfSBsG1EbRTobUBtBNW9/G0RqG0FqG0RqahtBans="
-],
-"facec": [
-"DhtEe39/On87ICAgeH4vOzIgIA==",
-"DhtEf39/KTdkIDA6JyAgICAgIA==",
-"DhtEfxtUG0Z0G0R/G1AqJCAgG0Z6G1EbRHcbUHw8MCAgICA=",
-"DhtEbhtUG0ZvNBtQG0Q5MWJgG1EbRj8bRD4bVBtGNRtRG0R7G1AgICAgaA==",
-"DhtEOXsbVBtGahtQG0R1KSBqIxtRehtQG0UpG0QmG0EkICAgG0Ri",
-"DhtEZm4bVBtGJRtQG0Q1ZSBgG1EbRn0bRG17G1AbRngbURtEbhtQICAgNA==",
-"DhtEaWsbVBtGIRtQG0R7KCIqG0Z3G0RhG1M5G1AbRScbRCEgICAp",
-"DhtEKit/fnYgYHsbUW4bUCobQTEoIBtEMWlg",
-"DiAbRGRoJyEkIisbQjwbQTEbRCEgIBtBJRtEIiw=",
-"DiAbRCh+G0YxG0EkICAgIBtEYBtRdxtQIBtBIiAbRTgg",
-"DiAgG0QnMBtFaBtENCB4G1EbRi8bRyMbRHobUBtFNCobQWAbRCUbQTI=",
-"DhtEYmAicRtFYiAbRGgbURtGNxtBf38bUBtEeTRoejIbQTY=",
-"DiAbRHBwMCAgG0Z6G1EbQyEbQX9/G1AbRGo7NiIbQWhr",
-"DhtUG0YyJCsbUBtEdSB4G1E1G1AbQWVrextEYmoqOhtBamo="
-]
-},
-{
 "name": "Unkle Maukie",
 "code": "UM",
 "hex": "#ffa726",
@@ -12186,6 +10796,1430 @@ window.KORHOGO_FAUNA = [
 "DiAgIBtEYBtFLBtRG0QqOGk/G1QbRikbURtEbykbUxtFaRtRG0ZqG1AbRDZo",
 "DiAgIBtBYBtRG0RmaWpoaWlpYRtFZRtEZm0bUGA="
 ]
+},
+{
+"name": "C7H5N3O6",
+"code": "C7",
+"hex": "#4fc3f7",
+"vt": 6,
+"motto": "Efficiency is...",
+"faction": "Blue / Grey / Divisionist / First-Wave nature force",
+"stats": {
+"STR": 9,
+"DEX": 8,
+"INT": 10,
+"WIS": 6,
+"CHA": 4,
+"CON": 7
+},
+"secs": [
+[
+"f",
+"En = E(n-1) * (1 - alpha)"
+],
+[
+"i",
+"Chunky grey golem, bug in chest, blue gear, cold, calculated, executor."
+],
+[
+"t",
+"Blue / Grey / Divisionist / First-Wave nature force / Machine / Design & Reproduction / Adequation & Seriation."
+],
+[
+"i",
+"White Knight / Machine / Golem / Gear / Iode Anacréon / Hephaistos / Naphta's Husband / Member of The Invisible College of Sages."
+],
+[
+"t",
+"Mechanical churner — a cold grinder with bug-heart precision. High INT and STR crush with relentless blue-grey clank."
+],
+[
+"t",
+"Powers: Golem's Oil Crush, Smash, Crippling Force. Insect's Oil Swarm — swarm, poisonous sting. His oil drives a relentless grind — churning flesh to dust."
+],
+[
+"i",
+"The Magician (I) / Binah / Mithraic Persian / Plato's Timaeus form-receptacle / Plotinus' oil grind derrick automation / Kabbalah's Gear in Gimel might churn new forms."
+],
+[
+"t",
+"Hexagram 60 — Limitation / \"Water over lake, Limitation, Success.\""
+],
+[
+"t",
+"Mini-Stories: Freeland / Churn of Singing Iron / Den of Clicking Dolls."
+],
+[
+"t",
+"Masks Krewsmatics: Gear + White Hive = Work."
+]
+],
+"face": [
+"DhtEd39/fxtUG0UqG0R/G1E1G1AgPyUgYBtRe38bUG4y",
+"DhtEf38bVBtFYBtEfxtRPxtSbxtQPSxzICQiaxtRb38bUHY=",
+"DhtUG0V0G1I/G1R6G1F0MBtSG0QyfxtQczwwICAiG1QbRWAbURtEK38=",
+"DhtSG0U/G1A/LxtSG0YsG1AbRT8bRDYbRS8bRC8hIGAkIGIiIw==",
+"DhtSG0VhG1AbRDVhfyEbUTYbUCAwMGh1JHh1JTg=",
+"DhtRG0UlG1AbRDF6G1EbRXQbUBtEan4xaGF6eH8bUS1/G1B9JQ==",
+"DhtRG0QjG1A1G1F1G1QbRSMbUBtEextSG0ZgYBtQG0J9G1F8fBtUG0U0G1AbRD9vfylq",
+"DhtRG0R9G1AlfhtBfBtRG0J+dxtSG0cyM2QbURtCbxtSG0RiG1EvG1AbQX0bRHwibw==",
+"DhtEJ2gbURtFahtSNBtHYBtRG0I7G1IbR30bQzQbURtGMxtSG0dgMBtRG0J1G0RrG1A/MCA=",
+"DiAbRGobUTQbUhtFNRtWG0ciG1EbRi8bUhtDNxtRYBtEahtVG0crG1YhG1IbRGp/G1AlICA=",
+"DhtEfRtBahtUG0UwKhtSG0R4G1EbQjcbQycbQiMbUBtBPxtSG0QqdBtQPycgICA=",
+"DhtEPWobQXUbRHgbVBtFaDAbURtGdBtUcBtSG0RjJRtQfXgwJiAg",
+"DhtENSJ3b38bVBtFKRtSG0R1MBtUG0UoIRtEfxtQaWIiICA=",
+"DhtEMiB1ZW8vY2MrKzZmJCAgIA=="
+],
+"facec": [
+"DhtEe3t/fxtUG0YiG0R/fxtQJD8lIGB/f24y",
+"DhtEfX9/f38bVBtGMBtQG0Q9LGsgMiJrf392",
+"DhtUG0YweHp0OG0bRH8bUHN2KCAgIhtUG0ZgG0R/fw==",
+"DhtGfxtUJxtQG0QvG0Z/G0Q/Ni8vISBgJCBiIiM=",
+"DhtUG0Y/G1AbRDVgfyF/ICgwaD0ieHVlaA==",
+"DhtUG0YkG1AbRDV6G1QbRjQbUBtEbn4xaSB2fnt/fz0l",
+"DhtUG0YwG1AbRDV/G1QbRiEbUBtEextGf399G1R8fDAbUBtEP28/a2o=",
+"DhtEfyV+fBtUG0ZudxtWG0c6L2QbVBtGazVgG1AbRH18Im4=",
+"DhtEJWobVBtGaH8bVhtHYBtUG0Y2G1YbR30bUyQbRm8bVHobVhtHMBtUG0Z1G0R/G1A/MCA=",
+"DiAbRGp/G1QbRm8bVhtHKhtUG0ZvG1MbRzcbRnQbURtEaxtWG0crNRtUG0YlG0R/G1AlICA=",
+"DhtEfWp/G1QbRiojNxtTG0clG0Q0G1JqG1QbRmUjG1AbRD8nIDAg",
+"DhtEPWp9eBtUG0ZgG1IbRH0bVBtGdhtQfBtSPRtUKhtQG0R9eDBmICA=",
+"DhtENSJ3bn8bVBtGKCIvG1IbRH4bVBtGIRtQG0Q/PDIkICA=",
+"DhtEMiA1ZW8vY2Mra2kpMiAgIA=="
+]
+},
+{
+"name": "Naphta",
+"code": "NA",
+"hex": "#ef6c00",
+"vt": 3,
+"motto": "Presence is the essence of power.",
+"faction": "Orange / Factualist / First Wave",
+"stats": {
+"STR": 7,
+"DEX": 8,
+"INT": 9,
+"WIS": 7,
+"CHA": 8,
+"CON": 6
+},
+"secs": [
+[
+"f",
+"Phi(t) = 1 / (1 + e^(-alpha t))"
+],
+[
+"i",
+"Knockout African lass, reptile-draped, grounded, gut-led, steady."
+],
+[
+"t",
+"Orange / Factualist / First Wave / Chance & Consciousness / Presence."
+],
+[
+"i",
+"Black Queen / Shakti / Durga / Flame / Hephaistos' Spouse / Death of Croisière Noire Protagonist / Plague of Justinian's Lover."
+],
+[
+"t",
+"Fiery sovereign — a steady queen with reptilian blaze. High INT and DEX rule with orange fury."
+],
+[
+"t",
+"Powers: Reptilian Oil Blaze, Inferno, Fiery Surge. Kerema's Oil Gaze — truth, piercing clarity. Her oil ignites a primal blaze — empowering kin with steady might."
+],
+[
+"i",
+"The High Priestess (II) / Yesod / Mithraic Nymphus / Plato's Phaedo opposites in tune / Plotinus' oil flare conscious crude / Kabbalah's Flame in Resh might blaze new truths."
+],
+[
+"t",
+"Hexagram 34 — Great Power / \"Thunder in heaven, Great strength, Do not misuse it.\""
+],
+[
+"t",
+"Mini-Stories: The Garden of Delight / Husk of Shattered Gleams."
+],
+[
+"t",
+"Masks Krewsmatics: Orange Flame + Black Cloud = Intensity."
+]
+],
+"face": [
+"DhtEextRPXsbUGwbUX4bUGcgICAbQXg+LxtEKyggIA==",
+"DhtRG0RvP38bUCk3JCAgOhtBJSAgICAgIA==",
+"DhtRG0R0G0J0G0R/G1AqJCEgG0J6G0F9fXwbRCQgICAg",
+"DhtEbhtRG0JvG1IbRCsbUDkxKGAbURtDNRtEIRtCMRtQG0R3YSAgIGg=",
+"DhtEaXsbUjUbUBtBNRtENCBqG0E3NxtEKRtBLxtEaCAgIGI=",
+"DhtEKX4bVBtFJxtQG0Q3ZCBgG1EbRzAbQX8bUH4bRXwbQTUbRGEgIDQ=",
+"DhtEaWsbQT8bRHsoIBtBKhtCdxtEcxtRYBtQG0E/G0QhICQoIQ==",
+"DhtEImcbUXQbUH50IGAbQXMzOxtENGZgNTkw",
+"DiAbRCgbQWA/G0RhJCIrG0F8G0QtIiAwJSJm",
+"DiAbRCIbQX4bRDloISAgIBtBYH0bRGBqKDog",
+"DiAgG0FnG0QwaCUgG0F4G0J+G1EbQyMbUBtBPxtENTpoJRtBOQ==",
+"DhtEIjAmfWogG0FoG1EbQzcbQX9/G1AbRGk1anY2G0F2",
+"DiAbRHBwG0FyICAbQnobUSEbQX9/G1AbRGp7OTkbQWlt",
+"DhtUG0U+P28bUBtBfSBsG1EbRTobUBtBNW9/G0RqG0FqG0RqahtBans="
+],
+"facec": [
+"DhtEe39/On87ICAgeH4vOzIgIA==",
+"DhtEf39/KTdkIDA6JyAgICAgIA==",
+"DhtEfxtUG0Z0G0R/G1AqJCAgG0Z6G1EbRHcbUHw8MCAgICA=",
+"DhtEbhtUG0ZvNBtQG0Q5MWJgG1EbRj8bRD4bVBtGNRtRG0R7G1AgICAgaA==",
+"DhtEOXsbVBtGahtQG0R1KSBqIxtRehtQG0UpG0QmG0EkICAgG0Ri",
+"DhtEZm4bVBtGJRtQG0Q1ZSBgG1EbRn0bRG17G1AbRngbURtEbhtQICAgNA==",
+"DhtEaWsbVBtGIRtQG0R7KCIqG0Z3G0RhG1M5G1AbRScbRCEgICAp",
+"DhtEKit/fnYgYHsbUW4bUCobQTEoIBtEMWlg",
+"DiAbRGRoJyEkIisbQjwbQTEbRCEgIBtBJRtEIiw=",
+"DiAbRCh+G0YxG0EkICAgIBtEYBtRdxtQIBtBIiAbRTgg",
+"DiAgG0QnMBtFaBtENCB4G1EbRi8bRyMbRHobUBtFNCobQWAbRCUbQTI=",
+"DhtEYmAicRtFYiAbRGgbURtGNxtBf38bUBtEeTRoejIbQTY=",
+"DiAbRHBwMCAgG0Z6G1EbQyEbQX9/G1AbRGo7NiIbQWhr",
+"DhtUG0YyJCsbUBtEdSB4G1E1G1AbQWVrextEYmoqOhtBamo="
+]
+},
+{
+"name": "Ts'ui Pên",
+"code": "TP",
+"hex": "#ff7043",
+"vt": 1,
+"motto": "Infinity breathes wisdom.",
+"faction": "Orange / Pink / Liquefactionist / First Wave",
+"stats": {
+"STR": 5,
+"DEX": 6,
+"INT": 9,
+"WIS": 10,
+"CHA": 7,
+"CON": 6
+},
+"secs": [
+[
+"f",
+"K(t) = int[0..t] kappa(s) * e^(-alpha(t-s)) ds"
+],
+[
+"i",
+"Old Asian geezer, slick butterfly vibe, visionary, tangled, coded."
+],
+[
+"t",
+"Orange / Pink / Liquefactionist / First Wave / Knowledge & Mystery / Intricacy & Adventure."
+],
+[
+"i",
+"White Bishop / Borges / Butterfly / Member of The Invisible College of Sages / D(e)ad Alus / Bedtime Storyteller."
+],
+[
+"t",
+"Cryptic weaver — a tangled sage with butterfly's haze. High WIS and INT spin his coded visions."
+],
+[
+"t",
+"Powers: Butterfly's Oil Haze, Mist, Blinding Veil. Konklave's Oil Whisper — suggestion, coded will. His oil unveils cryptic veils — a butterfly's dance through fate."
+],
+[
+"i",
+"The Pope (V) / Chokhmah / Mithraic Heliodromus / Plato's Timaeus demiurgic spark / Plotinus' oil haze refinery fumes / Kabbalah's Butterfly in Kuf might weave new tales."
+],
+[
+"t",
+"Hexagram 29 — The Abyss / \"Water flows into itself, Repetition deepens.\""
+],
+[
+"t",
+"Mini-Stories: Minraud II / Interzone."
+],
+[
+"t",
+"Masks Krewsmatics: Wall + Orange Panther = Wisdom."
+]
+],
+"face": [
+"DhtRG0Q/G1QbRXAbURtEb38bUHVlJBtSG0VqG0YqG1QbRTUbUWsbUnwbUT9/G1Q1G1AbRG0=",
+"DhtUG0VqG1E3bRtUNBtEfxtQbjYbUX4bUGsbQW8bVBtFJzsbUSwrG0R/G1A9",
+"DhtUG0VqG1EqfXkbRG8bQmgbVBtFNRtQG0R7G0F+b34bRH0bVBtFMBtReBtQG0R7Zw==",
+"DhtRG0R9G0VsG1UbRjAbUhtFMy8bQygbVBtFdRtQG0E3G0QqfRtSfG8bURtGIRtQG0Q/OTs=",
+"DhtRG0Q/G0V8G1UbRmAbUhtDfn0bURtGLxtQG0F3G1EbRCMbUHobQTobURtFaRtCMHwbVBtGcBtQG0RkZw==",
+"DhtRG0R1G0VqG1NtG1AbQj8bUSE4G1AbQXcbURtFIhtQG0F9G0RvZ2MbURtCLxtVG0ciG1AbRX0bRGs=",
+"DhtRG0IvG0YvG1AbRTcbRH4bUX04G1B9G0FzG0Q8G1EbQiQ0G1AbQX58G1EbQjQbRmsbUBtEdw==",
+"DhtEf29hbxtRfRtQNxtROxtDcBtCcBtQG0F2b3sbURtCPBtEahtQG0FvG0V9",
+"DhtEZiRgG1ElG1AbQn0bRCUbQWsbURtDYBtTG0V1G1EbQiQbRH8bQiobVBtFPxtQG0F9fRtRG0Ui",
+"DiAbRCEbQWp+G1EbRG8bUDVrG0FvG1IbRH0bUT0bUG8bUTgbVBtFKhtRG0RqaHA=",
+"DiAgG0EiG0R/G0F7G0Qxan8bURtFKhtCIhtQG0F+G1EbRS8bRH4bUDdrG1F9",
+"DhtEMCAhMxtBe3F6fhtSG0QjG1EbRScbRH4bUHsvYDEv",
+"DhtBNSAbRCp+G1QbRSMrG1EjG1AbQS8bRCdhMHhuIiIm",
+"DhtBNRtEMCAlISEgIBtBbmQbRCRvG0E3G0QwICA="
+],
+"facec": [
+"DhtEfxtUG0ZwG0R/fxtQdWUkG1QbRndvNCo/NW8bRH8bUDk=",
+"DhtUG0ZoI20bRH8bUH1tdX9rbxtUG0YiMSQrG0R/G1A7",
+"DhtEfxtUG0YrfGkbRH8bRmgwG1AbRG5+b359G1QbRjBoG1AbRHtr",
+"DhtEfxtUG0Zpf311f3UbUBtENyp9G1QbRiMwJRtQG0Q/ODk=",
+"DhtEfxtUG0Y0fxtWG0c4NRtRG0ZnG0QrNhtQejobVBtGaTB+G1AbRH4pOQ==",
+"DhtEfxtUG0ZqPhtQLxtRNxtTG0RyG1JuG1EbQnYbUhtELhtQL2VrG1QbRisbUj8bUH0bRGs=",
+"DhtUG0YvLxtQNxtBdhtRG0Z2G0J9G1BtG1EbRD4bUBtCNBtSG0Q7G1QbRjQbUhtEJRtQeBtRG0Y/G1RrG1AbRD0=",
+"DhtEPz8bRmEbQms+G0Q2G1EbQm1zaxtQdhtSG0Q/JhtTG0YnG1IbRHwbUG8bRn0=",
+"DhtEayAgG1FlG1AbRn0bQiFrG1EbR2AbUyobRDobUBtCeRtTG0Z9G0R5G1B9G1J+fw==",
+"DiAbRCEbQWIbURtEORtSMRtQG0YlG0JiG1MbRDYbUisbURtCPRtQG0Y7G1IbRHIbUHsbUXt/fw==",
+"DiAgG0IiG1IbRCwbUBtCextBMBtCKj4bURtGKhtEehtQfhtUG0YvG0R/G1A3a3s=",
+"DhtEMCAgG0YyG1EbRHwbUBtGcHgbRH4bVBtGfCUbRH8bUHsvYDEv",
+"DhtENSAqPhtUG0YjIyMbUBtELycbRmEgG0IwdCAbRCEn",
+"DhtEdSAgIyYgISAbQSwbRGQkbBtRbRtQICAg"
+]
+},
+{
+"name": "Honey Buzzard",
+"code": "HB",
+"hex": "#d32f2f",
+"vt": 1,
+"motto": "Even nothing is something that is nothing.",
+"faction": "Red / Sender / First Wave",
+"stats": {
+"STR": 6,
+"DEX": 8,
+"INT": 7,
+"WIS": 10,
+"CHA": 5,
+"CON": 8
+},
+"secs": [
+[
+"f",
+"D(t) = int[0..t] gamma * e^(-mu(t-s)) * R(s) ds"
+],
+[
+"i",
+"Buzzard head, black tux, red ring, tense, sharp, cryptic."
+],
+[
+"t",
+"Red / Sender / First Wave / Distance & Decay / G-Force & Entropy."
+],
+[
+"i",
+"White Bishop / Virgil / Member of The Invisible College of Sages / Amertume / Dark F(e)ather."
+],
+[
+"t",
+"Decaying entropist — a tense rot-bringer with red ring's pull. High WIS and DEX weave his cryptic rot."
+],
+[
+"t",
+"Powers: Buzzard's Oil Rot, Corrosive Cloud, Gear Decay. Red Ring's Oil Pull — gravity pull, disorienting force. His oil corrodes with entropic bite — a buzzard's feast on time's carcass."
+],
+[
+"i",
+"No-Name (XIII) / Keter / Mithraic Corax / Plato's Timaeus first cause / Plotinus' oil rot dead wells / Kabbalah's Buzzard in Ayin might fade new chants."
+],
+[
+"t",
+"Hexagram 18 — Work on What Has Been Spoiled / \"The past decays, Correct it with firmness.\""
+],
+[
+"t",
+"Mini-Stories: The City of Night / The Death of Joan / Vault of Lost Voices."
+],
+[
+"t",
+"Masks Krewsmatics: Red Ring + Pink Hand = Purpose."
+]
+],
+"face": [
+"DhtEKiMbUW8bUDUbUXc1f38bUH19fCgwICJ8",
+"DiAbRDZ+PRtRPT06KisbQX8bRHsbUH0oICAq",
+"DhtEKBtBahtRG0RvG1A9PxtUG0UoG1EbQix8G0ZwG0QuG1B+P3ZwcHA=",
+"DhtEaiQbQTcgG0Roa28bUjcbUxtFLRtSG0dsG1EbQjAbRG8bUDwwYCA=",
+"DhtEfyUgIHAbQXAbRGgbQSQjG0RjG1IyG1EbRjAbUBtENTUoIA==",
+"DhtEPyAgIGsbUXAbUH04cBtBcnEbUhtHIhtUG0Z9G1AbQXYbRGIg",
+"DhtEISAqNCAiLzAiKy8bUXwbUnxwG1AbRX0bRCE=",
+"DiAgIBtEKn18NCB4G0F8G1EbRGMbUHxzJhtBKxtEdQ==",
+"DiAgICAbRG0nIBtFaBtRG0IlG0F/G0R6fxtQNzUkIQ==",
+"DhtEInQgICAhIBtSNRtRG0YwG0R6en8bUDU1MSQ=",
+"DiAbQWsbRX0bQnAgIBtFeBtEPhtSfBtRG0YpG1R0G1EbRG8bUDU5IHg=",
+"DhtEIiIbUjAbUCMrIhtBIxtEYjt7G1J9G1AbRW8bRHl4fn8=",
+"DiAbRCEbQWobRDAbQXgbRXwbQXAgG0Q3NG8bQWobRD8rLj8=",
+"DiAbRCIiG1EbRWp/G1J5G1Q/G1AgG0Q1NWtqG1QbRSUoG1AbRH10"
+],
+"facec": [
+"DhtEaiMbUW8bUDV/f39/fX19KDAgIjw=",
+"DiAbRCYbUXsbUDUbUXt/f39/f38bUH0wISAq",
+"DiAbQWobRG81G1F7G1QbRigsfHFgG1AbRH4/dnBwcA==",
+"DhtFaBtEJBtBJSAbRDg+PxtUG0ZoehtHbRtGMBtEfxtQPDAwIA==",
+"DhtEfzEgIHB0aDQjYxtUG0ZtMBtQG0Q3NDIw",
+"DhtENyAgIGsbVBtGIhtQG0R9OHhycRtUG0Z7G1YbR2QbUBtEdmQg",
+"DhtEISAqdCAhLzAiK28bVBtGIiMvG1AbRH0h",
+"DiAgIBtEanx8NCB4fH98cyYrdQ==",
+"DhtEYCAgIG0lIWgbVBtGJRtEf39/G1A1NTEy",
+"DiAbRHQgICghIBtUG0ZqcBtEf39/G1A5OSgg",
+"DiAbRGsbRn0bRHAgIHg3G1QbRiMtdBtEfxtQNWUheA==",
+"DhtEIjIbVBtGbxtQG0QjKyIjYjt7G1QbRiIbUG8bRHN0fn8=",
+"DiAbRCRqMHh8cCA3NG9qPysuPw==",
+"DiAbRDIiG1QbRip3bzcbUCAbRDU1Ozp/f310"
+]
+},
+{
+"name": "Hátra Lövés",
+"code": "HL",
+"hex": "#9e9e9e",
+"vt": 7,
+"motto": "Surviving is striking from behind.",
+"faction": "Grey / Divisionist / First Wave",
+"stats": {
+"STR": 6,
+"DEX": 10,
+"INT": 5,
+"WIS": 7,
+"CHA": 6,
+"CON": 8
+},
+"secs": [
+[
+"f",
+"P(t) = int[0..t] e^(-lambda(t-s)) * A(s) ds"
+],
+[
+"i",
+"Ragged tribal rider, cowboy edge, precise, exact."
+],
+[
+"t",
+"Grey / Divisionist / First Wave / Agility & Endurance / Reaction & Dexterity."
+],
+[
+"i",
+"Black Knight / Saint Sebastian / Archer / Ulysses / Lovas Hátralövő / Baku Military Chief / Blonde Warrior Ruler."
+],
+[
+"t",
+"Swift ambusher — a precise rider with grey arrow's edge. High DEX and CON track his ragged endurance."
+],
+[
+"t",
+"Powers: Archer's Crude Shot, Oil Arrow, Fiery Pierce. Rider's Oil Slick — slick trap, slowing snare. His oil ignites arrows with lethal aim — piercing the wild's gut."
+],
+[
+"i",
+"Strength (XI) / Netzach / Mithraic Soldier / Plato's Laches gutsy strategy / Plotinus' oil jab pipeline snipe / Kabbalah's Archer in Nun might snipe new survival arcs."
+],
+[
+"t",
+"Hexagram 40 — Release / \"Thunder over water, Deliverance.\""
+],
+[
+"t",
+"Mini-Stories: Span of Flying Stitch Ups."
+],
+[
+"t",
+"Masks Krewsmatics: Arrow + Anchor = Exploration."
+]
+],
+"face": [
+"DhtEMn8bVBtFMX4bUBtBPxtEY38bVBtFIhtVG0YifyYbVBtFKxtVG0YoG0V/f38=",
+"DhtEZn8bVBtFfRtQG0Q3OnY/f3NvG0F9G1QbRXgbVRtGfjkwG0V/",
+"DhtEbX8bURtFPxtQG0FlG0RvKyJ4PH8bVRtHahtWYBtGfxtVL2QbRX8=",
+"DhtEe38bQTcbRCYkICAbVBtFaHA+G1UbRyJ6G1AbQXcbRH8/G1QbRWs=",
+"DhtEan9iYiBoMGsbUTQbVBtFJRtQG0F7G1EbRyMbRiMbRSMjG1AbRD8=",
+"DhtEKnsbQXwbVBtGcBtQG0V9IBtEaSAmKi8bVRtHaBtQG0F3Ly8h",
+"DiAbRCobRX8bVRtGZRtRG0c1G1AgG0RqfXAwG0VqG1UbR28bVn0oG1EbRnwbUBtFdA==",
+"DhtEdCAjG0UqG0QhZCJsf3wbQW8bVBtGIhtVIyMrJQ==",
+"DhtEbTAgICAgYSx4ej47Zi9vfw==",
+"DhtEPyFiZCAgIClybT5gZiYiKA==",
+"DhtEISA/fzQwImQibzZ6aCQgMA==",
+"DiAbRHBoaCEpMCBkKDE2bH8bRX4bVHA=",
+"DiAgG0RmZCAqfzQgIShhYnsbRX9/",
+"DiAbRCRtIiAgMDQwICAgan8bRX9/"
+],
+"facec": [
+"DhtEKn5/G1QbRigbUBtEPzN+fxtUG0Zrfy8jb392ZA==",
+"DhtEOX8bVBtGJBtQG0Q3ZGc/dztvfRtUG0Z4f39/bQ==",
+"DhtEZn8bVBtGNRtQG0RlNzcmaDx/G1QbRm4bVhtHaBtGf39/fw==",
+"DhtEO383JiQgIBtUG0ZgcCQrG1YbR3AbUBtEdz8/G1QbRis=",
+"DhtEKn9iYiBoMGt/G1QbRiUbURtEPxtTG0ZjG1FjYxtEKxtQMw==",
+"DhtEKnt8G1QbRnAbUBtEfSBpICYqLxtRG0Z9G0R9G1AbQSsvIA==",
+"DiAbRCobVBtGbm8bRyUbUCAbRGp9cDBqG1YbR259KBtUG0Z8G1AbRHQ=",
+"DhtENCAzKiFkImxvfG8bVBtGIm9rL28=",
+"DhtEbTAgICAgaWh4ei47Zi9vPw==",
+"DhtEPyFiZCAgICxyLT5gZiYiIg==",
+"DhtEISBvbzQwImQibzZ6KDRgIA==",
+"DiAbRHBhaSEpMCBkKDE2bH1+G1QbRjA=",
+"DiAgG0RmZCAqfzAgIShhYnsbVBtGZiY=",
+"DiAbRCR5KCAgMDQwICAgYn8bVBtGKDE="
+]
+},
+{
+"name": "Croisière Noire",
+"code": "CN",
+"hex": "#bdbdbd",
+"vt": 7,
+"motto": "Shelter brings expansion.",
+"faction": "White / Liquefactionist / First Wave / Second Wave Genitor",
+"stats": {
+"STR": 9,
+"DEX": 6,
+"INT": 8,
+"WIS": 7,
+"CHA": 5,
+"CON": 10
+},
+"secs": [
+[
+"f",
+"G(t) = int[0..t] c(s) * e^(gamma s) ds"
+],
+[
+"i",
+"Hive or bull, endless, practical, cunning."
+],
+[
+"t",
+"White / Liquefactionist / First Wave / Second Wave Genitor / Shelter & Abundant Expansion."
+],
+[
+"i",
+"Black Knight / Bull / Bee / Hive / Baldr / Citroën's Expedition / Melanesian Cargo / Recreational Vehicle / Motel / Cardboard Box / Member of The Invisible College of Sages / Death of Croisière Noire Protagonist."
+],
+[
+"t",
+"Endless conjurer — a cunning swarm-master with white hive's sprawl. High CON and STR fuel his boundless grind."
+],
+[
+"t",
+"Powers: Hive's Crude Swarm, Drones, Relentless Assault. Bull's Oil Charge — charge, crushing rush. His oil conjures a boundless hive — drowning earth in cunning chaos."
+],
+[
+"i",
+"The Chariot (VII) / Chesed / Mithraic Bull / Plato's Timaeus living cosmos / Plotinus' oil gush raw field / Kabbalah's Bull in Bet might charge new realms."
+],
+[
+"t",
+"Hexagram 42 — Increase / \"Wind above thunder, The superior person follows the tide.\""
+],
+[
+"t",
+"Mini-Stories: Spire of Endless Echoes."
+],
+[
+"t",
+"Masks Krewsmatics: White Hive + Gear = Work."
+]
+],
+"face": [
+"DiAgICAbQXAbQnwbUhtGJhtRG0UnG0RuG1A1G0FgG0VwG0RwMCAg",
+"DiAbQWAbQnwbUhtEIXB8G1AbQW8bRHcbVBtGcBtQG0V+LxtEMzMrKDA=",
+"DhtBfhtSG0UxG1EbQjcbUBtEISAbQWAbRX4bUhtEKBtQG0FzG0RmPj52Zmgg",
+"DhtRG0RweBtQITgbQngbVBtHJhtQG0R5G0F7G1IbRGsbUHs7NmwgMzE=",
+"DhtEKSF6G0V+G1MbRH4bUDkpIRtCbxtRMBtQG0Q1MmgxZjQ=",
+"DhtFfBtBPxtFJxtBJxtEb2sbUhtHbDwsG0R6G1AlICAgZDE=",
+"DhtEJ3QgeiAgG0ErG0QrKyMgICAgNjI=",
+"DhtEYHckeX0wICAgKCAgIGpqZg==",
+"DhtEaiVxKidwICAgICAgIHU1NQ==",
+"DhtEKWltMSAwICAgICAgIGRiIA==",
+"DhtEMhtBfhtEZSUgICAgICAgICAgICA=",
+"DhtEan9pISAgICAgICAgICAgIA==",
+"DhtEei9/JyAgICAgICAgKiAgIA==",
+"DhtEPiAgIiAgICAgICAgISAgIA=="
+],
+"facec": [
+"DiAgICAbRHAbRnx/G1QnG0R/G1A1YBtGcBtEcDAgIA==",
+"DiAbRGAbRnwbVH4vIxtEfxtQd3t+LzMzKygw",
+"DhtEfhtUG0ZvJxtQG0QhIGAbVBtGODYbUBtEOzo+PnZlYSA=",
+"DhtEfxtUG0YhG1AbRCU4G0Z4G1QbRyYbUBtEd3sbVBtGNBtQG0R7OzZ0YWNh",
+"DhtEKSF6fhtUG0chG1AbRHMsIRtGbxtUNBtQG0Q1MWwxZjQ=",
+"DhtEfD8bRicbRGdvaxtWG0dsPCwbVBtGJRtQG0QlICAgZDE=",
+"DhtEJzoweCgiKysrIyAgICRxKQ==",
+"DhtEYD8wbX0wICAgKCAgIGpqOQ==",
+"DhtEaidkKSdwICAgICAgIHU1NQ==",
+"DhtEKXl3JCAoICAgICAgIGRiIA==",
+"DhtEZH9tISAgICAgICAgICAgIA==",
+"DhtEan9qYCAgICAgICAgICAgIA==",
+"DhtEeit/JzAgICAgICAgaiAgIA==",
+"DhtEPiAgIiAgICAgICAgJCAgIA=="
+]
+},
+{
+"name": "Aube",
+"code": "AU",
+"hex": "#f48fb1",
+"vt": 1,
+"motto": "Light dawns anew.",
+"faction": "Pink / Liquefactionist / Second-Wave Offspring",
+"stats": {
+"STR": 6,
+"DEX": 9,
+"INT": 7,
+"WIS": 10,
+"CHA": 7,
+"CON": 8
+},
+"secs": [
+[
+"f",
+"L(t) = L0 * e^(gamma t)"
+],
+[
+"i",
+"Pale-haired lass, sheer gown, barefoot, bright, gutsy, visionary — progressively seen in full thick armour, short-haired."
+],
+[
+"t",
+"Pink / Liquefactionist / Second-Wave Offspring / Faith & Colours / Courage & Way Opening."
+],
+[
+"i",
+"White Queen / Joan of Arc / Gorge (Throat) / Rosy Fingers / Beatrice Portinari / Bedtime Story Protagonist / Maiden Call's Sister."
+],
+[
+"t",
+"Armoured dawnbreaker — a gutsy visionary wielding oil-slick wrath with pink-handed resolve. High WIS and DEX carve her as a ritual blade, slicing light through shadow."
+],
+[
+"t",
+"Powers: Oil of the Wrathful Dawn, Prismatic Slash, Chromatic Damage. Hand's Anointed Guidance — allies gain STR, shrugs off pain. Her anointed touch drives through blood — a consecration on doubt's edge."
+],
+[
+"i",
+"The Sun (XIX) / Chesed / Mithraic Lion / Plato's Republic cave-light / Plotinus' oil dawn flare-stack glow / Kabbalah's Gorge in Zayin might dawn a new light."
+],
+[
+"t",
+"Hexagram 24 — Return / \"Return on the seventh day, Going out and coming in without trouble.\""
+],
+[
+"t",
+"Mini-Stories: The Garden of Delight / Slab of Raw Colours."
+],
+[
+"t",
+"Masks Krewsmatics: Pink Hand + Red Ring = Purpose."
+]
+],
+"face": [
+"DhtEfxtFf38bVRtGNH0/G0V/G1AbQT8bRHcbQWt3G0RjahtUG0Vrf38=",
+"DhtEfxtFfxtVG0Z2fn91G0V/G1AbQTcbURtFbz8bRHobVBtFNBtQG0FqG0R/G1UbRjAbRX8=",
+"DhtEfxtVG0Zqfn8bVhtHMHUbURtGMBtFIRtQG0FvG0V3G0R7G0E3fhtUG0V6G1UbRmQbRX8=",
+"DhtUG0VoG1UbRmp/G1YbRyg6G1UbRjcbR28kG1AbQX03d2obVRtHPBtGI31h",
+"DhtUG0U0G1UbRm4bVhtHYBtVNxtGIRtRG0VhG1AbRDMbQSJvfxtRG0QiG1AbQTUbRCIiG1QbRSsbVRtGKQ==",
+"DhtUG0UqG1UbRmp/G1QbRT8bUSgbQyEbUBtEJXsbQXx3dRtEeDlgf28=",
+"DhtEfxtVG0ZuG0c1G1AbQTUbRGc3IRtRG0VwMBtEaX8hG1B3ICpq",
+"DhtUG0VqG1UbRmo1G1AbRHUgG0EwIBtRG0YqG1UbRzQbURtEahtQaxtRG0VoNBtQICAbRGA=",
+"DhtUG0UoG1UbRmolG1AbRCQbQWQ1IBtEKxtBLycgLycgKBtEKA==",
+"DhtEfxtVG0ZqG1QbRT0bUBtEJhtBcBtEcCAgIGB+ICBgcHA=",
+"DhtEfxtVG0YiJBtRG0UkG0RqG1UbRjAbUBtEJCAiYxtBcSAgextRG0Q1ag==",
+"DhtEfxtUG0U/bxtBfxtRG0QqG1UbRjUbUBtEMSAgazUgIBtFfhtUMBtQG0F7",
+"DhtEfxtUG0UhG1AbQWt/G1QbRWo3G1AbRCUgIBtBYhtEJSAgaxtUG0U1G1AbRHc=",
+"DhtEfz8wIxtUG0V+G1AbRHcgYCEsMSAgIBtUG0VpG1AbRDI="
+],
+"facec": [
+"DhtEfxtUG0Zqf39/f28bUBtFdRtEN3t3I2IbVBtGKnVl",
+"DhtEfxtUG0Zuf39/G1YbRzAbVBtGNxtQG0QxG1QbRm42G0R/fxtQG0FqG0R/G0Z/G1R5",
+"DhtEfxtGf38bVhtHYCk8G1EbRncbRHYbUG8bVBtGMRtQG0R7NxtRaRtUG0Z4f30=",
+"DhtEfxtGf38bVhtHNHcjbxtUG0Y8G1EbRDsbUDMnahtUG0Z+L39/",
+"DhtEfxtGfxtWG0cyJhtUG0Y/G1FvG1AbRTEgG1EbRHZmZxtQJCIiG1QbRiJv",
+"DhtEfxtUG0ZvG1YbRzIbVBtGNxtRG0RvG0ZvG1AbRCEbQWIbRDQbUX0bUGEbQmAbQSQgG1EbRHkbUG8=",
+"DhtEfxtGfxtUPxtQG0Q1YycgG1F7Oz57bm4bUCAbQigbRCo=",
+"DhtEfxtGfxtUfRtQG0Q1ICAgG1EbRm4bU3cbURtEbxtQLhtRe3cbUCAgYA==",
+"DhtEfxtGfxtUPRtQG0QkIBtBJSAbRCMrMSAmG0UlICAg",
+"DhtEfxtGfxtUNRtQIBtFcBtEcCAgIGA4ICAgG0FgG0Qw",
+"DhtEfxtUG0Z7PRtRG0R3dxtUG0Y0G1AbRCQgICowICB7G1E/fg==",
+"DhtEfxtUG0YqIhtRG0R2G1BuG0Z/G0QxICAbRSobQjUgIBtGfhtEfxtRPQ==",
+"DhtEf39rG1FuG1QbRmolG1AbRCUgICAxICBqG1QbRiQbUBtEMw==",
+"DhtEf28gIxtUG0Y6G1AbRHcgICAbQSggICAgG1QbRiEbUBtEMg=="
+]
+},
+{
+"name": "Silent Pact",
+"code": "SP",
+"hex": "#78909c",
+"vt": 7,
+"motto": "...",
+"faction": "Black / Sender / Second-Wave Offspring",
+"stats": {
+"STR": 7,
+"DEX": 6,
+"INT": 8,
+"WIS": 9,
+"CHA": 5,
+"CON": 8
+},
+"secs": [
+[
+"f",
+"V(t) = int[0..t] lambda * e^(-mu(t-s)) * L(s) ds"
+],
+[
+"i",
+"Veiled bloke, quiet, solid, trusty."
+],
+[
+"t",
+"Black / Sender / Second-Wave Offspring / Oath & Silence / Efficiency & Secrecy."
+],
+[
+"i",
+"Black Rook / De Profundis / Oath (Mitheta ra-Harpokrates) / Kaves Secret Chief / Bedtime Story Protagonist."
+],
+[
+"t",
+"Silent guardian — a solid oath-keeper with black veil's shroud. High WIS and CON hold his quiet strength."
+],
+[
+"t",
+"Powers: Oath's Oil Shroud, Shadows, Obscuring Veil. Silent Crude Strike — stealth blow, piercing quiet. His oil cloaks with silent strength — an oath carved in stillness."
+],
+[
+"i",
+"The Moon (XVIII) / Chokhmah / Mithraic Pater / Plato's Meno buried know-how / Plotinus' oil flow underground reserves / Kabbalah's Oath in Kaf might hush new depths."
+],
+[
+"t",
+"Hexagram 20 — Contemplation / \"Wind over earth, The tower watches.\""
+],
+[
+"t",
+"Mini-Stories: Trap of Shut Doors / The Control Room."
+],
+[
+"t",
+"Masks Krewsmatics: Black Veil + Purple Dagger = Analysis."
+]
+],
+"face": [
+"DiAbRDBkbRtRNxtGNRtQG0QnNCAgahtRKm9vJ2c=",
+"DiAbRGRpextSNRtRG0Y1G1AbRDA2ICAgG1EbRW10cDRg",
+"DhtEIjQ9G1E3G0NqG1IbRHobUGpiICAgG0FvG1IbRSEnG1F1fw==",
+"DhtEYmZ+G1ElG1IbQyobRH8bUGogYCAgG0EqG1IbRmQ0G0UiLw==",
+"DhtEaGkbUT8bRmo1G0R/G1BqICggICAbRW8bUhtGdTQbQn8=",
+"DhtEansbUz8bUhtDNhtRG0R+G1BveiBiICAgIBtCbxtSG0Y0G0J/",
+"DhtEZn8bURtGPhtQG0Q/NzV9IGIgICAgIhtRG0JvG1IbRSg=",
+"DhtEextSNRtQG0U/G0Q1NTU9IGogICAgIBtCaxtSG0U6",
+"DhtEfhtUG0ZqG1EbRH4bUGA1NTcgaiAgICAgahtSG0V+",
+"DhtEdxtRG0I+G1AbRD1qIDU1IGogICAgICAbVBtFJQ==",
+"DhtEbhtSahtQMWogNTUgaiAgICAgIGs=",
+"DhtEahtBPyAbRDUgNTUgaiAgICAgIHo=",
+"DhtEajEgJSAkNSBqICAgICAgag==",
+"DhtEahtBNRtEJCAgICAgICAgICAgIGo="
+],
+"facec": [
+"DhtEKCBmZn8bVBtGNxtQG0QnNCQgan9/f39/",
+"DhtEYmJmbhtUG0ZqNRtQG0QwNiAgIBtUG0ZlZWgbRH8bRmg=",
+"DhtEKDo6fxtUG0Z6IRtQG0RqYiAgIBtGb38bVH05OQ==",
+"DhtEYmZ/G1QbRmAbVhtHIhtEfxtQamAoICAqG0Z/f38bVHs=",
+"DhtEamp/G1QbR2gbRjcbRH8bUGsgYiAgIBtGb39/fw==",
+"DhtEansbVBtHYBtWJhtEfxtQb3ogaCAgICIbRm9/fw==",
+"DhtEOX8bVBtGPhtQG0Q/Nz17IGogICAgIhtUG0Zvfw==",
+"DhtEextUG0ZoJRtQG0QlNTU9IGogICAgIBtGa38=",
+"DhtEfhtUG0ZqG1AbRHdhNTU3IGogICAgIGobVBtGPQ==",
+"DhtEdxtUG0Y+G1AbRDtqIDU1IGogICAgICAbVBtGIQ==",
+"DhtEbhtUG0Y1G1AbRClqIDU1IGogICAgICBr",
+"DhtEej8wNSA1NSBqICAgICAgeg==",
+"DhtEajEgJWAhNSBqICAgICAgag==",
+"DhtEajUkICAgICAgICAgICAgag=="
+]
+},
+{
+"name": "Maiden Call",
+"code": "MC",
+"hex": "#42a5f5",
+"vt": 4,
+"motto": "I'll come if you come.",
+"faction": "Blue / White / Sender / Second-Wave Offspring",
+"stats": {
+"STR": 5,
+"DEX": 7,
+"INT": 6,
+"WIS": 8,
+"CHA": 10,
+"CON": 6
+},
+"secs": [
+[
+"f",
+"I(t) = int[0..t] phi(s) * e^(lambda(t-s)) ds"
+],
+[
+"i",
+"Dark-haired, maybe Asian, old phone or glowing anchor in hands, curious, haunting, sweet."
+],
+[
+"t",
+"Blue / White / Sender / Second-Wave Offspring / Innocence & Relationship / Authenticity & Warmth."
+],
+[
+"i",
+"Black Bishop / Echo (Siren) / Mermaid / Marie / Aube's Sister."
+],
+[
+"t",
+"Haunting binder — a sweet whisperer with anchor's grasp. High CHA and WIS lure with fragile grace."
+],
+[
+"t",
+"Powers: Siren's Oil Lure, Call, Psychic Pull. Anchor's Crude Grasp — roots, oily grip. Her oil weaves haunting whispers — binding souls with fragile grace."
+],
+[
+"i",
+"The Lovers (VI) / Yesod / Mithraic Nymphus / Plotinus' oil whisper pipe signals / Kabbalah's Echo in Dalet might ring new lures."
+],
+[
+"t",
+"Hexagram 6 — Conflict / \"Heaven and water move apart, Conflict, But with inner truth.\""
+],
+[
+"t",
+"Mini-Stories: Pit of Broken Calls."
+],
+[
+"t",
+"Masks Krewsmatics: Anchor + Arrow = Exploration."
+]
+],
+"face": [
+"DhtEaXlvPzhkIG1+O38bVBtFNRtEf38bUSobQX8=",
+"DhtEOGlnfiQ5NCh2G1E3G1JzG1EbQm0bRH9/LRtFKQ==",
+"DhtEYDB5fzA1NShmextRextUG0UqG0R/G1E3G0U1cA==",
+"DiAbRG1rbyB1LS8bQS9vfRtUG0VgG0dwG0Z8G1F8G0U+",
+"DiAbRHx7P2JlcCBwcBtUG0YqG1AbQXcbURtEfHBwG1AbQTc=",
+"DiAgIBtEMTUgIiBgICEbQW8bRH5/fyk=",
+"DiAbRCkueSUgIBtBeBtFdHwbQXx+G0Q5f2Zo",
+"DiAbRCp+fyAgIBtSG0coG1R8G1J+G1F8G0Y2G0MlG1AbRDkhG0Fq",
+"DiAbRDBrPiAgIBtRG0JiG1IbR2swG0NrG1AbQW0bURtCbhtQG0F1G0QhJQ==",
+"DiAbRCImJSAgIBtBPxtSG0MiG1FwG1AbQT8bRGobVBtFbxtGNRtQG0QoYA==",
+"DiAbRGB8ICAgIH9+G0UjG0F6G1EbRnwbVBtFNBtGNRtQG0QiIA==",
+"DhtEeidxfDAgICpmMC8bQW8bRG8bVBtFfRtQG0QpLA==",
+"DhtEMSg3fzUgYH99fzljdxtUG0UqG1AbQXUg",
+"DhtENWp7KjUgIG9/G1QbRTAbUBtENWIvehtUG0VrG1AbQTQ="
+],
+"facec": [
+"DhtEaWlvPzhkKGl+O39/f39/fw==",
+"DhtEOGtjfiQ1NCh2fxtUG0YsbRtEf39/G0Yh",
+"DhtEKDB5fyQ1NSJme38bVBtGKBtEf38bRjEy",
+"DhtEKGlrb2BlLS8vb31/G1QbRnh8fD4=",
+"DiAbRD19P2hpYGBgcBtUG0YqG1AbRHd/G1QbRiEbRH8bUDU=",
+"DiAbRGAiMDUgIyBhICFvf39/IA==",
+"DiAbRCkueSUgIHh8G0Z4G0R8fjk/NhtBYA==",
+"DiAbRCp+fyAgIBtUG0ZvG0d0G1Z+eBtUG0Y2NRtQG0Q7MBtBKg==",
+"DiAbRDRrPiAgIBtUG0ZiG1YbR2sbVBtGdxtWG0drG1AbRG0bVBtGbhtQG0Q9MBtCJA==",
+"DiAbRCImJSAgID8bVBtGb3EbUBtEP2obVBtGKzUbUBtEKGA=",
+"DiAbRGB8ICAgIG9+I2kbVBtGfDQ1G1AbRCIg",
+"DhtEeidhdDAgIBtCIhtELDAvb28bVBtGZRtQG0QpLA==",
+"DhtEMSA2fxtGNCAgG1IbRHsbUBtGPhtEdhtCJBtEaz0bVBtGIhtQG0R1IA==",
+"DhtENRtCKBtEOSI1ICAbQmkbRD8bUnYbUDEoamobVBtGKBtQG0Q0"
+]
+},
+{
+"name": "Plague of Justinian",
+"code": "PJ",
+"hex": "#546e7a",
+"vt": 7,
+"motto": "In contagion strength.",
+"faction": "Black / Sender / Second-Wave Offspring",
+"stats": {
+"STR": 7,
+"DEX": 6,
+"INT": 8,
+"WIS": 5,
+"CHA": 10,
+"CON": 8
+},
+"secs": [
+[
+"f",
+"M(t) = int[0..t] nu(s) * e^(-delta(t-s)) ds"
+],
+[
+"i",
+"Guy with a t-shirt, whose head is an exploding cloud."
+],
+[
+"t",
+"Black / Sender / Second-Wave Offspring / Surge & Contagion / Transformation."
+],
+[
+"i",
+"White Rook / Sultan / Aphrodite's Lover."
+],
+[
+"t",
+"Surging rot-bringer — a dark transformer with black miasma's rush. High CHA and CON spread his plague."
+],
+[
+"t",
+"Powers: Plague's Oil Miasma, Toxic Mist, Spreading Rot. Surge's Crude Rush — speed boost, chaotic surge. His oil spreads a dark scourge — a plague's wild gift."
+],
+[
+"i",
+"The Wheel (X) / Gevurah / Mithraic Soldier / Plato's Timaeus wild motion / Plotinus' oil spill historic mess / Kabbalah's Sultan in Aleph might flood new plagues."
+],
+[
+"t",
+"Hexagram 43 — Breakthrough / \"Lake rising to heaven, One must speak out.\""
+],
+[
+"t",
+"Mini-Stories: Flow of Black Reflections."
+],
+[
+"t",
+"Masks Krewsmatics: Black Cloud + Orange Flame = Intensity."
+]
+],
+"face": [
+"DhtEbm4/fHh4eBtUG0VwG1B6G0Q8OTkoMCAg",
+"DiAbRHs1OhtBfRtUG0ZwG1F6G1InG1EbQnEbRHobUHZ2IiAgIA==",
+"DhtEMH4gG1I3G1UbRn4bVhtHMikmG1UbRnEbVBtFNCIhG1AbRHQwICA=",
+"DhtEdRtBeRtCfBtUG0Z6G1J3G0doG1Z+G1IbRi0bURtFNxtEMBtUG0V4G1IbRGt/G1A2JCA=",
+"DhtFeBtRG0Z6G1I4G1EvbxtSG0clG0R8fhtQb28bUXx+f38bUHUg",
+"DhtFbxtUIyMbRH8bUD9/G1QbRnAbURtHeBtSG0RjG1B+anhjZ25s",
+"DiAbRCEqLy8bVBtFMGIbURtHJRtQG0RvbmcbUWUbUG9hISE=",
+"DhtBYBtEYCAgG0FuYRtSG0R9G1QbRjUbUBtEfSl7G0EnG0QiICAg",
+"DhtRG0Q1G1B+KXw/dxtSdRtUG0UlG1AbRCcgIiBhISQg",
+"DhtEI2B6JTs8NSQgICAgICUgIA==",
+"DhtEaHk3IDcmNDkxISAgICkgIA==",
+"DhtEahtBahtEdSAiJCQkIiAgICAiICA=",
+"DiAbVBtFeiUbUCAgICAgICB8G0F8G0QwICAg",
+"DhtFfhtEdyEwICAgICAgG1QbRW8bUBtEPyAgICA="
+],
+"facec": [
+"DhtELn4/bHh4eH16NBtCJCQwICAg",
+"DhtEIm41On0bVBtGcBtQfhtWG0ckG1QbRnEbRH8bUHY0ICAgIA==",
+"DhtEMH8gG1QbRmgbVhtHODooNhtUG0Z9NBtEfxtGIRtQG0R0MCAg",
+"DhtEdXkbRn0bVHp/G1YbR2h+G0Z/G1QnG0R/G0Z4MBtEfxtQNiAg",
+"DhtEeBtUG0Z+fz9vG1YbRyUbVBtGIyEbUBtEb29/b39/dSA=",
+"DhtEbxtUG0YjIRtEfxtQP38bVBtGcBtHcBtGLBtQG0Q9NnZma2ps",
+"DhtEMCEqLy8bVBtGMCI3G1AbRG9md39vISEh",
+"DiAbQmAgIBtEbnEbVBtGIjUbUBtEfSl6JyIiICA=",
+"DhtCextRG0R5G1AofD93G1QbRiolG1AbRCcgIiBpISAg",
+"DhtEI2B6JTs8NzAwIDAgICUgIA==",
+"DhtEaHk3IDU1NGZiICAgIGEgIA==",
+"DhtEKnp1ICIkIiQhICAgICAgIA==",
+"DhtEIhtGfhtEfyAgICAgICB8fDAgICA=",
+"DhtEfnchMCAgICAgIBtUG0YiG1AbRHcgICAg"
+]
+},
+{
+"name": "Poisoned Well",
+"code": "PW",
+"hex": "#ab47bc",
+"vt": 5,
+"motto": "Words are venom. Honey is the pus of the real.",
+"faction": "Purple / Sender / Second-Wave Offspring",
+"stats": {
+"STR": 4,
+"DEX": 6,
+"INT": 9,
+"WIS": 10,
+"CHA": 8,
+"CON": 5
+},
+"secs": [
+[
+"f",
+"W(t) = P0 * e^(-alpha t)"
+],
+[
+"i",
+"Chubby bald kid, dark trousers, cigar, sly, sharp, luring."
+],
+[
+"t",
+"Purple / Sender / Second-Wave Offspring / Corruption & Assertivity."
+],
+[
+"i",
+"Black Bishop / Pharmakon / Insult / Baby Face / Viper / Blonde Warrior Ruler."
+],
+[
+"t",
+"Twisted whisperer — a sly venom-child with purple sting. High WIS and INT weave his cunning traps."
+],
+[
+"t",
+"Powers: Venom's Oil Whisper, Lie, Psychic Twist. Well's Crude Trap — oil puddle, slowing mire. His oil twists venom into whispers — a sly child's deadly game."
+],
+[
+"i",
+"The Tower (XVI) / Binah / Mithraic Serpent / Plato's Sophist twisted words / Plotinus' oil stain aquifer rot / Kabbalah's Insult in Pe might venom new cons."
+],
+[
+"t",
+"Hexagram 47 — Oppression / \"Water below a lake, Exhaustion, Hidden strength.\""
+],
+[
+"t",
+"Mini-Stories: The Word Hoard / Gash of Hissing Words / The Terminal Bar."
+],
+[
+"t",
+"Masks Krewsmatics: Purple Dagger + Black Veil = Analysis."
+]
+],
+"face": [
+"DhtEIiQgICBgG1E/G1QbRXwbUH0bUhtEIxtRG0Z4G1V2G1AbRTUbRCQgIA==",
+"DiAgIBtEYjV6G1FtG1AbQSczG1QbRWsbUDcbQXs1ICAg",
+"DiAgIBtEInZ/G1EbQmobRnR4G0JuG1QbRn0bVXgbUBtENSFgYA==",
+"DhtEMSAgICJrG1EhG1IbRmobQ3UbUBtFdxtUG0Z7G1U3G1AgIBtEaGk=",
+"DhtEISAgICB+bxtRG0UrG1UbRiMbUhtEfhtRG0JrG1AnIBtEcHB9",
+"DiAgICAgG0FvfRtEdxtFbxtUG0YvG1MbRH4bUD8bQX8bURtEYn9/",
+"DhtEfCcgICAbQWobUhtEYBtRG0YsG0R/G1N1G1AbRX0bRGs2OxtRO38=",
+"DiAgICAbRDAgG0Ftf3I5G1EbRHAbUCIkM2p/",
+"DiAgG0RhIDAoG0FoG0N4G1EbR34bVX0bUBtCfBtEaGggIhtRew==",
+"DiAgICAbRCkxYxtRG0dvG1J1G1MbRSEbRGobUGo6ICQbUXc=",
+"DiAgICAgG0QpIBtCaxtSG0M1G1MbRzUbVBtGNRtQG0QqNjQgZg==",
+"DiAgICAgG0QiICIbUhtDJRtTG0VwG1A3G0RiICAgKw==",
+"DiAgICAgICAgG0FvG1IbRXEbUBtBNSAgICAbRCo=",
+"DiAgICAgICAgG0QiG1FwG1AhICAgICA="
+],
+"facec": [
+"DhtEIiQgICAgfhtUG0Z4G1B9fBtUfH8bUBtENSggIA==",
+"DiAgIBtEYjR6fy8zG1QbRmMbUBtEN3s1ICAg",
+"DiAgIBtEInZ/G1QbRmp8fG59ehtQG0Q1IWBg",
+"DhtEMSAgICJrfxtGfxtWG0dlG1AbRncbVhtHcBtGfxtQG0QhIGhp",
+"DhtEJCAgICB+bxtUG0YrdyFrG1AnIBtEcHJ2",
+"DiAgG0QwICBvfXcbRm8bVC8bRyEbRH9/f39/",
+"DhtEfCcgICBqG0Y/G1FvG1IbRD8bUBtGLzUbRG03O39/",
+"DiAgG0QwIDAgNRtCdxtBYhtFKRtRG0JlG1AgG0QlKWp/",
+"DiAgG0RkIDAoYBtGeBtUG0d+G1Z9G1AbRjQbRGhqImJ/",
+"DiAgIBtEJCkxMxtWG0drNXobUBtGNxtEaGkgJH8=",
+"DiAgICAgG0QpMBtGaxtWG0clZRtQG0Y/G0RqMSQgZg==",
+"DiAgICAgIBtEJCIbRn8bVG8bUDUbRCggICAr",
+"DiAgICAgICAgG0RvG0Z/G0I1ICAgIBtEKg==",
+"DiAgICAgICAgG0QiG1I5G1AgICAgICA="
+]
+},
+{
+"name": "Cadaver Synod",
+"code": "CS",
+"hex": "#8d6e63",
+"vt": 7,
+"motto": "Judgement is stronger than death!",
+"faction": "Green / Purple / Divisionist / Second-Wave Offspring",
+"stats": {
+"STR": 8,
+"DEX": 7,
+"INT": 7,
+"WIS": 8,
+"CHA": 9,
+"CON": 6
+},
+"secs": [
+[
+"f",
+"J(t) = Sum[i=1..n] wi * Si(t)"
+],
+[
+"i",
+"Dusty stage, ointment stink, fierce, alert — more and more seen as a tall and muscled masked luchador in shiny tux, with long peacock feathers in the back, surrounded by red skeletons or headless elegant male dummies."
+],
+[
+"t",
+"Green / Purple / Divisionist / Second-Wave Offspring / Intensity & Verdict / Passion & Staging."
+],
+[
+"i",
+"Black Rook / Mummy / Boniface VI / Kafka / The Syncret / Speaker & Master of Ceremony."
+],
+[
+"t",
+"Theatrical arbiter — a fierce judge with peacock flair and oily verdicts. High CHA and STR stage his dusty reign."
+],
+[
+"t",
+"Powers: Synod's Oil Verdict, Mark, Psychic Judgement. Peacock's Crude Flash — dazzle, blinding flare. His oil marks the guilty — a theatrical stab at dusty souls."
+],
+[
+"i",
+"The Judgement (XX) / Tiferet / Mithraic Lion / Plato's Republic soul justice / Plotinus' oil ghost old rig bones / Kabbalah's ILLbient ILion in Mem might judge new pasts."
+],
+[
+"t",
+"Hexagram 49 — Revolution / \"Fire in the lake, The superior person changes like a Maukian leopard.\""
+],
+[
+"t",
+"Mini-Stories: The City of Night."
+],
+[
+"t",
+"Masks Krewsmatics: Mask + Green Lyre = Expressivity."
+]
+],
+"face": [
+"DiAgG0QkIBtBJGp8IDU0G1EbRD4bUDMbQWsbUhtFOxtQG0E3G0R7",
+"DiAgIBtBYCJqeiRlG0RtG0ErG1EbQnRwG1AbQXcbURtFaDQ=",
+"DiAgG0EwICAgKjJyG0QhIBtBZBtRG0I+G1AbQXwbURtCLhtQG0U1",
+"DiAgG0FuJCAgYigbRGAgIBtBan0bURtFYBtSG0QvG1AbQXU=",
+"DiAgIBtBNSAgICEbRGQgfTAbQisvG0F3Kg==",
+"DiAgICAbRGAoMnp4MBtRMxtCYBtELxtCeBtSG0RqG1Ag",
+"DiAgICAbRGkbQWlxG0RgcHEbQm8bUhtDdDUbRjIkG1AbRDU=",
+"DiAgG0QoMCJ7G0FmG0Q3fHtiG0JvG0N/G0Z/G1IbRGAbUCA=",
+"DiAgG0Q+PCAuG0E5G0R9az0yG0FlOxtRG0JvG1AbQWEbRGQ=",
+"DiAgG0QmJCBgcythbzBrG0FkG0RraBtBIQ==",
+"DiAbRGAhKSAgJmMtJjUoKSs0IQ==",
+"DiAbRCIgICAgIHV8OCEiICIgIQ==",
+"DiAgIBtEISAgIDtuNyAgICAgIA==",
+"DiAgG0QhICAgICs4KSAgICAgIA=="
+],
+"facec": [
+"DiAgICAbQSRqbCA0G0U0G1EbRG8bUDMvG0Z/G0Q3ew==",
+"DiAgICAbQSQqOigwG1EbRG4bUCobVBtGdBtQG0R+JxtRbz8=",
+"DiAgG0EwICAgKWFiG0QhIBtBZBtUG0Y6G1AbRHwbVBtGLhtQNA==",
+"DiAgG0EuNCAgYiggICAbRCp1G1F+fhtQdQ==",
+"DiAgG0EhNCAgICEbRGQgfDAbRisvG0R3Kg==",
+"DiAgICAgG0QoMHo4NH8bVBtGcBtEfxtGeDUbUCA=",
+"DiAgICAbRGkbRWEbRHEgcnEbRm8bVhtHcGUbRn9/G1AbRDU=",
+"DiAgG0FgIBtEInsbQWIbRDF8e2IbVBtHKxtWbRtGfxtUPxtQG0Qh",
+"DiAgG0QyG0U4IBtELjEbUW4bUGs9MRtBYRtEOxtUG0ZvG1AbRCEbQTA=",
+"DiAgG0EkG0QkIGBzG0UqG0RhbzBhG0ElG0QjJBtBJA==",
+"DiAbQWAgG0RiICAjYy0mNWQbRSobRCkbRTEbQSE=",
+"DiAbRCIgICAgIH18OCEoIiAgIQ==",
+"DiAgIBtEISAgYCtmNyAgIGAgIA==",
+"DiAgG0QhICAgICs5KSAgICAgMA=="
+]
+},
+{
+"name": "Truce",
+"code": "TR",
+"hex": "#ffd54f",
+"vt": 3,
+"motto": "Do we have an agreement?",
+"faction": "Grey / Yellow / Factualist / Second-Wave Offspring",
+"stats": {
+"STR": 6,
+"DEX": 8,
+"INT": 8,
+"WIS": 7,
+"CHA": 8,
+"CON": 6
+},
+"secs": [
+[
+"f",
+"B(t) = int[0..t] alpha(t-s) * phi(s) ds"
+],
+[
+"i",
+"Twin blokes, synced moves, keen, balancer."
+],
+[
+"t",
+"Grey / Yellow / Factualist / Second-Wave Offspring / Deals & Symmetry / Consent & Trade."
+],
+[
+"i",
+"White Knight / Scales / Anal Market / The Two Cheeks."
+],
+[
+"t",
+"Harmonious balancers — keen twins with grey-yellow equilibrium. High DEX and INT sync their scales."
+],
+[
+"t",
+"Powers: Scales' Oil Equilibrium, Stat Shift, Balanced Flow. Twin's Oil Concord — shared strength, allied bond. Their oil weighs fate in tandem — a twin-born harmony trembling under strain."
+],
+[
+"i",
+"Temperance (XIV) / Tiferet / Mithraic Heliodromus / Plato's Phaedo soul balance / Plotinus' oil tweak flow control / Kabbalah's Scales in Lamed might weigh new pacts."
+],
+[
+"t",
+"Hexagram 12 — Standstill / \"Heaven blocks earth, Stagnation Temporary.\""
+],
+[
+"t",
+"Mini-Stories: Souk of Red Dreams."
+],
+[
+"t",
+"Masks Krewsmatics: Scales + Red Gun = Alternative."
+]
+],
+"face": [
+"DiAbRGAgICAgICAgICAgICAgNQ==",
+"DiAbRGAgJCAoICAgIBtBcBtEPCQgIGY=",
+"DiAgIBtEJCBiIGIgPxtBISAgICAbRCk=",
+"DiAgIBtEMSAoICggG1QbR2gbUnwbUxtFIxtQG0F3ICAbRGA=",
+"DiAgIBtEJCBiIGIgG1EbRyIbUiMbURtCIxtEJhtQNDAo",
+"DiAgIBtEMSAoICggG1IbR2glG1EbRn4bQjcbUBtEfTdi",
+"DiAgIBtEJCBiIGIgG0JrG1E8G1IbRiUbURtFNRtEfhtQICg=",
+"DiAgIBtEISAoICggG0EqG1EbRywbUBtFPxtBdxtEPzAi",
+"DiAgICAgG0QiIGJgG0dwG0Z8G1IbRG4bUX4bUD96ZA==",
+"DiAgIBtEMCBgIGAbVBtHfhtWNxtSG0Y/G0QiG1EbQnAbVBtFJHwbRH8=",
+"DhtFeHR8G0J4fHx8fhtSG0ZyczMbRXQbURtCLBtUG0UnG1EbRHwbUC8=",
+"DhtBKy8/G0RvG1F4G1QbRSMbUhtEfBtUG0UrG1IbRHQbURtFJxtEYHp/G1A/NSU=",
+"DiAgIBtEIiMnJ2cvPzc3KWEiIA==",
+"DiAgICAgIBtEaBtBPX0bRHx8dH0wICA="
+],
+"facec": [
+"DiAbRCggICBgICAgICAgICAgNQ==",
+"DiAbRGIgMSAoICggIHA8JCAgZg==",
+"DiAbRGAgJCBiIGIgPyMgISAgKQ==",
+"DiAgIBtEMSAoIGQgG1QbR2gbVnw0G1AbRncgIBtEIg==",
+"DiAgIBtEJCAqIGggG1QbRiMbVhtHIxtUG0YjYBtQG0Q0MGI=",
+"DiAgIBtEMSBiIGggG1YbR2olLBtUG0Y3G1AbRH03KA==",
+"DiAgIBtEJCAoICggG0ZrG1Q8G1YbRyQbVBtGNRtEfxtQICk=",
+"DiAgIBtEMSBiIGIgKhtUG0csG0YnG1AbRHc/MGI=",
+"DiAgG0RgICAoIChgG0Z4fhtUIRtEfxtQb3pk",
+"DiAgG0RgIGAiIGgbVBtHPhtWNyYbVBtGfHAkOBtEfw==",
+"DhtEeBtGdBtEfHwbRnx8fH5/f38bVG8sJxtEfxtQZw==",
+"DhtEJy8/bxtUG0YiIiMjKykhG0R/fxtQPzYm",
+"DiAgIBtEIiMnZ2cvb2dnJjJiIA==",
+"DiAgICAgIBtEaD0bVBtGYBtQG0R8fHx8MCAg"
+]
+},
+{
+"name": "Auvergne",
+"code": "AV",
+"hex": "#66bb6a",
+"vt": 2,
+"motto": "Men become equal by covenant and right.",
+"faction": "Green / Factualist / Second-Wave Offspring",
+"stats": {
+"STR": 7,
+"DEX": 6,
+"INT": 8,
+"WIS": 9,
+"CHA": 9,
+"CON": 6
+},
+"secs": [
+[
+"f",
+"C(t) = int[0..t] P(s) * e^(-mu(t-s)) ds"
+],
+[
+"i",
+"Tall, sky-eyes, volcanic sprawl, gloomy, poetic, loud."
+],
+[
+"t",
+"Green / Factualist / Second-Wave Offspring / Tradition & Creation / Transmission."
+],
+[
+"i",
+"White Rook / Bard / Orpheus / Shepherd David."
+],
+[
+"t",
+"Volcanic hymnist — a loud poet chanting oil-fuelled resonance with green lyre's might. High CHA and WIS belt out his earthy roar."
+],
+[
+"t",
+"Powers: Lyre's Oil Resonance, Hymn, Psychic Force. Volcanic Crude Eruption — oil burst, fiery blast. His oil channels earth's fiery pulse — breaking foes with molten force."
+],
+[
+"i",
+"The Star (XVII) / Hod / Mithraic Nymphus / Plato's Republic rough wisdom / Plotinus' oil hum drillers' chants / Kabbalah's Bard in Mem might hum new lore."
+],
+[
+"t",
+"Hexagram 31 — Influence / \"Mutual influence, The superior person encourages harmony.\""
+],
+[
+"t",
+"Mini-Stories: The Factory / Ridge of Fading Chants."
+],
+[
+"t",
+"Masks Krewsmatics: Green Lyre + Mask = Expressivity."
+]
+],
+"face": [
+"DiAbRCQgJDAkKGAgMDAgICAgIA==",
+"DhtEYmJiKGJiamh5aiRkYCAgIA==",
+"DhtEZGRmZmZkbRtUG0VgG1EbRG8bUGAgICkxMCA=",
+"DhtEZGVtampmG1E/G1JpG1BicTAgIGIkMA==",
+"DhtENXVtOXt7G1I/bhtVG0d6G1MzG1AbQX1wICAbRDUk",
+"DhtEbTs+dnd/G1F9G1QbRWAbUBtCdxtRG0NjG1AbQXF+IBtEYDU5",
+"DhtEPX9uPz49fxtRNRtSG0d9G1MbRGAbURtGaiUbUBtEImo6OA==",
+"DhtEf31/P3c/fn8bVRtHKhtRG0IxG1AbQX4bRDcgPjY0",
+"DhtEP35/bj13fX8bURtGeBtSG0R9G1AbQScbRGA1Mikp",
+"DhtEd39+f39/G1MvG1JxG1UbR2obURtGNhtFZRtEPxtQNX0gIA==",
+"DhtEd31/fhtSL2EbVBtGIRtQG0Q7G0FrIhtRG0R5OBtQfSUgIA==",
+"DhtEdz1/G1QbRmgbUiUbURtCdRtEfxtQd281G1E/fRtQN344IA==",
+"DhtEPXd/G0V/G1UbRiEbURtFNxtQG0R3fzJ1G0FrfRtEKxtUG0VqG1AbRDUg",
+"DhtEP3obQW4bVBtFPzclG1AbRCF3bSIyG1QbRW8bUBtEfRtRfhtQNSA="
+],
+"facec": [
+"DiAbRCQwJCgwZGBgYCAgICAgIA==",
+"DhtEImRiJCk4aGg5bCkyMDAgIA==",
+"DhtEMTkyNmZmbn4bVBtGMBtQG0RgICApOGAg",
+"DhtEMjY2NnZmfxtUG0Y2G1AbRGJxMCAgYmQg",
+"DhtENnY2dnZ/G1QbRmAxG0d6G1Z3G1QbRnAbUBtEcCAgNSQ=",
+"DhtEdW1rdm57fxtUG0ZgG1B3G1QbRyMbUBtEc34gYGUp",
+"DhtEdj92d292b38bVhtHfS0bVBtGazUbUBtEImppKQ==",
+"DhtEfT9+dz92b38bVBtGazEbUBtEfjcgdmUp",
+"DhtEPX9vdj9+e38bVBtGfCIbUBtEJ2A1Mikp",
+"DhtEdz9/fn99G1QbRnAbUT8bVBtHahtGNmQbRH8bUDV9ICA=",
+"DhtEPXd9f30bRj8bQj82G0ZjG0Qif399JSAg",
+"DhtEdz1/G1QbRmh/dRtRG0Q+G1AbQjMbQW0xG0R/fzd+MCA=",
+"DhtEbTt9G0Z/G1RvORtQG0Q1G0J3JGUbRGp9K381IA==",
+"DhtEPTt+G1QbRjcxIRtQG0QhG0JmNSAbRCIbVBtGIhtQG0R9fzUg"
+]
+},
+{
+"name": "Grand Colonel",
+"code": "GC",
+"hex": "#90a4ae",
+"vt": 7,
+"motto": "",
+"faction": "Third-Wave eruption from Maukie's unconscious / Divisionist — Maukie's split shadow",
+"stats": {
+"STR": 10,
+"DEX": 6,
+"INT": 5,
+"WIS": 7,
+"CHA": 9,
+"CON": 8
+},
+"secs": [
+[
+"f",
+"N(t) = C(t) + M(t) + E(t)"
+],
+[
+"i",
+"Tall blond brute, grim, resolved, in uniform."
+],
+[
+"t",
+"Third-Wave eruption from Maukie's unconscious / Divisionist — Maukie's split shadow / Honour & Return of the Repressed."
+],
+[
+"i",
+"Blonde Warrior / Yellow King / Duke of Montebello / Tears in Rain / Death of Croisière Noire Witness / Hades."
+],
+[
+"t",
+"Iron enforcer — a grim warlord with wolfish slash. High STR and CHA command with brutal edge."
+],
+[
+"t",
+"Powers: Wolf's Crude Slash, Oil-Blade, Bloody Cut. Colonel's Oil Command — allies boost, iron will. His oil tears with iron fury — a warlord's unyielding edge."
+],
+[
+"i",
+"The Emperor (IV) / Malkuth / Mithraic Soldier / Plato's Republic ruler undone / Plotinus' oil tomb roughneck graves / Kabbalah's Blonde Warrior in Tav might bury new foes."
+],
+[
+"t",
+"Hexagram 44 — Coming to Meet / \"The feminine force rises uninvited.\""
+]
+],
+"face": [
+"DiAgICAgIBtEfxtRbxtQPTAgICAgICA=",
+"DiAgICAgG0F4G1QbRngbUhtEIxtQG0F9G0R0ICAgIGAg",
+"DiAgICAbRGgbUxtFNxtELy8bUBtFfBtEdmUgICAiNA==",
+"DiAgICAbRH4bVhtHfhtTLxtSG0M/G0J/G1EbRHobUG8gICAgNA==",
+"DiAgIBtEahtRYhtQG0YvG1UbRyMbUBtGLxtFbxtRG0Q/G1AzMjUgaH0=",
+"DiAgIBtBehtRG0U0G1IbR3w0G0QjG1UbR3gbUhtEahtQNWU1IH8h",
+"DiAgIBtEfxtRG0J3G1IbR28bUBtCdxtRejcbRC8bUCcbUW8bUCRoKSA=",
+"DiAbRDYgG1E3G1IbRSIbVRtHahtRG0J3cicbUBtBPxtEOxtRehtQMTVkIg==",
+"DhtEaHV5G1F9G1IbRWAbURtDIhtTG0R4G1AbQj8bQWcbRD4hG0FrG0R9ezQg",
+"DhtEanV+G1EbRWwbRGQbUBtBbz8bRD9zG0FwICBrG0QvfHo=",
+"DhtEfxtRNxtQG0E/dxtEeXcbQSEbRCQjIHAwMiNscw==",
+"DhtEf3x/f39/G0FqG0QsdnduZmYsMCA=",
+"DhtEf39+f3s1P3dtO3N1ZSUmIA==",
+"DhtEN39tbW1hd2c1ZyQkMSkgIQ=="
+],
+"facec": [
+"DiAgICAgIBtEf392JCAgICAgIA==",
+"DiAgICAbRGBoG1QbRnh8G1AbRH42ICAgICgg",
+"DiAgICAbRGgbVBtGeRtHcHAbUBtEfH5pICAgIjQ=",
+"DiAgICAbRH4bVhtHfn8nG0Z/G0R/G1BtITAgIDQ=",
+"DiAgIBtEan8bRj8bVhtHIxtQG0YvG1QjG0R/G1AzOjQgaH0=",
+"DiAgIBtEextUG0ZlG0d8G1Y0G1QbRnwbR3gbRjUbUBtENWU1KHsh",
+"DiAgIBtEfxtUG0Z1G1YbR28bUBtGdxtUejcbRH8bUDd/JGgpIA==",
+"DiAbRDYgfxtGfxtUG0dqG0Z3cicbUBtEPz5/JTUmIg==",
+"DhtEaHV5fxtGfxtUG0ciIxtQG0Y/G0RnPiFrfXsmIA==",
+"DhtEanV+G1QbRmwwG1AbRG8/P2MbQTAgIBtEay91fg==",
+"DhtEf38/dxtCeRtRG0R7G1AhIBtFIxtEIRtCYCAgG0QjbHI=",
+"DhtEf3wuG1I5G1FuG1AbQjcbRGg0G0J0NRtEZhtCamYoICA=",
+"DhtEf39zG1F7G1ArMWU2G0I1G0Q6dHkgG0EhICA=",
+"DhtEPX9xaXMgOXEpKTgoICAgIA=="
+]
+},
+{
+"name": "Malika",
+"code": "MA",
+"hex": "#bf360c",
+"vt": 1,
+"motto": "I am the debt of the fire.",
+"faction": "Third-Wave eruption from Grand Colonel's unconscious",
+"stats": {
+"STR": 7,
+"DEX": 5,
+"INT": 8,
+"WIS": 9,
+"CHA": 7,
+"CON": 9
+},
+"secs": [
+[
+"f",
+"Psi(t) = Eb(t) / (1 + D(t))"
+],
+[
+"i",
+"Brunette, rugged frame, wide hips, scars like burnt salt veins, banged-up, born from the rig's wild dance."
+],
+[
+"t",
+"Third-Wave eruption from Grand Colonel's unconscious / Costs & Transcendence."
+],
+[
+"i",
+"Slag / Grisette / Quintina / Ember / Caput Corvi / Beata Beatrix / Persephone."
+],
+[
+"t",
+"Tempered survivor — a scarred ember with smouldering grit. High CON and WIS endure with fiery scars."
+],
+[
+"t",
+"Powers: Ember's Oil Smoulder, Slick Burn, Fiery Renewal. Slag's Crude Shell — tough skin, enduring shield. Her oil smoulders with tempered radiance — a survivor's renewal through flame."
+],
+[
+"i",
+"The Empress (III) / Da'at / Mithraic Nymphus / Plato's Phaedo wisdom through ruin / Plotinus' oil haze flare-stack poison / Kabbalah's Ember in He might smolder new blooms."
+],
+[
+"t",
+"Hexagram 36 — Darkening of the Light / \"Injury, The light retreats to survive.\""
+]
+],
+"face": [
+"DhtFahtUJRtEfxtQbyNmZGYbRX4bQicbRDEhIi9ufw==",
+"DhtBahtEN3UpYSAkG1JhG1AbQSEgG0QpdDAgIGs=",
+"DhtEKjU5IiRgG0J+G0UlICAgG0QkG0FhG0V8G0FwIA==",
+"DiAbRHdkKSAbRX4bQT8gICAgG0RgG1EbRnobUjUbURtFfRtQIA==",
+"DiAbRG9oaRtBaRtRG0Y+G1AbRCEgYCBoLxtBJxtSG0Q0G1AbRS8g",
+"DhtEOnIxORtUG0Z6G1AbQX0bRCEgICAbQXsbUhtHZBtUG0Z8G1IbRWIbUBtEdCA=",
+"DhtEfn8bUWobVBtFYBtQPyAgICAbRGgbQX4bURtCfhtSG0MwG0R0G1AbQTUg",
+"DhtRG0QvG1QbRWAbURtCYBtUG0Z+G1AbRDUgICIgMhtSMxtFKBtQG0F3G0Q/IGA=",
+"DhtRG0V+G1I/G0RoG1AnICAgICAbUT8bUHYbRS8bQi8bRCUgIA==",
+"DhtFfxtUPxtQfRtCfBtBdBtEIjAgIBtRNWsbUCEgICAg",
+"DhtFfxtUPxtSNhtGdBtRG0I1G1AbRDAgICAbURtFYhtEKhtQNSAgIGo=",
+"DhtUG0U/G1FoG1J7G1EnG0RwG1A2YCBqG1EbRTIbQiwbRG8bUDQgIDA=",
+"DhtRG0R+G1QbRT8bURtEcH4bVBtFaBtQG0Q1JCBtG1QbRWsbUX4bRH4bUDUgIHs=",
+"DhtRG0RhfxtQbysbVBtFKhtQG0RgYSAbQXobVBtFNBtRJxtUahtQG0QlICB/"
+],
+"facec": [
+"DhtEahtUG0YlG0R/G1B3KypkZn4bRicbRDEhIi9ufw==",
+"DhtEaj90KSkiMBtUG0Y+G1AhG0QiKHQwICBr",
+"DhtEKjVkISRgG1QbRzgbUBtEJSAgIiBhfHAg",
+"DiAbRHdkKWAbRn4bRD8gICAgYBtUG0Z+fzUbUCA=",
+"DhtEYG9qamgbVBtGPhtQG0QhIGAgeC8nG1QbRmsbUBtELyA=",
+"DhtEZHMyNBtUG0Z+G0R/G1AkICAgfhtWG0dkG1QbRnx9G1AbRHQg",
+"DhtEfX9/G1QbRmAbUD8gICAgG0RoextUG0Z+dysbUBtENSA=",
+"DhtEfxtUG0ZgYBtWG0c4G1AbRDUgICIgMhtUG0ZqfxtQG0R3PyBg",
+"DhtUG0Y6fiYbUBtEJyAgICAgf3YvG0Y/G0QlICA=",
+"DhtUG0Z2NxtQfXwbRHQiMCAgG1QbRigwG1AbRCEgICAg",
+"DhtUG0Y2Pnt/NRtQG0QkICAgG1QbRmAkG1AbRDUgICBq",
+"DhtUG0YiaD8zIRtQG0Q1YCBqG1QbRjIkG0R/G1A0ICBk",
+"DhtEfxtUG0YqG0R/f38bUDUkIG0bVBtGK3YbRH8bUDUgIH0=",
+"DhtEf39vK39hYSBufxtUG0YhG0R/G1A1ICB/"
+]
 }
 ];
 </script>
@@ -12263,7 +12297,8 @@ window.KORHOGO_FAUNA = [
   var MENU = [
     ['MAIN', 'MAIN, TOUS', 'MAIN, ALL'],
     ['KORHOGO', 'KORHOGO, TOUS', 'KORHOGO, ALL'],
-    ['@KOINS', 'KOINS', 'KOINS']
+    ['@KOINS', 'KOINS', 'KOINS'],
+    ['KAVE', 'FAUNA', 'FAUNA']
   ];
   /* ======================================================================
      MAIN, ALL — les services en ligne de la ligne (émulateurs Minitel).
@@ -12322,7 +12357,7 @@ window.KORHOGO_FAUNA = [
   KM.KORHOGO = {
     help: function () {
       return [
-        L('1 Tchat, 2 BAL, 3 Maukie.', '1 Chat, 2 Box, 3 Maukie.'),
+        L('1 Tchat, 2 BAL, 3 Maukie, 4 Fauna.', '1 Chat, 2 Box, 3 Maukie, 4 Fauna.'),
         '',
         L('Numéro puis ', 'Number, then ') + K('ENVOI') + '.'
       ];
@@ -12332,25 +12367,27 @@ window.KORHOGO_FAUNA = [
       var v = new Vdt();
       v.cls().cur(0);
       v.big(2, 3, 'KORHOGO', 7);
-      v.pos(4, 22).fg(7).size('d').text(L('TOUS', 'ALL'));
+      v.pos(8, 41 - L('TOUS', 'ALL').length).fg(7).text(L('TOUS', 'ALL'));
       UI.rule(v, 9, 4);
       var items = [
         [L('TCHAT', 'CHAT'), L('Direct Kaves, en direct', 'Direct Kaves, live')],
         [L('BAL', 'BOX'), L('Votre Kalabass', 'Your Kalabass')],
-        [L('MAUKIE', 'MAUKIE'), L('laisser un mot', 'leave a word')]
+        [L('MAUKIE', 'MAUKIE'), L('laisser un mot', 'leave a word')],
+        ['FAUNA', 'We are The Fauna!']
       ];
       items.forEach(function (it, i) {
         v.pos(11 + i, 1).fg(3).text(lpad(i + 1, 2) + '  ').fg(7).text(pad(it[0], 10)).fg(6).text(it[1]);
       });
-      v.pos(16, 2).fg(7).text(L('Code ou n° :', 'Code or no.:'));
-      v.pos(16, 16); UI.kbtn(v, 'ENVOI');
+      v.pos(17, 2).fg(7).text(L('Code ou n° :', 'Code or no.:'));
+      v.pos(17, 16); UI.kbtn(v, 'ENVOI');
       UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
-      h.form([{ r: 16, c: 15, len: 12 }]);
+      h.form([{ r: 17, c: 15, len: 12 }]);
     },
     key: function (h, k, vals) {
       if (k.fn !== 'ENVOI') return false;
       var q = norm(vals[0] || '').trim().toUpperCase(), n = parseInt(q, 10);
+      if (n === 4 || /^(FAUNA|FICHES?|PROFILES?|MASKS?)$/.test(q)) { KOR.open('KAVE'); return true; }
       var view = n === 1 || q === 'TCHAT' || q === 'CHAT' || q === 'KAVE' ? 'rooms'
         : n === 2 || q === 'BAL' || q === 'BOX' || q === 'MSG' ? 'inbox'
         : n === 3 || q === 'MAUKIE' || q === 'MAUK' ? 'mauk' : null;
@@ -12368,6 +12405,7 @@ window.KORHOGO_FAUNA = [
         [[3, ' 1 '], [7, pad(L('MAIN, TOUS', 'MAIN, ALL'), 18)], [6, L('météo, encyclo, SNCF…', 'weather, encyclo, SNCF…')]],
         [[3, ' 2 '], [7, pad(L('KORHOGO, TOUS', 'KORHOGO, ALL'), 18)], [6, L('Tchat, BAL, Maukie', 'Chat, Box, Maukie')]],
         [[3, ' 3 '], [7, pad('KOINS', 18)], [6, L('Truce vérifie', 'Truce checks')]],
+        [[3, ' 4 '], [7, pad('FAUNA', 18)], [6, 'We are The Fauna!']],
         '',
         L('Numéro puis ', 'Number, then ') + K('ENVOI') + '.'
       ];
@@ -12385,7 +12423,7 @@ window.KORHOGO_FAUNA = [
       v.pos(16, 17); UI.kbtn(v, 'ENVOI');
       UI.footer(v, [[L('Aide', 'Help'), 'GUIDE'], [L('Quitter', 'Quit'), 'CONNEXION/FIN']]);
       h.out(v);
-      h.form([{ r: 16, c: 13, len: 1 }]);
+      h.form([{ r: 16, c: 13, len: 10 }]);
       h.term.then(function () { setTimeout(function () { KOR.presence(); }, 0); });
     },
     // Nombre de connectés, en haut à droite, comme sur les services d'époque
@@ -12410,6 +12448,7 @@ window.KORHOGO_FAUNA = [
       if (/^MAIN\b/.test(q)) { KOR.open('MAIN'); return true; }
       if (/^(MINITEL|KIOSQUE|GATEWAY)\b/.test(q)) { h.go('KIOSQUE'); return true; }
       if (/^(KORHOGO|KOR)\b/.test(q)) { KOR.open('KORHOGO'); return true; }
+      if (/^(FAUNA|FICHES?|PROFILES?|MASKS?)$/.test(q)) { KOR.open('KAVE'); return true; }
       h.clearField(0); h.bell();
       return true;
     }
@@ -12512,7 +12551,10 @@ window.KORHOGO_FAUNA = [
       }
       var pages = 1 + Math.ceil(secsToLines(FAUNA[this.cur]).length / 15);
       if (k.fn === 'SUITE' || k.fn === 'ENVOI') {
-        if (this.page < pages - 1) this.show(h, this.cur, this.page + 1);
+        if (this.page < pages - 1) {
+          this.show(h, this.cur, this.page + 1);
+          if (this.page === pages - 1 && S.KOIN && S.KOIN.fiche(FAUNA[this.cur].name)) msg(h, '+1 Koin', false, 2);
+        }
         else this.show(h, (this.cur + 1) % FAUNA.length, 0);
         return true;
       }
@@ -12531,7 +12573,7 @@ window.KORHOGO_FAUNA = [
      ====================================================================== */
   var KOR = {
     get help() { var x = (this.mode && this.mode.help) || KM.HOME.help; return typeof x === 'function' ? x() : x; },
-    enter: function (h) { this.h = h; this.koinPlus = false; this.mode = KM.HOME; KM.HOME.render(h); },
+    enter: function (h) { this.h = h; this.koinPlus = false; if (KOR.faunaOnce) { KOR.faunaOnce = false; this.mode = KM.HOME; KOR.open('KAVE'); return; } this.mode = KM.HOME; KM.HOME.render(h); },
     open: function (name) {
       var h = this.h;
       if (this.mode && this.mode.leave) this.mode.leave(h);
@@ -13021,6 +13063,13 @@ window.KORHOGO_FAUNA = [
   try {
     var _q = new URLSearchParams(location.search);
     var _svc = (_q.get('svc') || (location.hash || '').replace(/^#/, '')).toLowerCase();
+    /* from the arcade's Minitel: straight to 3615 KORHOGO, the line dials by itself */
+    if (_svc === 'korhogo' && H.state === 'local') {
+      H.lastNumber = '3615 KORHOGO';
+      if (S.KORHOGO) S.KORHOGO.faunaOnce = true;   /* the arcade lands on the Fauna, the list of the Masks */
+      H.go('LOCAL');
+      setTimeout(function () { H.dial(); }, 700);
+    }
     if (_svc === 'koins' && H.state === 'local') {
       H.lastNumber = '3615 KOINS';
       H.gateOnce = true;   /* après le crédit KOINS, on débouche sur l'accueil */
@@ -13029,6 +13078,38 @@ window.KORHOGO_FAUNA = [
     }
   } catch (e) { /* rien */ }
 })();
+</script>
+<script>
+/* [IK] a Koin earned here falls through the screen, the way a coin drops into a slot */
+function koinDrop(n){
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  var sc = document.getElementById('screen'); if (!sc) return;
+  var r = sc.getBoundingClientRect(), A = window.AudioContext || window.webkitAudioContext, ac = null;
+  try { ac = koinDrop.ac || (koinDrop.ac = A ? new A() : null); } catch (e) {}
+  for (var i = 0; i < Math.min(n, 6); i++) (function (i) {
+    var c = document.createElement('span');
+    c.textContent = '\u25C9';
+    c.setAttribute('aria-hidden', 'true');
+    c.style.cssText = 'position:fixed;z-index:50;pointer-events:none;font:18px monospace;color:#ffe08a;text-shadow:0 0 10px rgba(255,224,138,.9);left:' + (r.left + r.width * (.42 + Math.random() * .16)) + 'px;top:' + r.top + 'px';
+    document.body.appendChild(c);
+    var a = c.animate([
+      { transform: 'translateY(-20px) rotateY(0deg)', opacity: 0 },
+      { opacity: 1, offset: .1 },
+      { transform: 'translateY(' + (r.height - 10) + 'px) rotateY(900deg)', opacity: 1, offset: .9 },
+      { transform: 'translateY(' + r.height + 'px) rotateY(1080deg)', opacity: 0 }
+    ], { duration: 1100, delay: i * 200, easing: 'cubic-bezier(.45,0,.9,.55)', fill: 'both' });
+    a.onfinish = function () {
+      c.remove();
+      if (!ac) return;
+      try {
+        var t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+        o.type = 'triangle'; o.frequency.setValueAtTime(2093, t); o.frequency.setValueAtTime(3136, t + .04);
+        g.gain.setValueAtTime(.05, t); g.gain.exponentialRampToValueAtTime(.0001, t + .16);
+        o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + .17);
+      } catch (e) {}
+    };
+  })(i);
+}
 </script>
 </body>
 </html>

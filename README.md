@@ -14,10 +14,10 @@ Codes directs : 3615 KORHOGO, 3615 METEO, 3615 ENCYCLO, 3615 KALABASS, 3615 KOIN
 
 ## Koins
 
-- **3 Koins** à la première connexion du jour au 3615, puis **1 Koin** par connexion, au plus une fois par heure.
+- **1 Koin** par connexion au 3615 KOINS.
+- **x2** : une victoire dans un jeu d'Insert Koin double le total.
 - **1 Koin** par fiche de la Fauna lue jusqu'à sa dernière page (une fois par fiche).
 - **1 Koin** par message envoyé, dans un Kave ou en privé (5 par jour au plus).
-- **10 Koins par jour** au plus en tout.
 
 Le solde s'affiche en permanence sur le boîtier (voyant `KOINS`) et en haut de l'écran. Ce sont les Koins d'[Insert Koin](https://mauktenieb.github.io/insertkoin/), partagés par les deux sites (même adresse, `ik.koins` dans le navigateur).
 
@@ -53,10 +53,10 @@ Direct codes: 3615 KORHOGO, 3615 WEATHER, 3615 ENCYCLO, 3615 KALABASS, 3615 KOIN
 
 ### Koins
 
-- **3 Koins** on the first 3615 connection of the day, then **1 Koin** per connection, at most once an hour.
+- **1 Koin** per connection to 3615 KOINS.
+- **x2**: a win in an Insert Koin game doubles the total.
 - **1 Koin** per Fauna profile read to its last page (once per profile).
 - **1 Koin** per message sent, in a Kave or privately (5 a day at most).
-- **10 Koins a day** at most in all.
 
 The balance always shows on the casing (`KOINS` light) and at the top of the screen. These are the Koins of [Insert Koin](https://mauktenieb.github.io/insertkoin/), shared by both sites (same address, `ik.koins` in the browser).
 
