@@ -12820,7 +12820,8 @@ window.KORHOGO_FAUNA = [
     /* ----- Ligne téléphonique ----- */
     dial: function () {
       var raw = String(this.values()[0] || '3615');
-      var m = norm(raw).toUpperCase().match(/^\s*(\d{4,10})\s*(.*)$/);
+      /* 3615 KOINS, 3615koins, 36 15 Koins… : spaces and capitals do not matter */
+      var m = norm(raw).toUpperCase().replace(/^\s*[\d ]+/, function (d) { return d.replace(/ /g, '') + ' '; }).match(/^\s*(\d{4,10})\s*(.*)$/);
       if (!m) { UI.message(this, L('Tapez un numéro, par exemple 3615.', 'Type a number, for example 3615.'), true); return; }
       var num = m[1], code = m[2].trim();
       this.lastNumber = raw.trim();
