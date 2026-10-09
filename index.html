@@ -367,6 +367,12 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
 }
 
 /* ---------- Petits écrans ---------- */
+/* low landscape screens (phone on its side, framed in Insert Koin): the whole screen fits the height, the rest scrolls below */
+@media (orientation: landscape) and (max-height: 520px) {
+  .desk { padding-block: 8px 24px; gap: 12px; }
+  .terminal { max-width: calc((100svh - 16px) / .9); margin-inline: auto; }
+  .hood { border-radius: 22px 22px 12px 12px; }
+}
 @media (max-width: 720px) {
   .deck { grid-template-columns: minmax(0, 1fr); width: 100%; padding: 12px; }
   .fkeys { order: -1; grid-template-columns: repeat(4, minmax(0, 1fr)); }
