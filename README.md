@@ -73,7 +73,7 @@ The terminal engine (Videotex decoder, sounds, general services) is under the MI
 Independent project, not affiliated with Orange. Minitel is a trademark of Orange.
 
 <!-- network:start -->
-## Korhogo Fauna
+## Korhogo
 
 Mauk Tenieb's transmedia world. [Katabase](https://mauktenieb.github.io/katabase): concept albums, the 18 Masks, the lore · [Insert Koin](https://mauktenieb.github.io/insertkoin/): the browser arcade.
 
