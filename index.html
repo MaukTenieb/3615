@@ -503,7 +503,7 @@ html.framed .topline { display: none; }
   'use strict';
   var lang = 'fr';
   try {
-    lang = localStorage.getItem('vdx.lang') ||
+    lang = localStorage.getItem('ik.lang') || localStorage.getItem('vdx.lang') ||
       ((navigator.language || 'fr').slice(0, 2).toLowerCase() === 'fr' ? 'fr' : 'en');
   } catch (e) { /* rien */ }
   if (lang !== 'en') lang = 'fr';
@@ -528,7 +528,7 @@ html.framed .topline { display: none; }
     get lang() { return lang; },
     set: function (l) {
       lang = l === 'en' ? 'en' : 'fr';
-      try { localStorage.setItem('vdx.lang', lang); } catch (e) { /* rien */ }
+      try { localStorage.setItem('vdx.lang', lang); localStorage.setItem('ik.lang', lang); } catch (e) { /* rien */ }
       try { document.documentElement.lang = lang; } catch (e) { /* rien */ }
       listeners.forEach(function (fn) { fn(lang); });
     },
