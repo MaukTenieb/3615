@@ -1463,7 +1463,7 @@ html.framed .topline { display: none; }
   S.LIST = LIST;
 
   /* Koins partagés avec l'Insert Koin (même origine, même localStorage) :
-     +1 par connexion au 3615 KOINS, sans limite ; une victoire à l'arcade double le total */
+     +1 par connexion au 3615 KOINS, sans limite ; une victoire rapporte 1 Koin */
   var KOIN = {
     HOUR: 3600000,
     get: function () {
@@ -1487,7 +1487,7 @@ html.framed .topline { display: none; }
         return true;
       } catch (e) { return false; }
     },
-    /* [IK] the ledger, as the KOINS screen says: every connection adds 1 Koin, a win in a game doubles
+    /* [IK] the ledger, as the KOINS screen says: every connection adds 1 Koin, a win in a game adds 1
        the total (in the arcade). Also 1 per profile read to its last page (once per profile) and
        1 per message sent, 5 a day — the only limit, so the public relays are not flooded. */
     day: function () {
@@ -1581,7 +1581,7 @@ html.framed .topline { display: none; }
       var line = L('Truce vérifie ton solde : ', 'Truce checks your balance: ') + this.balance + '.';
       v.pos(12, 3).fg(7).text(line.slice(0, 38));
       if (this.won) v.pos(13, 3).fg(2).text('+' + this.won + ' Koin' + (this.won > 1 ? 's' : ''));
-      v.pos(14, 3).fg(7).text(L('x2 quand tu gagnes une partie.', 'x2 when you win in a game.'));
+      v.pos(14, 3).fg(7).text(L('+1 quand tu gagnes une partie.', '+1 when you win in a game.'));
       footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
       h.fm = null;
