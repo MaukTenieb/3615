@@ -1,6 +1,6 @@
 # 3615 KORHOGO — K Terminal
 
-Le Minitel de [Korhogo Fauna](https://mauktenieb.github.io/korhogo), l'univers de Mauk Tenieb.
+Le Minitel de [Korhogo Fauna](https://mauktenieb.github.io/katabase), l'univers de Mauk Tenieb.
 
 **En ligne : https://mauktenieb.github.io/3615/**
 
@@ -41,7 +41,7 @@ Projet indépendant, sans lien avec Orange. Minitel est une marque d'Orange.
 
 ## English
 
-The Minitel of [Korhogo Fauna](https://mauktenieb.github.io/korhogo), the universe of Mauk Tenieb. **Online: https://mauktenieb.github.io/3615/**
+The Minitel of [Korhogo Fauna](https://mauktenieb.github.io/katabase), the universe of Mauk Tenieb. **Online: https://mauktenieb.github.io/3615/**
 
 The **K Terminal** opens 3615: the service kiosk offers **1 KORHOGO**, **2 WEATHER**, **3 ENCYCLO** (Wikipedia). In **KORHOGO**:
 
@@ -73,18 +73,11 @@ The terminal engine (Videotex decoder, sounds, general services) is under the MI
 Independent project, not affiliated with Orange. Minitel is a trademark of Orange.
 
 <!-- network:start -->
-## Mauk Tenieb on GitHub
+## Korhogo Fauna
 
-- [mauktenieb.github.io](https://mauktenieb.github.io/): Start here: every site and link.
-- [katabase](https://github.com/MaukTenieb/katabase) · [site](https://mauktenieb.github.io/katabase): Korhogo Fauna: concept albums, 18 avatars, lore.
-- [insertkoin](https://github.com/MaukTenieb/insertkoin) · [site](https://mauktenieb.github.io/insertkoin/): Insert Koin, the browser arcade: Puck You!, Fauna Chess, Erratik, Faunarratik, Katabatik.
-- [korhogo](https://github.com/MaukTenieb/korhogo) · [site](https://mauktenieb.github.io/korhogo/): The first Korhogo site.
-- [reporhogo](https://github.com/MaukTenieb/reporhogo) · [site](https://mauktenieb.github.io/reporhogo/): One topic, forty-one code forges (MIT).
-- [Photofauna](https://github.com/MaukTenieb/Photofauna) · [site](https://mauktenieb.github.io/insertkoin/fotofauna.html): The pocket photo emulator.
-- [detour](https://github.com/MaukTenieb/detour): Cuts a sheet of eight portraits into a sprite strip (Python).
-- [torview](https://github.com/MaukTenieb/torview) · [site](https://mauktenieb.github.io/torview/): Minimal Tor webview browser (Go).
-- [faunator](https://github.com/MaukTenieb/faunator) · [site](https://mauktenieb.github.io/faunator/): Tor inside a web page: web and .onion, no extension (MIT).
-- [korhotube](https://github.com/MaukTenieb/korhotube): All the videos of a YouTube channel as JSON: tags, chapters, dubbing, dates (MIT).
+Mauk Tenieb's transmedia world. [Katabase](https://mauktenieb.github.io/katabase): concept albums, the 18 Masks, the lore · [Insert Koin](https://mauktenieb.github.io/insertkoin/): the browser arcade.
 
-Artist: https://github.com/MaukTenieb · Music and sales: https://mauktenieb.bandcamp.com · Journal: https://korhogo.substack.com · Bio: https://orcid.org/0009-0007-9096-8267
+[Bandcamp](https://mauktenieb.bandcamp.com): music and sales · [Substack](https://korhogo.substack.com): the journal · [YouTube](https://www.youtube.com/@mauktenieb): clips and mini-films.
+
+Start here: https://mauktenieb.github.io/
 <!-- network:end -->
