@@ -75,7 +75,7 @@ Independent project, not affiliated with Orange. Minitel is a trademark of Orang
 <!-- network:start -->
 ## Korhogo
 
-Mauk Tenieb's transmedia world. [Katabase](https://mauktenieb.github.io/katabase): concept albums, the 18 Masks, the lore · [Insert Koin](https://mauktenieb.github.io/insertkoin/): Mauk Tenieb's browser games set in Korhogo.
+Mauk Tenieb's transmedia world. [Katabase](https://mauktenieb.github.io/katabase): concept albums, the 18 Masks, the lore · [Insert Koin](https://mauktenieb.github.io/insertkoin/): the games and machines of Korhogo in the browser.
 
 [Bandcamp](https://mauktenieb.bandcamp.com): music and sales · [Substack](https://korhogo.substack.com): the journal · [YouTube](https://www.youtube.com/@mauktenieb): clips and mini-films.
 
