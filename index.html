@@ -12312,16 +12312,38 @@ window.KORHOGO_FAUNA = [
      lus sur le worker « palmares ». Une page par jeu ; SUITE / RETOUR.
      ====================================================================== */
   var PAL = {
-    URL: 'https://palmares.mauktenieb.workers.dev/top?game=',
+    /* le palmarès passe par le réseau ouvert Nostr, comme la messagerie : les dix officiels sont réécrits chaque heure
+       par la routine du dépôt insertkoin (palmares.json) ; les relais donnent les entrées des dernières minutes.
+       Règles communes : /insertkoin/palmares-rules.js ; méthode : /insertkoin/PALMARES.md */
+    BASE: '/insertkoin/',
     GAMES: [['korong', 'KORONG!', 'MASKS', L('BUTS PRIS', 'GOALS IN')], ['fauninvaders', 'FAUNINVADERS', 'SCORE', L('VAGUE', 'WAVE')]],
     data: {}, at: 0,
+    rules: function () {
+      if (window.IKPR) return Promise.resolve(window.IKPR);
+      var b = this.BASE;
+      return new Promise(function (ok) { var s = document.createElement('script'); s.src = b + 'palmares-rules.js'; s.onload = function () { ok(window.IKPR || null); }; s.onerror = function () { ok(null); }; document.head.appendChild(s); });
+    },
     load: function (cb) {
       var self = this;
       if (Date.now() - this.at < 60000 && this.data.korong) { cb(); return; }
-      var n = 0;
-      this.GAMES.forEach(function (g) {
-        fetch(self.URL + g[0], { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
-          .then(function (t) { self.data[g[0]] = Array.isArray(t) ? t : []; if (++n === self.GAMES.length) { self.at = Date.now(); cb(); } });
+      var NT = window.NostrTools;
+      Promise.all([
+        fetch(this.BASE + 'palmares.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }),
+        this.rules()
+      ]).then(function (r) {
+        var off = r[0] || {}, R = r[1];
+        if (!R || !NT) { self.GAMES.forEach(function (g) { self.data[g[0]] = off[g[0]] || []; }); self.at = Date.now(); cb(); return; }
+        var pool = new NT.SimplePool();
+        pool.querySync(R.RELAYS, { kinds: [R.KIND], '#t': [R.TAG], since: R.SINCE, limit: 500 }, { maxWait: 4000 }).catch(function () { return []; })
+          .then(function (evs) {
+            try { pool.close(R.RELAYS); } catch (e) {}
+            var live = evs.filter(function (e) { try { return NT.verifyEvent(e); } catch (x) { return false; } }).map(R.entry).filter(Boolean);
+            self.GAMES.forEach(function (g) {
+              var o = (off[g[0]] || []).map(function (x) { return Object.assign({ game: g[0] }, x); });
+              self.data[g[0]] = R.top(o.concat(live), g[0]);
+            });
+            self.at = Date.now(); cb();
+          });
       });
     },
     // la ligne d'accueil : le premier de chaque jeu
