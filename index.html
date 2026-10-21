@@ -12304,8 +12304,7 @@ window.KORHOGO_FAUNA = [
     ['MAIN', 'MAIN, TOUS', 'MAIN, ALL'],
     ['KORHOGO', 'KORHOGO, TOUS', 'KORHOGO, ALL'],
     ['@KOINS', 'KOINS', 'KOINS'],
-    ['KAVE', 'FAUNA', 'FAUNA'],
-    ['PALMARES', 'PALMARÈS', 'PALMARÈS']
+    ['KAVE', 'FAUNA', 'FAUNA']
   ];
   /* ======================================================================
      PALMARÈS — les dix meilleurs de Korong! et de FaunInvaders (Insert Koin),
@@ -12346,45 +12345,9 @@ window.KORHOGO_FAUNA = [
           });
       });
     },
-    // la ligne d'accueil : le premier de chaque jeu
-    first: function (g) {
-      var t = this.data[g[0]] || [], x = t[0];
-      return x ? '1. ' + x.ini + '  ' + x.a + (g[0] === 'korong' ? ' MASKS' : '') : '-';
-    }
+    first: function () { return ''; }
   };
-  KM.PALMARES = {
-    help: function () {
-      return [
-        L('Les dix meilleurs de Korong! et', 'The ten best of Korong! and'),
-        L('de FaunInvaders, dans Insert Koin.', 'FaunInvaders, in Insert Koin.'),
-        '',
-        UI.hk('SUITE', 'jeu suivant', 'next game'),
-        UI.hk('RETOUR', 'jeu précédent', 'previous game'),
-        UI.hk('SOMMAIRE', "retour à l'accueil", 'back to the home page')
-      ];
-    },
-    enter: function (h) { var self = this; this.p = 0; this.wait = true; this.render(h); PAL.load(function () { self.wait = false; if (KOR.mode === self && h.svc === KOR) self.render(h); }); },
-    render: function (h) {
-      var g = PAL.GAMES[this.p], t = PAL.data[g[0]] || [], v = kh(new Vdt(), 'PALMARÈS');
-      v.pos(5, 2).fg(3).size('d').text(g[1]).size('n');
-      v.pos(8, 2).fg(6).text('    ' + 'INI' + '   ' + lpad(g[2], 7) + '   ' + g[3]);
-      if (this.wait) v.pos(10, 6).fg(7).text('...');
-      else if (!t.length) v.pos(10, 6).fg(7).text(L('Tableau vide.', 'Empty board.'));
-      else t.forEach(function (x, i) {
-        v.pos(10 + i, 2).fg(i ? 7 : 3).text(lpad(i + 1, 2) + '. ').fg(i ? 7 : 3).text(x.ini + '   ' + lpad(x.a, 7) + '   ' + x.b);
-      });
-      v.pos(21, 2).fg(6).text((this.p + 1) + '/' + PAL.GAMES.length);
-      UI.footer(v, [[L('Jeu', 'Game'), this.p ? 'RETOUR' : 'SUITE'], ['KORHOGO!', 'SOMMAIRE']]);
-      h.out(v);
-      h.fm = null;
-    },
-    key: function (h, k) {
-      if (k.fn === 'SUITE') { if (this.p < PAL.GAMES.length - 1) { this.p++; this.render(h); } else h.bell(); return true; }
-      if (k.fn === 'RETOUR') { if (this.p > 0) { this.p--; this.render(h); } else h.bell(); return true; }
-      if (k.fn === 'REPETITION') { this.render(h); return true; }
-      return false;
-    }
-  };
+
   /* ======================================================================
      MAIN, ALL — les services en ligne de la ligne (émulateurs Minitel).
      ====================================================================== */
@@ -12491,7 +12454,6 @@ window.KORHOGO_FAUNA = [
         [[3, ' 2 '], [7, pad(L('KORHOGO, TOUS', 'KORHOGO, ALL'), 18)], [6, L('Tchat, BAL, Maukie', 'Chat, Box, Maukie')]],
         [[3, ' 3 '], [7, pad('KOINS', 18)], [6, L('Truce vérifie', 'Truce checks')]],
         [[3, ' 4 '], [7, pad('FAUNA', 18)], [6, 'We are The Fauna!']],
-        [[3, ' 5 '], [7, pad('PALMARÈS', 18)], [6, 'Korong!, FaunInvaders']],
         '',
         L('Numéro puis ', 'Number, then ') + K('ENVOI') + '.'
       ];
@@ -12505,18 +12467,25 @@ window.KORHOGO_FAUNA = [
       MENU.forEach(function (m, i) {
         v.pos(12 + i, 9).fg(3).text(lpad(i + 1, 2) + '  ').fg(7).text(L(m[1], m[2]));
       });
-      v.pos(17, 11).fg(7).text('>');
-      v.pos(17, 17); UI.kbtn(v, 'ENVOI');
+      v.pos(16, 11).fg(7).text('>');
+      v.pos(16, 17); UI.kbtn(v, 'ENVOI');
       UI.footer(v, [[L('Aide', 'Help'), 'GUIDE'], [L('Quitter', 'Quit'), 'CONNEXION/FIN']]);
       h.out(v);
-      h.form([{ r: 17, c: 13, len: 10 }]);
+      h.form([{ r: 16, c: 13, len: 10 }]);
       h.term.then(function () { setTimeout(function () { KOR.presence(); }, 0); });
-      /* le premier de chaque jeu, sous le menu, dès que le palmarès répond */
+      /* le palmarès, sous le menu : les cinq premiers de Korong! (Masks battus) et de FaunInvaders (score, vague), côte à côte */
       var home = this;
       PAL.load(function () {
         if (h.svc !== KOR || KOR.mode !== home || h.helpOpen) return;
         var w = new Vdt();
-        PAL.GAMES.forEach(function (g, i) { w.pos(19 + i, 4).can().pos(19 + i, 4).fg(6).text(pad(g[1], 14)).fg(3).text(cut(PAL.first(g), 20)); });
+        PAL.GAMES.forEach(function (g, j) {
+          var c = j ? 22 : 2, t = PAL.data[g[0]] || [];
+          w.pos(18, c).fg(6).text(g[1]);
+          for (var i = 0; i < 5; i++) {
+            var x = t[i];
+            w.pos(19 + i, c).fg(i ? 7 : 3).text((i + 1) + ' ' + (x ? x.ini + ' ' + (j ? lpad(x.a, 5) + ' ' + L('V', 'W') + x.b : lpad(x.a, 2) + ' MASKS') : '...'));
+          }
+        });
         h.out(w); h.refocus();
       });
     },
