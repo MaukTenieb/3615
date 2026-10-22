@@ -1443,7 +1443,7 @@ html.framed .topline { display: none; }
     ENCYCLOPEDIE: 'ENCYCLO', ENCYCLOPEDIA: 'ENCYCLO', MESSAGERIE: 'MSG', MESSAGE: 'MSG', MESSAGES: 'MSG',
     BAL: 'MSG', TCHAT: 'MSG', CHAT: 'MSG', MAIL: 'MSG', EMAIL: 'MSG', MAILBOX: 'MSG', ULLA: 'MSG',
     KIOSQUE: 'KIOSQUE', KIOSK: 'KIOSQUE', TELETEL: 'KIOSQUE', GUIDE: 'KIOSQUE',
-    KREW: 'MSG', KREWS: 'MSG',    MSG: 'MSG', KALABASS: 'MSG', KOINS: 'KOINS', KOIN: 'KOINS',
+    KREW: 'MSG', KREWS: 'MSG',    MSG: 'MSG', KALABASS: 'MSG', KOINS: 'KOINS', KOIN: 'KOINS', KINOS: 'KOINS', KINO: 'KOINS',
     KAVE: 'MSG', KAVES: 'MSG', FAUNA: 'KORHOGO', MAUKTENIEB: 'KORHOGO',
     GATEWAY: 'KIOSQUE', GATE: 'KIOSQUE', GENERAL: 'KIOSQUE', PASSERELLE: 'KIOSQUE',
     MINI: 'MINITEL', MINIPAVI: 'MINITEL', TELETEL2: 'MINITEL'
@@ -1545,7 +1545,7 @@ html.framed .topline { display: none; }
     line: function (v, r, c, plus) {
       var n = this.get();
       if (n === null) return v;
-      v.pos(r, c).fg(6).text('KOINS  ').g1().fg(3).raw(0x7F).g0().fg(3).text(' ' + n);
+      v.pos(r, c).fg(6).text(Math.random() < .5 ? 'KOINS  ' : 'KINOS  ').g1().fg(3).raw(0x7F).g0().fg(3).text(' ' + n);
       if (plus) v.fg(2).text('  +1');
       return v;
     }
@@ -12300,10 +12300,12 @@ window.KORHOGO_FAUNA = [
      Accueil
      ====================================================================== */
   // [mode, libellé FR, libellé EN] ; 1 et 2 ouvrent les branches, 3 le service KOINS
+  /* the Koins read Koins or Kinos, drawn at each visit */
+  var KW = Math.random() < .5 ? 'KOINS' : 'KINOS';
   var MENU = [
-    ['MAIN', 'MAIN, TOUS', 'MAIN, ALL'],
-    ['KORHOGO', 'KORHOGO, TOUS', 'KORHOGO, ALL'],
-    ['@KOINS', 'KOINS', 'KOINS'],
+    ['MAIN', 'WORLD', 'WORLD'],
+    ['KORHOGO', 'KORHOGO', 'KORHOGO'],
+    ['@KOINS', KW, KW],
     ['KAVE', 'FAUNA', 'FAUNA']
   ];
   /* ======================================================================
@@ -12415,7 +12417,6 @@ window.KORHOGO_FAUNA = [
       var v = new Vdt();
       v.cls().cur(0);
       v.big(2, 3, 'KORHOGO', 7);
-      v.pos(8, 41 - L('TOUS', 'ALL').length).fg(7).text(L('TOUS', 'ALL'));
       UI.rule(v, 9, 4);
       var items = [
         [L('TCHAT', 'CHAT'), L('Direct Kaves, en direct', 'Direct Kaves, live')],
@@ -12450,9 +12451,9 @@ window.KORHOGO_FAUNA = [
   KM.HOME = {
     help: function () {
       return [
-        [[3, ' 1 '], [7, pad(L('MAIN, TOUS', 'MAIN, ALL'), 18)], [6, L('météo, encyclo, SNCF…', 'weather, encyclo, SNCF…')]],
-        [[3, ' 2 '], [7, pad(L('KORHOGO, TOUS', 'KORHOGO, ALL'), 18)], [6, L('Tchat, BAL, Maukie', 'Chat, Box, Maukie')]],
-        [[3, ' 3 '], [7, pad('KOINS', 18)], [6, L('Truce vérifie', 'Truce checks')]],
+        [[3, ' 1 '], [7, pad('WORLD', 18)], [6, L('météo, encyclo, SNCF…', 'weather, encyclo, SNCF…')]],
+        [[3, ' 2 '], [7, pad('KORHOGO', 18)], [6, L('Tchat, BAL, Maukie', 'Chat, Box, Maukie')]],
+        [[3, ' 3 '], [7, pad(KW, 18)], [6, L('Truce vérifie', 'Truce checks')]],
         [[3, ' 4 '], [7, pad('FAUNA', 18)], [6, 'We are The Fauna!']],
         '',
         L('Numéro puis ', 'Number, then ') + K('ENVOI') + '.'
@@ -12478,6 +12479,7 @@ window.KORHOGO_FAUNA = [
       PAL.load(function () {
         if (h.svc !== KOR || KOR.mode !== home || h.helpOpen) return;
         var w = new Vdt();
+        w.pos(17, 15).fg(3).text('HALL OF KAVE');
         PAL.GAMES.forEach(function (g, j) {
           var c = j ? 22 : 2, t = PAL.data[g[0]] || [];
           w.pos(18, c).fg(6).text(g[1]);
