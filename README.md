@@ -47,6 +47,7 @@ The **K Terminal** opens 3615: the service kiosk offers **1 KORHOGO**, **2 WEATH
 
 1. **The Fauna** — the Fauna profiles;
 2. **Kalabass** — the **Direct Kaves** (live chat, one Kave per character), **Your Kalabass** (encrypted personal mailbox, received and sent), **Unkle Maukie**;
+   every message of the chat and of the mailbox carries a proof of work (NIP-13, 16 bits, computed when it is sent, under a second); messages without it stay out, so mass senders pay for each message;
 3. **Koins** — the balance and the rules.
 
 Direct codes: 3615 KORHOGO, 3615 WEATHER, 3615 ENCYCLO, 3615 KALABASS, 3615 KOINS. In French or English.

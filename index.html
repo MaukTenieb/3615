@@ -9798,6 +9798,11 @@ var NostrTools = (() => {
   var RELAYS = global.VDX_RELAYS || ['wss://relay.damus.io', 'wss://nos.lol', 'wss://relay.primal.net', 'wss://nostr.mom'];
   var TAG = '3615minitel';
   var PTAG = '3615minitel-presence';
+  /* anti-spam : chaque message de la BAL et du tchat porte une preuve de travail (NIP-13, 16 bits, calculée
+     à l'envoi en moins d'une seconde) ; les messages sans elle, envoyés en masse par des robots, restent dehors.
+     Les messages d'avant le 22 oct. 2026 passent s'ils viennent d'un usager de l'annuaire. */
+  var POW = 16, POW_SINCE = 1792701000;
+  function powOk(ev) { try { return NT.nip13.getPow(ev.id) >= POW; } catch (e) { return false; } }
   var BEAT = 60, ALIVE = 150;          // signal toutes les 60 s, connecté si vu depuis 150 s
   var HALL = '3615';
 
@@ -9926,8 +9931,14 @@ var NostrTools = (() => {
         }
       }));
       // boîte aux lettres : reçus et envoyés
+      self.held = {};
       var onDm = function (ev) {
         if (self.inbox[ev.id]) return;
+        if (ev.pubkey !== self.pk && !powOk(ev)) {
+          if (ev.created_at >= POW_SINCE) return;
+          if (!self.dir[ev.pubkey]) { self.held[ev.id] = ev; return; }
+        }
+        delete self.held[ev.id];
         self.inbox[ev.id] = ev;
         var other = ev.pubkey === self.pk ? (ev.tags.filter(function (t) { return t[0] === 'p'; })[0] || [])[1] : ev.pubkey;
         if (!other) return;
@@ -9936,6 +9947,7 @@ var NostrTools = (() => {
           self.emit('dm', ev);
         }, function () { self.plain[ev.id] = null; });
       };
+      this.on(function (type) { if (type === 'dir') Object.keys(self.held).forEach(function (id) { if (self.dir[self.held[id].pubkey]) onDm(self.held[id]); }); });
       this.subs.push(this.pool.subscribe(RELAYS, { kinds: [4], '#p': [this.pk], limit: 200 }, { onevent: onDm }));
       this.subs.push(this.pool.subscribe(RELAYS, { kinds: [4], authors: [this.pk], limit: 200 }, { onevent: onDm }));
       if (this.nick()) this.publishProfile();
@@ -9990,6 +10002,7 @@ var NostrTools = (() => {
     },
     publish: function (tpl) {
       if (!this.pool) return Promise.reject(new Error('offline'));
+      if (tpl.kind === 4 || tpl.kind === 42) { tpl.pubkey = this.pk; NT.nip13.minePow(tpl, POW); }
       var ev = NT.finalizeEvent(tpl, this.sk);
       var ps = this.pool.publish(RELAYS, ev);
       return new Promise(function (res, rej) {
@@ -10310,6 +10323,7 @@ var NostrTools = (() => {
         self.sub = NET.pool.subscribe(RELAYS, { kinds: [42], '#e': [rid], since: since, limit: 60 }, {
           onevent: function (ev) {
             if (self.seen[ev.id]) return; self.seen[ev.id] = 1;
+            if (ev.created_at >= POW_SINCE && !powOk(ev)) return;
             if (!loaded) backlog.push(ev); else self.show(ev);
           },
           oneose: function () {
