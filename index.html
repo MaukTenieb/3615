@@ -12436,7 +12436,8 @@ window.KORHOGO_FAUNA = [
         [L('TCHAT', 'CHAT'), L('Direct Kaves, en direct', 'Direct Kaves, live')],
         [L('BAL', 'BOX'), L('Votre Kalabass', 'Your Kalabass')],
         [L('MAUKIE', 'MAUKIE'), L('laisser un mot', 'leave a word')],
-        ['FAUNA', 'We are The Fauna!']
+        ['FAUNA', 'We are The Fauna!'],
+        ['KURATIONS', 'Korhogo Kuration']
       ];
       items.forEach(function (it, i) {
         v.pos(11 + i, 1).fg(3).text(lpad(i + 1, 2) + '  ').fg(7).text(pad(it[0], 10)).fg(6).text(it[1]);
@@ -12451,6 +12452,7 @@ window.KORHOGO_FAUNA = [
       if (k.fn !== 'ENVOI') return false;
       var q = norm(vals[0] || '').trim().toUpperCase(), n = parseInt(q, 10);
       if (n === 4 || /^(FAUNA|FICHES?|PROFILES?|MASKS?)$/.test(q)) { KOR.open('KAVE'); return true; }
+      if (n === 5 || /^KURATIONS?$/.test(q)) { KOR.open('KUR'); return true; }
       var view = n === 1 || q === 'TCHAT' || q === 'CHAT' || q === 'KAVE' ? 'rooms'
         : n === 2 || q === 'BAL' || q === 'BOX' || q === 'MSG' ? 'inbox'
         : n === 3 || q === 'MAUKIE' || q === 'MAUK' ? 'mauk' : null;
@@ -12650,9 +12652,78 @@ window.KORHOGO_FAUNA = [
   /* ======================================================================
      Service 3615 KORHOGO
      ====================================================================== */
+  /* ======================================================================
+     KURATIONS — les cassettes « Korhogo Kuration » des visiteurs d'Insert Koin (touche ♡ du magnétoscope),
+     lues sur le réseau Nostr par /insertkoin/ik-kuration.js. Liste, puis une cassette : ses morceaux, son adresse.
+     ====================================================================== */
+  KM.KUR = {
+    help: function () {
+      return [
+        L('Numéro d\'une cassette, puis ', 'Type the number of a cassette, then ') + K('ENVOI') + '.',
+        L('Dans Insert Koin, la touche ♡ du', 'In Insert Koin, the ♡ key of the'),
+        L('magnétoscope garde un morceau.', 'VHS deck keeps a track.'),
+        '',
+        UI.hk('SUITE', 'page suivante', 'next page'),
+        UI.hk('SOMMAIRE', 'retour à l\'accueil', 'back to the home page')
+      ];
+    },
+    lib: function () {
+      if (window.IKK) return Promise.resolve(window.IKK);
+      return new Promise(function (ok) { var s = document.createElement('script'); s.src = '/insertkoin/ik-kuration.js'; s.onload = function () { ok(window.IKK || null); }; s.onerror = function () { ok(null); }; document.head.appendChild(s); });
+    },
+    enter: function (h) {
+      var self = this; this.cur = -1; this.page = 0; this.list = null;
+      this.render(h);
+      this.lib().then(function (K) { return K ? K.all() : []; }).then(function (a) {
+        self.list = a || [];
+        if (h.svc === KOR && KOR.mode === self) { h.term.flush(); self.render(h); }
+      });
+    },
+    render: function (h) {
+      if (this.cur >= 0) { this.renderOne(h); return; }
+      var v = kh(new Vdt(), 'KURATIONS'), list = this.list;
+      v.pos(6, 2).fg(3).size('h').text('Korhogo Kuration');
+      if (!list) v.pos(9, 2).fg(6).text(L('Lecture du réseau...', 'Reading the network...'));
+      else if (!list.length) v.pos(9, 2).fg(6).text(L('Zéro cassette pour l\'instant.', 'Zero cassette for now.'));
+      else list.slice(0, 12).forEach(function (k, i) {
+        v.pos(8 + i, 2).fg(7).text(lpad(i + 1, 2) + ' ').fg(3).text(pad(cut(k.name, 16), 17)).fg(6).text(lpad(k.tracks.length, 3) + L(' morceaux', ' tracks'));
+      });
+      v.pos(21, 2).fg(7).text(L('Cassette n° :', 'Cassette no. :'));
+      v.pos(21, 21); UI.kbtn(v, 'ENVOI');
+      UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+      h.out(v);
+      h.form([{ r: 21, c: 16, len: 2 }]);
+    },
+    renderOne: function (h) {
+      var k = this.list[this.cur], per = 11, pages = Math.max(1, Math.ceil(k.tracks.length / per)), p = this.page % pages;
+      var v = kh(new Vdt(), (p + 1) + '/' + pages);
+      h.clearForm();
+      v.pos(5, 2).fg(3).size('h').text(cut(k.name, 38));
+      v.pos(7, 2).fg(6).text(k.tracks.length + L(' morceaux', ' tracks'));
+      k.tracks.slice(p * per, p * per + per).forEach(function (t, i) { v.pos(9 + i, 2).fg(7).text(cut(t.title, 38)); });
+      v.pos(20, 2).fg(6).text('mauktenieb.github.io/insertkoin/?k=');
+      v.pos(21, 2).fg(7).text(k.pk.slice(0, 32));
+      v.pos(22, 2).fg(7).text(k.pk.slice(32));
+      UI.footer(v, [[L('Liste', 'List'), 'SOMMAIRE'], [L('Suite', 'Next'), 'SUITE']]);
+      h.out(v);
+    },
+    key: function (h, k, vals) {
+      if (this.cur >= 0) {
+        if (k.fn === 'SUITE') { this.page++; h.term.flush(); this.renderOne(h); return true; }
+        if (k.fn === 'RETOUR') { this.page = Math.max(0, this.page - 1); h.term.flush(); this.renderOne(h); return true; }
+        if (k.fn === 'SOMMAIRE') { this.cur = -1; h.term.flush(); this.render(h); return true; }
+        return false;
+      }
+      if (k.fn !== 'ENVOI') return false;
+      var n = parseInt(norm(vals[0] || '').trim(), 10);
+      if (!this.list || !(n >= 1 && n <= Math.min(12, this.list.length))) { h.clearField(0); h.bell(); return true; }
+      this.cur = n - 1; this.page = 0; h.term.flush(); this.renderOne(h); return true;
+    }
+  };
+
   var KOR = {
     get help() { var x = (this.mode && this.mode.help) || KM.HOME.help; return typeof x === 'function' ? x() : x; },
-    enter: function (h) { this.h = h; this.koinPlus = false; if (KOR.faunaOnce) { KOR.faunaOnce = false; this.mode = KM.HOME; KOR.open('KAVE'); return; } this.mode = KM.HOME; KM.HOME.render(h); },
+    enter: function (h) { this.h = h; this.koinPlus = false; if (KOR.kurOnce) { KOR.kurOnce = false; this.mode = KM.HOME; KOR.open('KUR'); return; } if (KOR.faunaOnce) { KOR.faunaOnce = false; this.mode = KM.HOME; KOR.open('KAVE'); return; } this.mode = KM.HOME; KM.HOME.render(h); },
     open: function (name) {
       var h = this.h;
       if (this.mode && this.mode.leave) this.mode.leave(h);
@@ -12931,6 +13002,7 @@ window.KORHOGO_FAUNA = [
       // dès la connexion : on compte parmi les connectés, et les messages différés sont signalés
       if (S.NET && S.NET.ok) { S.NET.start(); this.notify(S.NET.unread()); }
       var name = code ? S.resolve(code) : null;
+      if (code && /^KURATIONS?$/.test(norm(code).toUpperCase().replace(/[^A-Z]/g, ''))) { name = 'KORHOGO'; if (S.KORHOGO) S.KORHOGO.kurOnce = true; }
       this.go(name || 'KORHOGO');
       if (code && !name) UI.message(this, L('Service inconnu : ', 'Unknown service: ') + UI.cut(code, 18), true);
     },
