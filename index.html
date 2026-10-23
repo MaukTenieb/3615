@@ -14,7 +14,7 @@
 <meta property="og:url" content="https://mauktenieb.github.io/3615/">
 <link rel="canonical" href="https://mauktenieb.github.io/3615/">
 <link rel="alternate" type="text/markdown" href="llms.txt" title="Summary for language models">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "3615", "url": "https://mauktenieb.github.io/3615/", "image": "https://mauktenieb.github.io/3615/apercu.png", "description": "3615 — le Minitel de Korhogo Fauna. Composez le 3615 : Enter Korhogo, le Kalabass, la météo, l'encyclopédie et Koins (Get them). Français / English.", "applicationCategory": "GameApplication", "operatingSystem": "Any", "inLanguage": ["fr", "en"], "isAccessibleForFree": true, "author": {"@type": "Person", "name": "Mauk Tenieb", "url": "https://mauktenieb.github.io/", "sameAs": ["https://github.com/MaukTenieb", "https://orcid.org/0009-0007-9096-8267", "https://www.wikidata.org/wiki/Q141544315", "https://musicbrainz.org/artist/701a6795-f583-4567-b8f4-0d05f961d63f", "https://mauktenieb.bandcamp.com", "https://korhogo.substack.com", "https://mauktenieb.substack.com", "https://www.youtube.com/@mauktenieb", "https://www.discogs.com/artist/9104440-Mauk-Tenieb", "https://www.flickr.com/people/mauktenieb/", "https://www.instagram.com/mauktenieb", "https://www.facebook.com/mauktenieb", "https://x.com/mauktenieb", "https://archive.org/details/@mauk_tenieb449", "https://open.spotify.com/artist/46TR4jGT6eQwpw27q6zSQ5", "https://www.bandlab.com/mauktenieb", "https://mauktenieb.github.io/katabase/", "https://mauktenieb.github.io/insertkoin/", "https://mauktenieb.github.io/3615/"]}, "copyrightHolder": {"@type": "Person", "name": "Mauk Tenieb"}, "isPartOf": {"@type": "CreativeWorkSeries", "name": "Korhogo", "url": "https://mauktenieb.github.io/"}, "isRelatedTo": {"@type": "VideoGame", "name": "Insert Koin", "url": "https://mauktenieb.github.io/insertkoin/"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "3615", "url": "https://mauktenieb.github.io/3615/", "image": "https://mauktenieb.github.io/3615/apercu.png", "description": "3615, le Minitel de la Korhogo Fauna. Composez le 3615 KORHOGO : WORLD (météo, encyclopédie, SNCF, Minitel), KORHOGO (les 18 fiches, les Kaves, le Kalabass, Maukie), KOINS, KURATIONS, CURATORS, HALL OF KAVE. Français / English.", "applicationCategory": "GameApplication", "operatingSystem": "Any", "inLanguage": ["fr", "en"], "isAccessibleForFree": true, "author": {"@type": "Person", "name": "Mauk Tenieb", "url": "https://mauktenieb.github.io/", "sameAs": ["https://github.com/MaukTenieb", "https://orcid.org/0009-0007-9096-8267", "https://www.wikidata.org/wiki/Q141544315", "https://musicbrainz.org/artist/701a6795-f583-4567-b8f4-0d05f961d63f", "https://mauktenieb.bandcamp.com", "https://korhogo.substack.com", "https://mauktenieb.substack.com", "https://www.youtube.com/@mauktenieb", "https://www.discogs.com/artist/9104440-Mauk-Tenieb", "https://www.flickr.com/people/mauktenieb/", "https://www.instagram.com/mauktenieb", "https://www.facebook.com/mauktenieb", "https://x.com/mauktenieb", "https://archive.org/details/@mauk_tenieb449", "https://open.spotify.com/artist/46TR4jGT6eQwpw27q6zSQ5", "https://www.bandlab.com/mauktenieb", "https://mauktenieb.github.io/katabase/", "https://mauktenieb.github.io/insertkoin/", "https://mauktenieb.github.io/3615/"]}, "copyrightHolder": {"@type": "Person", "name": "Mauk Tenieb"}, "isPartOf": {"@type": "CreativeWorkSeries", "name": "Korhogo", "url": "https://mauktenieb.github.io/"}, "isRelatedTo": {"@type": "VideoGame", "name": "Insert Koin", "url": "https://mauktenieb.github.io/insertkoin/"}}</script>
 <link rel="icon" type="image/png" href="icone.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1095,6 +1095,9 @@ html.framed .topline { display: none; }
     'I': ['11111', '00100', '00100', '00100', '00100', '00100', '11111'],
     'M': ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
     'N': ['10001', '11001', '10101', '10011', '10001', '10001', '10001'],
+    'W': ['10001', '10001', '10001', '10101', '10101', '11011', '10001'],
+    'L': ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+    'D': ['11110', '10001', '10001', '10001', '10001', '10001', '11110'],
     ' ': ['0', '0', '0', '0', '0', '0', '0']
   };
 
@@ -1429,32 +1432,56 @@ html.framed .topline { display: none; }
   /* ======================================================================
      KIOSQUE 3615
      ====================================================================== */
-  // [service, code fr, code en, description fr, description en]
+  // [code tapé, libellé fr, libellé en] : la liste du kiosque, un numéro par ligne
   var LIST = [
-    ['METEO', 'METEO', 'WEATHER', '', ''],
-    ['ENCYCLO', 'ENCYCLO', 'ENCYCLO', '', ''],
-    ['MINITEL', 'MINITEL', 'MINITEL', '', ''],
-    ['KORHOGO', 'KORHOGO', 'KORHOGO', '', ''],
-    ['MSG', 'KALABASS', 'KALABASS', '', ''],
-    ['KOINS', 'KOINS', 'KOINS', '', '']
+    ['METEO', 'METEO', 'WEATHER'],
+    ['ENCYCLO', 'ENCYCLO', 'ENCYCLO'],
+    ['SNCF', 'SNCF', 'SNCF'],
+    ['MINITEL', 'MINITEL', 'MINITEL'],
+    ['KORHOGO', 'KORHOGO', 'KORHOGO'],
+    ['KALABASS', 'KALABASS', 'KALABASS'],
+    ['KOINS', 'KOINS', 'KOINS']
   ];
-  var ALIAS = {
-    METEOFRANCE: 'METEO', TEMPS: 'METEO', WEATHER: 'METEO', WIKI: 'ENCYCLO', WIKIPEDIA: 'ENCYCLO',
-    ENCYCLOPEDIE: 'ENCYCLO', ENCYCLOPEDIA: 'ENCYCLO', MESSAGERIE: 'MSG', MESSAGE: 'MSG', MESSAGES: 'MSG',
-    BAL: 'MSG', TCHAT: 'MSG', CHAT: 'MSG', MAIL: 'MSG', EMAIL: 'MSG', MAILBOX: 'MSG', ULLA: 'MSG',
-    KIOSQUE: 'KIOSQUE', KIOSK: 'KIOSQUE', TELETEL: 'KIOSQUE', GUIDE: 'KIOSQUE',
-    KREW: 'MSG', KREWS: 'MSG',    MSG: 'MSG', KALABASS: 'MSG', KOINS: 'KOINS', KOIN: 'KOINS', KINOS: 'KOINS', KINO: 'KOINS',
-    KAVE: 'MSG', KAVES: 'MSG', FAUNA: 'KORHOGO', MAUKTENIEB: 'KORHOGO',
-    GATEWAY: 'KIOSQUE', GATE: 'KIOSQUE', GENERAL: 'KIOSQUE', PASSERELLE: 'KIOSQUE',
-    MINI: 'MINITEL', MINIPAVI: 'MINITEL', TELETEL2: 'MINITEL'
+  /* ---------- Routeur des codes ------------------------------------------
+     Un seul tableau pour le numéroteur (« 3615 CODE »), le kiosque et les
+     pages KORHOGO. Cible : [service, vue] ; la vue est un mode KORHOGO
+     (KM.WORLD, KM.FAUNA…), une vue de la KALABASS (rooms, menu…) ou le
+     code que la ligne MINITEL compose. */
+  var ROUTES = {};
+  [
+    [['KIOSQUE', 'KIOSK', 'TELETEL', 'GATEWAY', 'GATE', 'GENERAL', 'PASSERELLE', 'SERVICES'], 'KIOSQUE'],
+    [['KORHOGO', 'KOR', 'MAUKTENIEB'], 'KORHOGO'],
+    [['WORLD', 'MAIN', 'MONDE'], 'KORHOGO', 'WORLD'],
+    [['FAUNA', 'FICHE', 'FICHES', 'PROFILE', 'PROFILES', 'MASK', 'MASKS'], 'KORHOGO', 'FAUNA'],
+    [['KURATIONS', 'KURATION'], 'KORHOGO', 'KUR'],
+    [['CURATORS', 'CURATOR', 'CURATIONS'], 'KORHOGO', 'CUR'],
+    [['HALL', 'HALLOFKAVE', 'PALMARES', 'SCORES'], 'KORHOGO', 'HALL'],
+    [['KAVES', 'KAVE', 'DIRECTKAVES', 'TCHAT', 'CHAT'], 'MSG', 'rooms'],
+    [['KALABASS', 'MSG', 'MESSAGERIE', 'MESSAGE', 'MESSAGES', 'MAIL', 'EMAIL', 'MAILBOX', 'ULLA', 'KREW', 'KREWS'], 'MSG', 'menu'],
+    [['BAL', 'BOX', 'INBOX'], 'MSG', 'inbox'],
+    [['ANNUAIRE', 'DIRECTORY'], 'MSG', 'dir'],
+    [['MAUKIE', 'MAUK', 'UNKLE', 'UNKLEMAUKIE'], 'MSG', 'mauk'],
+    [['KOINS', 'KOIN', 'KINOS', 'KINO'], 'KOINS'],
+    [['METEO', 'METEOFRANCE', 'TEMPS', 'WEATHER'], 'METEO'],
+    [['ENCYCLO', 'WIKI', 'WIKIPEDIA', 'ENCYCLOPEDIE', 'ENCYCLOPEDIA'], 'ENCYCLO'],
+    [['MINITEL', 'MINI', 'MINIPAVI', 'TELETEL2'], 'MINITEL'],
+    [['SNCF', 'TRAIN', 'TRAINS'], 'MINITEL', 'SNCF']
+  ].forEach(function (r) { r[0].forEach(function (c) { ROUTES[c] = [r[1], r[2]]; }); });
+  // « 3615 KURATIONS », « 3615kurations », « Kurations » : même cible
+  S.route = function (q) {
+    q = norm(q || '').toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/^3615(?=[A-Z])/, '');
+    return ROUTES[q] || null;
   };
-  S.resolve = function (q) {
-    q = norm(q).toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (!q) return null;
-    if (/^\d{1,2}$/.test(q)) return LIST[+q - 1] ? LIST[+q - 1][0] : null;
-    if (ALIAS[q]) return ALIAS[q];
-    for (var i = 0; i < LIST.length; i++) if (LIST[i][0] === q) return q;
-    return null;
+  // Ouvre la cible d'un code ; faux si le code est inconnu
+  S.open = function (h, q) {
+    var r = S.route(q);
+    if (!r) return false;
+    var name = r[0], view = r[1];
+    if (name === 'KORHOGO' && S.KORHOGO) { S.KORHOGO.goto(h, view); return true; }
+    if (name === 'MSG' && S.MSG) { S.MSG.want = view; h.go('MSG'); return true; }
+    h.go(name);
+    if (name === 'MINITEL' && view && S.MINITEL.dial) S.MINITEL.dial(view);
+    return true;
   };
   S.code = function (name) {
     for (var i = 0; i < LIST.length; i++) if (LIST[i][0] === name) return L(LIST[i][1], LIST[i][2]);
@@ -1462,10 +1489,13 @@ html.framed .topline { display: none; }
   };
   S.LIST = LIST;
 
-  /* Koins partagés avec l'Insert Koin (même origine, même localStorage) :
-     +1 par connexion au 3615 KOINS, sans limite ; une victoire rapporte 1 Koin */
+  /* Koins partagés avec l'Insert Koin (même origine, même localStorage).
+     Le barème : 3 Koins à la première connexion du jour au 3615 KOINS, puis 1 par heure,
+     10 par jour au plus (ik.koinDay.k compte ces gains) ; 1 par fiche lue jusqu'à sa
+     dernière page (une fois par fiche) ; 1 par message envoyé, 5 par jour ; 1 par
+     victoire dans un jeu de l'arcade. */
   var KOIN = {
-    HOUR: 3600000,
+    HOUR: 3600000, FIRST: 3, DAYMAX: 10, MSGMAX: 5,
     get: function () {
       try {
         var s = localStorage.getItem('ik.koins');
@@ -1474,26 +1504,12 @@ html.framed .topline { display: none; }
         return isNaN(n) || n < 0 ? 0 : n;
       } catch (e) { return null; }
     },
-    credit: function () {
-      try {
-        var now = Date.now(), last = parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0;
-        if (last && last <= now && now - last < this.HOUR) return false;
-        var n = this.get();
-        if (n === null) return false;
-        n += 1;
-        localStorage.setItem('ik.koins', String(n));
-        if (n >= 1) localStorage.setItem('ik.freeAt', '0');
-        localStorage.setItem('ik.kalabassAt', String(now));
-        return true;
-      } catch (e) { return false; }
-    },
-    /* [IK] the ledger, as the KOINS screen says: every connection adds 1 Koin, a win in a game adds 1
-       the total (in the arcade). Also 1 per profile read to its last page (once per profile) and
-       1 per message sent, 5 a day — the only limit, so the public relays are not flooded. */
+    // le carnet du jour : n = tous les gains, k = gains du 3615 KOINS, msg = messages payés
     day: function () {
       var t = new Date(), d = t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate(), o = null;
       try { o = JSON.parse(localStorage.getItem('ik.koinDay') || 'null'); } catch (e) { o = null; }
-      if (!o || o.d !== d) o = { d: d, n: 0, msg: 0, first: false };
+      if (!o || o.d !== d) o = { d: d, n: 0, k: 0, msg: 0, first: false };
+      o.k = o.k || 0; o.n = o.n || 0; o.msg = o.msg || 0;
       return o;
     },
     add: function (n, o) {
@@ -1510,13 +1526,28 @@ html.framed .topline { display: none; }
         return n;
       } catch (e) { return 0; }
     },
-    // a connection to 3615 KOINS: 1 Koin, every time
+    last: function () { try { return parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0; } catch (e) { return 0; } },
+    // une connexion au 3615 KOINS : 3 à la première du jour, puis 1 par heure, 10 par jour au plus
     grant: function () {
       try {
-        var n = this.add(1);
-        localStorage.setItem('ik.kalabassAt', String(Date.now()));
+        var o = this.day(), now = Date.now(), n;
+        if (!o.first) n = this.FIRST;
+        else if (now - this.last() >= this.HOUR) n = 1;
+        else return 0;
+        n = Math.min(n, this.DAYMAX - o.k);
+        if (n <= 0) return 0;
+        o.first = true; o.k += n;
+        n = this.add(n, o);
+        localStorage.setItem('ik.kalabassAt', String(now));
         return n;
       } catch (e) { return 0; }
+    },
+    // heure du prochain Koin de connexion, ou 0 si le plafond du jour est atteint
+    nextAt: function () {
+      var o = this.day();
+      if (!o.first) return Date.now();
+      if (o.k >= this.DAYMAX) return 0;
+      return this.last() + this.HOUR;
     },
     fiche: function (name) {
       try {
@@ -1528,19 +1559,9 @@ html.framed .topline { display: none; }
       } catch (e) { return 0; }
     },
     message: function () {
-      var o = this.day(); if (o.msg >= 5) return 0;
+      var o = this.day(); if (o.msg >= this.MSGMAX) return 0;
       o.msg++; return this.add(1, o);
     },
-    // secondes restant avant la prochaine connexion rémunérée
-    wait: function () {
-      return 0;
-      try {
-        var last = parseInt(localStorage.getItem('ik.kalabassAt'), 10) || 0;
-        if (!last) return 0;
-        return Math.max(0, Math.ceil((last + this.HOUR - Date.now()) / 1000));
-      } catch (e) { return 0; }
-    },
-    // Koins partagés avec l'Insert Koin (même origine, même localStorage)
     // KOINS, pièce (mosaïque dorée), solde, +1 si crédité à cette connexion
     line: function (v, r, c, plus) {
       var n = this.get();
@@ -1553,35 +1574,51 @@ html.framed .topline { display: none; }
   S.KOIN = KOIN;
 
   /* ======================================================================
-     Service 3615 KOINS — le solde et le +1, à chaque connexion.
+     Service 3615 KOINS : le solde, les gains du jour et le barème.
      ====================================================================== */
   S.KOINS = {
     help: function () {
       return [
-        L("Truce vérifie ton solde. Chaque", 'Truce checks your balance. Every'),
-        L("connexion ajoute 1 Koin.", "connection adds 1 Koin."),
-        L("Victoire dans un jeu : +1.", "Win a game: +1."),
+        L('Truce vérifie ton solde.', 'Truce checks your balance.'),
         '',
-        K('SOMMAIRE') + L(" ramène à l'accueil.", " brings you back to the home page.")
+        L('Connexion au 3615 KOINS :', 'Connecting to 3615 KOINS:'),
+        L('  +3 à la première du jour,', '  +3 at the first of the day,'),
+        L('  puis +1 par heure, 10 par jour.', '  then +1 an hour, 10 a day.'),
+        L('Fiche de la Fauna lue au bout : +1.', 'Fauna profile read to the end: +1.'),
+        L('Message envoyé : +1, 5 par jour.', 'Message sent: +1, 5 a day.'),
+        L('Victoire dans un jeu : +1.', 'Win in a game: +1.'),
+        '',
+        K('SOMMAIRE') + L(" ramène à l'accueil.", ' brings you back to the home page.')
       ];
     },
     enter: function (h) {
       this.h = h;
-      var credited = KOIN.grant();
-      this.balance = KOIN.get();
-      this.won = credited;
-      if (h.gateOnce) { h.gateOnce = false; h.go('KORHOGO'); return; }
+      this.won = KOIN.grant();
       this.render();
     },
     render: function () {
-      var h = this.h, v = new Vdt();
+      var h = this.h, v = new Vdt(), o = KOIN.day(), bal = KOIN.get(), at = KOIN.nextAt();
       v.cls().cur(0);
       v.big(2, 3, '3615', 7);
+      v.pos(4, 22).fg(3).size('d').text(Math.random() < .5 ? 'KOINS' : 'KINOS');
       rule(v, 9, 4);
-      var line = L('Truce vérifie ton solde : ', 'Truce checks your balance: ') + this.balance + '.';
-      v.pos(12, 3).fg(7).text(line.slice(0, 38));
-      if (this.won) v.pos(13, 3).fg(2).text('+' + this.won + ' Koin' + (this.won > 1 ? 's' : ''));
-      v.pos(14, 3).fg(7).text(L('+1 quand tu gagnes une partie.', '+1 when you win in a game.'));
+      v.pos(11, 3).fg(7).text(cut(L('Truce vérifie ton solde : ', 'Truce checks your balance: ') + (bal === null ? '?' : bal) + '.', 38));
+      if (this.won) v.pos(12, 3).fg(2).text('+' + this.won + ' Koin' + (this.won > 1 ? 's' : '') + L(' à cette connexion', ' on this connection'));
+      v.pos(13, 3).fg(6).text(L('Gains du jour : ', "Today's gains: ")).fg(7).text('+' + o.n)
+        .fg(6).text(L(', connexions ', ', connections ')).fg(7).text(o.k + '/' + KOIN.DAYMAX);
+      var nx;
+      if (!at) nx = L('Prochain Koin : demain.', 'Next Koin: tomorrow.');
+      else if (at <= Date.now()) nx = L('Prochain Koin : maintenant.', 'Next Koin: now.');
+      else { var d = new Date(at); nx = L('Prochain Koin : ', 'Next Koin: ') + lpad(d.getHours(), 2, '0') + ':' + lpad(d.getMinutes(), 2, '0') + '.'; }
+      v.pos(14, 3).fg(6).text(cut(nx, 38));
+      v.pos(16, 3).fg(3).text(L('Barème', 'Rules'));
+      [
+        L('1re connexion du jour : +3', 'First connection of the day: +3'),
+        L('puis +1 par heure, 10 par jour au plus', 'then +1 an hour, 10 a day at most'),
+        L('Fiche de la Fauna lue au bout : +1', 'Fauna profile read to the end: +1'),
+        L('Message envoyé : +1, 5 par jour', 'Message sent: +1, 5 a day'),
+        L('Victoire dans un jeu : +1', 'Win in a game: +1')
+      ].forEach(function (s, i) { v.pos(17 + i, 3).fg(7).text(cut(s, 38)); });
       footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
       h.fm = null;
@@ -1617,19 +1654,19 @@ html.framed .topline { display: none; }
         v.pos(11 + i, 1).fg(7).text(lpad(i + 1, 2) + ' ').fg(3).text(L(s[1], s[2]));
       });
       v.pos(18, 2).fg(7).text(L('Code ou n° :', 'Code or no.:'));
-      v.pos(18, 16); kbtn(v, 'ENVOI');
+      v.pos(18, 30); kbtn(v, 'ENVOI');
       footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
-      h.form([{ r: 18, c: 15, len: 12 }]);
+      h.form([{ r: 18, c: 15, len: 14 }]);
     },
     key: function (k, vals) {
       var h = this.h;
       if (k.fn === 'ENVOI') {
-        var name = S.resolve(vals[0]);
-        if (!vals[0]) { h.bell(); return true; }
-        if (!name) { h.clearField(0); message(h, L('Service inconnu : ', 'Unknown service: ') + cut(vals[0], 18), true); return true; }
-        if (name === 'KIOSQUE') { this.render(); return true; }
-        h.go(name);
+        var q = String(vals[0] || '').trim(), n = parseInt(q, 10);
+        if (!q) { h.bell(); return true; }
+        if (/^\d{1,2}$/.test(q) && LIST[n - 1]) q = LIST[n - 1][0];
+        if (S.route(q) && S.route(q)[0] === 'KIOSQUE') { this.render(); return true; }
+        if (!S.open(h, q)) { h.clearField(0); message(h, L('Service inconnu : ', 'Unknown service: ') + cut(vals[0], 18), true); }
         return true;
       }
       return false;
@@ -9873,7 +9910,8 @@ var NostrTools = (() => {
       if (this.sk) return true;
       if (!this.ok) return false;
       var skh = store('nostr.sk');
-      if (!skh) { skh = hex(NT.generateSecretKey()); store('nostr.sk', skh); }
+      // une clé née ici porte vdx.nostr.own = 1 ; une clé importée porte 0 et ne publie aucun profil (kind 0)
+      if (!skh) { skh = hex(NT.generateSecretKey()); store('nostr.sk', skh); store('nostr.own', 1); }
       this.sk = unhex(skh);
       this.pk = NT.getPublicKey(this.sk);
       return true;
@@ -9882,6 +9920,7 @@ var NostrTools = (() => {
       var d = NT.nip19.decode(nsec.trim());
       if (d.type !== 'nsec') throw new Error('not nsec');
       store('nostr.sk', hex(d.data));
+      store('nostr.own', 0);   // clé importée : son profil Nostr reste celui de son auteur
       this.stop();
       this.sk = null; this.identity();
       this.start();
@@ -10012,9 +10051,14 @@ var NostrTools = (() => {
         });
       });
     },
+    /* vdx.nostr.own : 1 pour une clé née ici, 0 pour une clé importée. Une clé sans marque est née
+       dans le navigateur, au 3615 d'avant la marque ou dans l'arcade (ik-palmares.js, ik-kuration.js). */
+    own: function () { return store('nostr.own') !== 0; },
+    // profil kind 0 de l'annuaire : publié pour une clé née dans le navigateur, gardé en local pour une clé importée
     publishProfile: function () {
       var nick = this.nick(), mask = this.mask();
       this.dir[this.pk] = { name: nick, mask: mask, t: now() };
+      if (!this.own()) return Promise.resolve(null);
       return this.publish({ kind: 0, created_at: now(), tags: [['t', TAG]], content: JSON.stringify({ name: nick, mask: mask, about: '3615 KORHOGO' }) })
         .catch(function () { /* réessayé à la prochaine connexion */ });
     },
@@ -10123,10 +10167,15 @@ var NostrTools = (() => {
     },
     enter: function (h) {
       this.h = h;
-      this.koinPlus = false;   /* le +1 est le propre du service KOINS, à chaque connexion */
+      this.koinPlus = false;   /* les Koins de connexion sont le propre du service KOINS */
+      var want = this.want || 'menu'; this.want = null;
       if (!NET.ok) { this.view = 'nonet'; this.render(); return; }
       NET.identity(); NET.start();
-      this.view = NET.nick() ? 'menu' : 'profile';
+      /* les Kaves et la Kalabass demandent un pseudo : la vue voulue attend après le profil.
+         Unkle Maukie part par e-mail, hors relais : il s'ouvre tout de suite. */
+      this.after = null;
+      if (!NET.nick() && want !== 'mauk' && want !== 'profile') { this.after = want; want = 'profile'; }
+      this.view = want; this.page = 0; this.to = '';
       this.render();
     },
     leave: function () { this.view = ''; this.stopChat(); },
@@ -10197,7 +10246,7 @@ var NostrTools = (() => {
     },
     k_mauk: function (k, vals) {
       var h = this.h;
-      if (k.fn === 'SOMMAIRE') { this.view = 'menu'; this.render(); return true; }
+      if (k.fn === 'SOMMAIRE') { if (!NET.nick()) { h.go('KORHOGO'); return true; } this.view = 'menu'; this.render(); return true; }
       if (k.fn !== 'ENVOI') return false;
       var name = (vals[0] || '').trim(), mail = (vals[1] || '').trim();
       var body = vals.slice(2).map(function (l) { return l.replace(/\s+$/, ''); });
@@ -10253,7 +10302,7 @@ var NostrTools = (() => {
     k_profile: function (k, vals) {
       var h = this.h;
       if (k.fn === 'REPETITION') { this.showKey = !this.showKey; this.render(); return true; }
-      if (k.fn === 'SOMMAIRE') { if (!NET.nick()) { h.bell(); return true; } this.showKey = false; this.view = 'menu'; this.render(); return true; }
+      if (k.fn === 'SOMMAIRE') { this.showKey = false; if (!NET.nick()) { h.go('KORHOGO'); return true; } this.view = 'menu'; this.render(); return true; }
       if (k.fn !== 'ENVOI') return false;
       var key = ((vals[2] || '') + (vals[3] || '')).replace(/\s+/g, '').toLowerCase();
       var nick = cleanNick(vals[0]);
@@ -10271,7 +10320,8 @@ var NostrTools = (() => {
       store('nick', nick); store('mask', mask);
       NET.publishProfile(); NET.beat();
       this.showKey = false;
-      this.view = 'menu'; this.render();
+      this.view = this.after || 'menu'; this.after = null; this.page = 0; this.to = '';
+      this.render();
       return true;
     },
     repeat: function () {
@@ -12313,25 +12363,29 @@ window.KORHOGO_FAUNA = [
   /* ======================================================================
      Accueil
      ====================================================================== */
-  // [mode, libellé FR, libellé EN] ; 1 et 2 ouvrent les branches, 3 le service KOINS
+  // [mode, libellé FR, libellé EN] : un mode KORHOGO (KM.*), ou @SERVICE pour un service du 3615
   /* the Koins read Koins or Kinos, drawn at each visit */
   var KW = Math.random() < .5 ? 'KOINS' : 'KINOS';
   var MENU = [
-    ['MAIN', 'WORLD', 'WORLD'],
+    ['WORLD', 'WORLD', 'WORLD'],
     ['KORHOGO', 'KORHOGO', 'KORHOGO'],
     ['@KOINS', KW, KW],
-    ['KAVE', 'FAUNA', 'FAUNA']
+    ['KUR', 'KURATIONS', 'KURATIONS'],
+    ['CUR', 'CURATORS', 'CURATORS'],
+    ['HALL', 'HALL OF KAVE', 'HALL OF KAVE']
   ];
   /* ======================================================================
      PALMARÈS — les dix meilleurs de Korong! et de FaunInvaders (Insert Koin),
-     lus sur le worker « palmares ». Une page par jeu ; SUITE / RETOUR.
+     lus dans /insertkoin/palmares.json et sur les relais Nostr. Les cinq
+     premiers sous le menu de l'accueil ; les dix en pleine page dans
+     HALL OF KAVE (KM.HALL).
      ====================================================================== */
   var PAL = {
     /* le palmarès passe par le réseau ouvert Nostr, comme la messagerie : les dix officiels sont réécrits chaque heure
        par la routine du dépôt insertkoin (palmares.json) ; les relais donnent les entrées des dernières minutes.
        Règles communes : /insertkoin/palmares-rules.js ; méthode : /insertkoin/PALMARES.md */
     BASE: '/insertkoin/',
-    GAMES: [['korong', 'KORONG!', 'MASKS', L('BUTS PRIS', 'GOALS IN')], ['fauninvaders', 'FAUNINVADERS', 'SCORE', L('VAGUE', 'WAVE')]],
+    GAMES: [['korong', 'KORONG!', 'MASKS', ['BUTS PRIS', 'GOALS IN']], ['fauninvaders', 'FAUNINVADERS', 'SCORE', ['VAGUE', 'WAVE']]],
     data: {}, at: 0,
     rules: function () {
       if (window.IKPR) return Promise.resolve(window.IKPR);
@@ -12347,12 +12401,14 @@ window.KORHOGO_FAUNA = [
         this.rules()
       ]).then(function (r) {
         var off = r[0] || {}, R = r[1];
-        if (!R || !NT) { self.GAMES.forEach(function (g) { self.data[g[0]] = off[g[0]] || []; }); self.at = Date.now(); cb(); return; }
+        if (!R || !NT) { self.GAMES.forEach(function (g) { self.data[g[0]] = off[g[0]] || []; }); self.data.kave = off.kave || []; self.at = Date.now(); cb(); return; }
         var pool = new NT.SimplePool();
-        pool.querySync(R.RELAYS, { kinds: [R.KIND], '#t': [R.TAG], since: R.SINCE, limit: 500 }, { maxWait: 4000 }).catch(function () { return []; })
+        pool.querySync(R.RELAYS, { kinds: [R.KIND], '#t': R.KAVE ? [R.TAG, R.KAVE] : [R.TAG], since: R.SINCE, limit: 1000 }, { maxWait: 4000 }).catch(function () { return []; })
           .then(function (evs) {
             try { pool.close(R.RELAYS); } catch (e) {}
-            var live = evs.filter(function (e) { try { return NT.verifyEvent(e); } catch (x) { return false; } }).map(R.entry).filter(Boolean);
+            var ok = evs.filter(function (e) { try { return NT.verifyEvent(e); } catch (x) { return false; } });
+            var live = ok.map(R.entry).filter(Boolean);
+            self.data.kave = R.hall ? R.hall((off.kave || []).concat(ok.map(R.card).filter(Boolean))) : (off.kave || []);
             self.GAMES.forEach(function (g) {
               var o = (off[g[0]] || []).map(function (x) { return Object.assign({ game: g[0] }, x); });
               self.data[g[0]] = R.top(o.concat(live), g[0]);
@@ -12364,116 +12420,92 @@ window.KORHOGO_FAUNA = [
     first: function () { return ''; }
   };
 
+  /* ---------- Pages de menu numérotées (WORLD, KORHOGO) -----------------
+     items : [code du routeur, libellé, description]. Un numéro ouvre sa
+     ligne ; tout autre code du 3615 passe par le routeur (S.open). */
+  function menuHelp(intro, items) {
+    return intro.concat(items.map(function (it, i) {
+      return [[3, ' ' + (i + 1) + ' '], [7, pad(it[1], 10)], [6, cut(it[2], 25)]];
+    }), ['', L('Numéro ou code, puis ', 'Number or code, then ') + K('ENVOI') + '.']);
+  }
+  function menuPage(h, title, items) {
+    var v = new Vdt();
+    v.cls().cur(0);
+    v.big(2, 3, title, 7);
+    UI.rule(v, 9, 4);
+    items.forEach(function (it, i) {
+      v.pos(11 + i, 1).fg(3).text(lpad(i + 1, 2) + '  ').fg(7).text(pad(it[1], 10)).fg(6).text(cut(it[2], 24));
+    });
+    v.pos(17, 2).fg(7).text(L('Code ou n° :', 'Code or no.:'));
+    v.pos(17, 31); UI.kbtn(v, 'ENVOI');
+    UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+    h.out(v);
+    h.form([{ r: 17, c: 15, len: 14 }]);
+  }
+  function menuKey(h, k, vals, items) {
+    if (k.fn !== 'ENVOI') return false;
+    var q = norm(vals[0] || '').trim(), n = parseInt(q, 10);
+    if (/^\d{1,2}$/.test(q) && items[n - 1]) q = items[n - 1][0];
+    if (!S.open(h, q)) { h.clearField(0); h.bell(); }
+    return true;
+  }
+
   /* ======================================================================
-     MAIN, ALL — les services en ligne de la ligne (émulateurs Minitel).
+     WORLD — les services du monde : METEO, ENCYCLO, et la ligne Minitel
+     réelle (SNCF, autres codes).
      ====================================================================== */
-  KM.MAIN = {
-    help: function () {
+  KM.WORLD = {
+    items: function () {
       return [
-        L('Les services en ligne du 3615.', 'The services on line at 3615.'),
-        L('1 météo, 2 encyclo, 3 SNCF, 4 autres codes.', '1 weather, 2 encyclo, 3 SNCF, 4 other codes.'),
-        '',
-        L('Numéro puis ', 'Number, then ') + K('ENVOI') + '.'
+        ['METEO', L('METEO', 'WEATHER'), L('la météo', 'the weather')],
+        ['ENCYCLO', 'ENCYCLO', L("l'encyclopédie", 'the encyclopedia')],
+        ['SNCF', 'SNCF', L('les trains', 'trains')],
+        ['MINITEL', 'MINITEL', L('autres codes Minitel', 'other Minitel codes')]
       ];
     },
-    enter: function (h) { this.h = h; this.render(h); },
-    render: function (h) {
-      var v = new Vdt();
-      v.cls().cur(0);
-      v.big(2, 3, 'MAIN', 7);
-      v.pos(4, 22).fg(7).size('d').text(L('EN LIGNE', 'ON LINE'));
-      UI.rule(v, 9, 4);
-      var items = [
-        ['METEO', L('la météo', 'the weather')],
-        ['ENCYCLO', L("l'encyclopédie", 'the encyclopedia')],
-        ['SNCF', L('les trains', 'trains')],
-        ['MINITEL', L('autres codes', 'other codes')]
-      ];
-      items.forEach(function (it, i) {
-        v.pos(11 + i, 1).fg(3).text(lpad(i + 1, 2) + '  ').fg(7).text(pad(it[0], 10)).fg(6).text(it[1]);
-      });
-      v.pos(17, 2).fg(7).text(L('Code ou n° :', 'Code or no.:'));
-      v.pos(17, 16); UI.kbtn(v, 'ENVOI');
-      UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      h.out(v);
-      h.form([{ r: 17, c: 15, len: 12 }]);
-    },
-    key: function (h, k, vals) {
-      if (k.fn !== 'ENVOI') return false;
-      var q = norm(vals[0] || '').trim().toUpperCase(), n = parseInt(q, 10);
-      if (n === 1) { h.go('METEO'); return true; }
-      if (n === 2) { h.go('ENCYCLO'); return true; }
-      if (n === 3) { h.go('MINITEL'); if (S.MINITEL && S.MINITEL.dial) S.MINITEL.dial('SNCF'); return true; }
-      if (n === 4) { h.go('MINITEL'); return true; }
-      if (q === 'SNCF') { h.go('MINITEL'); if (S.MINITEL && S.MINITEL.dial) S.MINITEL.dial('SNCF'); return true; }
-      var name = S.resolve(q);
-      if (!name) { h.clearField(0); h.bell(); return true; }
-      if (name === 'KORHOGO') { KOR.open('KORHOGO'); return true; }
-      if (name !== 'KIOSQUE') { h.go(name); return true; }
-      h.clearField(0); h.bell();
-      return true;
-    }
+    help: function () { return menuHelp([L('Les services du monde.', 'The services of the world.'), ''], this.items()); },
+    enter: function (h) { this.render(h); },
+    render: function (h) { menuPage(h, 'WORLD', this.items()); },
+    key: function (h, k, vals) { return menuKey(h, k, vals, this.items()); }
   };
 
   /* ======================================================================
-     KORHOGO, ALL — Tchat, BAL, Maukie.
+     KORHOGO — la Fauna, les Kaves (tchat), la Kalabass (boîte, écrire,
+     annuaire, profil) et Unkle Maukie.
      ====================================================================== */
   KM.KORHOGO = {
-    help: function () {
+    items: function () {
       return [
-        L('1 Tchat, 2 BAL, 3 Maukie, 4 Fauna.', '1 Chat, 2 Box, 3 Maukie, 4 Fauna.'),
-        '',
-        L('Numéro puis ', 'Number, then ') + K('ENVOI') + '.'
+        ['FAUNA', 'FAUNA', 'We are The Fauna!'],
+        ['KAVES', 'KAVES', L('Direct Kaves, en direct', 'Direct Kaves, live')],
+        ['KALABASS', 'KALABASS', L('BAL, annuaire, profil', 'box, directory, profile')],
+        ['MAUKIE', 'MAUKIE', L('laisser un mot', 'leave a word')]
       ];
     },
-    enter: function (h) { this.h = h; this.render(h); },
-    render: function (h) {
-      var v = new Vdt();
-      v.cls().cur(0);
-      v.big(2, 3, 'KORHOGO', 7);
-      UI.rule(v, 9, 4);
-      var items = [
-        [L('TCHAT', 'CHAT'), L('Direct Kaves, en direct', 'Direct Kaves, live')],
-        [L('BAL', 'BOX'), L('Votre Kalabass', 'Your Kalabass')],
-        [L('MAUKIE', 'MAUKIE'), L('laisser un mot', 'leave a word')],
-        ['FAUNA', 'We are The Fauna!'],
-        ['KURATIONS', 'Korhogo Kuration']
-      ];
-      items.forEach(function (it, i) {
-        v.pos(11 + i, 1).fg(3).text(lpad(i + 1, 2) + '  ').fg(7).text(pad(it[0], 10)).fg(6).text(it[1]);
-      });
-      v.pos(17, 2).fg(7).text(L('Code ou n° :', 'Code or no.:'));
-      v.pos(17, 16); UI.kbtn(v, 'ENVOI');
-      UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
-      h.out(v);
-      h.form([{ r: 17, c: 15, len: 12 }]);
+    help: function () {
+      return menuHelp([L('KAVES et KALABASS demandent un', 'KAVES and KALABASS ask for a'),
+        L('pseudo, saisi une fois.', 'nickname, typed once.'), ''], this.items());
     },
-    key: function (h, k, vals) {
-      if (k.fn !== 'ENVOI') return false;
-      var q = norm(vals[0] || '').trim().toUpperCase(), n = parseInt(q, 10);
-      if (n === 4 || /^(FAUNA|FICHES?|PROFILES?|MASKS?)$/.test(q)) { KOR.open('KAVE'); return true; }
-      if (n === 5 || /^KURATIONS?$/.test(q)) { KOR.open('KUR'); return true; }
-      var view = n === 1 || q === 'TCHAT' || q === 'CHAT' || q === 'KAVE' ? 'rooms'
-        : n === 2 || q === 'BAL' || q === 'BOX' || q === 'MSG' ? 'inbox'
-        : n === 3 || q === 'MAUKIE' || q === 'MAUK' ? 'mauk' : null;
-      if (!view) { h.clearField(0); h.bell(); return true; }
-      h.go('MSG');
-      var m = S.MSG;
-      if (m) { m.view = view; m.page = 0; m.to = ''; m.render(); }
-      return true;
-    }
+    enter: function (h) { this.render(h); },
+    render: function (h) { menuPage(h, 'KORHOGO', this.items()); },
+    key: function (h, k, vals) { return menuKey(h, k, vals, this.items()); }
   };
 
   KM.HOME = {
     help: function () {
-      return [
-        [[3, ' 1 '], [7, pad('WORLD', 18)], [6, L('météo, encyclo, SNCF…', 'weather, encyclo, SNCF…')]],
-        [[3, ' 2 '], [7, pad('KORHOGO', 18)], [6, L('Tchat, BAL, Maukie', 'Chat, Box, Maukie')]],
-        [[3, ' 3 '], [7, pad(KW, 18)], [6, L('Truce vérifie', 'Truce checks')]],
-        [[3, ' 4 '], [7, pad('FAUNA', 18)], [6, 'We are The Fauna!']],
-        '',
-        L('Numéro puis ', 'Number, then ') + K('ENVOI') + '.'
+      var d = [
+        L('météo, encyclo, SNCF', 'weather, encyclo, SNCF'),
+        L('Fauna, Kaves, Kalabass', 'Fauna, Kaves, Kalabass'),
+        L('Truce vérifie', 'Truce checks'),
+        L('cassettes du public', "visitors' cassettes"),
+        L('cassettes Curators', 'Curators tapes'),
+        L('le palmarès', 'the high scores')
       ];
+      return MENU.map(function (m, i) {
+        return [[3, ' ' + (i + 1) + ' '], [7, pad(L(m[1], m[2]), 13)], [6, d[i]]];
+      }).concat(['', L('Numéro ou code, puis ', 'Number or code, then ') + K('ENVOI') + '.',
+        L('Tout code du 3615 marche ici :', 'Every 3615 code works here:'),
+        [[3, '  METEO, KAVES, KALABASS, FAUNA…']]]);
     },
     render: function (h) {
       var v = new Vdt();
@@ -12482,13 +12514,13 @@ window.KORHOGO_FAUNA = [
       v.pos(3, 21).fg(6).text('3615');
       v.big(4, 6, 'KORHOGO!', 3);
       MENU.forEach(function (m, i) {
-        v.pos(12 + i, 9).fg(3).text(lpad(i + 1, 2) + '  ').fg(7).text(L(m[1], m[2]));
+        v.pos(12 + (i % 3), i < 3 ? 5 : 22).fg(3).text((i + 1) + '  ').fg(7).text(L(m[1], m[2]));
       });
-      v.pos(16, 11).fg(7).text('>');
-      v.pos(16, 17); UI.kbtn(v, 'ENVOI');
+      v.pos(16, 9).fg(7).text('>');
+      v.pos(16, 27); UI.kbtn(v, 'ENVOI');
       UI.footer(v, [[L('Aide', 'Help'), 'GUIDE'], [L('Quitter', 'Quit'), 'CONNEXION/FIN']]);
       h.out(v);
-      h.form([{ r: 16, c: 13, len: 10 }]);
+      h.form([{ r: 16, c: 11, len: 14 }]);
       h.term.then(function () { setTimeout(function () { KOR.presence(); }, 0); });
       /* le palmarès, sous le menu : les cinq premiers de Korong! (Masks battus) et de FaunInvaders (score, vague), côte à côte */
       var home = this;
@@ -12519,18 +12551,14 @@ window.KORHOGO_FAUNA = [
     },
     key: function (h, k, vals) {
       if (k.fn !== 'ENVOI') return false;
-      var q = norm(vals[0] || '').trim().toUpperCase(), n = parseInt(q, 10);
-      if (n >= 1 && n <= MENU.length) {
+      var q = norm(vals[0] || '').trim(), n = parseInt(q, 10);
+      if (/^\d$/.test(q) && MENU[n - 1]) {
         var go = MENU[n - 1][0];
         if (go.charAt(0) === '@') h.go(go.slice(1)); else KOR.open(go);
         return true;
       }
-      /* branches nommées : MAIN → les services en ligne ; MINITEL… → kiosque (liste des services) ; KORHOGO… → Tchat, BAL, Maukie */
-      if (/^MAIN\b/.test(q)) { KOR.open('MAIN'); return true; }
-      if (/^(MINITEL|KIOSQUE|GATEWAY)\b/.test(q)) { h.go('KIOSQUE'); return true; }
-      if (/^(KORHOGO|KOR)\b/.test(q)) { KOR.open('KORHOGO'); return true; }
-      if (/^(FAUNA|FICHES?|PROFILES?|MASKS?)$/.test(q)) { KOR.open('KAVE'); return true; }
-      h.clearField(0); h.bell();
+      /* tout code du 3615 : « KORHOGO » ouvre ici la branche KORHOGO */
+      if (!S.open(h, q)) { h.clearField(0); h.bell(); }
       return true;
     }
   };
@@ -12538,7 +12566,7 @@ window.KORHOGO_FAUNA = [
   /* ======================================================================
      ENTER KORHOGO — We are The Fauna!
      ====================================================================== */
-  KM.KAVE = {
+  KM.FAUNA = {
     help: function () {
       return [
         L('Numéro d\'un personnage, puis ', 'Type the number of a character, then ') + K('ENVOI') + '.',
@@ -12591,7 +12619,7 @@ window.KORHOGO_FAUNA = [
         UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
         UI.footer(v, [['ENTER KORHOGO', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
         h.out(v);
-        h.term.then(function () { if (h.svc === KOR && KOR.mode === KM.KAVE && self.page === 0) speakMotto(h, f.motto); });
+        h.term.then(function () { if (h.svc === KOR && KOR.mode === KM.FAUNA && self.page === 0) speakMotto(h, f.motto); });
         return;
       }
       var start = (this.page - 1) * per;
@@ -12650,21 +12678,23 @@ window.KORHOGO_FAUNA = [
   };
 
   /* ======================================================================
-     Service 3615 KORHOGO
-     ====================================================================== */
-  /* ======================================================================
      KURATIONS — les cassettes « Korhogo Kuration » des visiteurs d'Insert Koin (touche ♡ du magnétoscope),
-     lues sur le réseau Nostr par /insertkoin/ik-kuration.js. Liste, puis une cassette : ses morceaux, son adresse.
+     lues sur le réseau Nostr par /insertkoin/ik-kuration.js. Liste par pages de 12, puis une cassette :
+     ses morceaux (11 par page) et son adresse.
      ====================================================================== */
   KM.KUR = {
+    PER: 12, TPER: 11,
     help: function () {
       return [
-        L('Numéro d\'une cassette, puis ', 'Type the number of a cassette, then ') + K('ENVOI') + '.',
-        L('Dans Insert Koin, la touche ♡ du', 'In Insert Koin, the ♡ key of the'),
-        L('magnétoscope garde un morceau.', 'VHS deck keeps a track.'),
+        L('Les cassettes Korhogo Kuration des', 'The Korhogo Kuration cassettes of'),
+        L("visiteurs d'Insert Koin : le coeur", 'Insert Koin visitors: the heart key of'),
+        L('du magnétoscope garde un morceau.', 'the VHS deck keeps a track.'),
+        '',
+        L("Numéro d'une cassette, puis ", 'Number of a cassette, then ') + K('ENVOI') + '.',
         '',
         UI.hk('SUITE', 'page suivante', 'next page'),
-        UI.hk('SOMMAIRE', 'retour à l\'accueil', 'back to the home page')
+        UI.hk('RETOUR', 'page précédente', 'previous page'),
+        UI.hk('SOMMAIRE', 'liste, puis accueil', 'list, then home page')
       ];
     },
     lib: function () {
@@ -12672,56 +12702,271 @@ window.KORHOGO_FAUNA = [
       return new Promise(function (ok) { var s = document.createElement('script'); s.src = '/insertkoin/ik-kuration.js'; s.onload = function () { ok(window.IKK || null); }; s.onerror = function () { ok(null); }; document.head.appendChild(s); });
     },
     enter: function (h) {
-      var self = this; this.cur = -1; this.page = 0; this.list = null;
+      var self = this; this.cur = -1; this.page = 0; this.lp = 0; this.list = null;
       this.render(h);
       this.lib().then(function (K) { return K ? K.all() : []; }).then(function (a) {
         self.list = a || [];
-        if (h.svc === KOR && KOR.mode === self) { h.term.flush(); self.render(h); }
+        if (h.svc === KOR && KOR.mode === self && !h.helpOpen) { h.term.flush(); self.render(h); }
       });
     },
+    pages: function () { return Math.max(1, Math.ceil((this.list || []).length / this.PER)); },
     render: function (h) {
       if (this.cur >= 0) { this.renderOne(h); return; }
-      var v = kh(new Vdt(), 'KURATIONS'), list = this.list;
+      var list = this.list, per = this.PER, n = this.pages(), p = Math.min(this.lp, n - 1);
+      var v = kh(new Vdt(), 'KURATIONS ' + (p + 1) + '/' + n);
       v.pos(6, 2).fg(3).size('h').text('Korhogo Kuration');
       if (!list) v.pos(9, 2).fg(6).text(L('Lecture du réseau...', 'Reading the network...'));
       else if (!list.length) v.pos(9, 2).fg(6).text(L('Zéro cassette pour l\'instant.', 'Zero cassette for now.'));
-      else list.slice(0, 12).forEach(function (k, i) {
-        v.pos(8 + i, 2).fg(7).text(lpad(i + 1, 2) + ' ').fg(3).text(pad(cut(k.name, 16), 17)).fg(6).text(lpad(k.tracks.length, 3) + L(' morceaux', ' tracks'));
+      else list.slice(p * per, p * per + per).forEach(function (k, i) {
+        v.pos(8 + i, 2).fg(7).text(lpad(p * per + i + 1, 3) + ' ').fg(3).text(pad(cut(k.name, 16), 17)).fg(6).text(lpad(k.tracks.length, 3) + L(' morceaux', ' tracks'));
       });
       v.pos(21, 2).fg(7).text(L('Cassette n° :', 'Cassette no. :'));
       v.pos(21, 21); UI.kbtn(v, 'ENVOI');
+      UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
       UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
-      h.form([{ r: 21, c: 16, len: 2 }]);
+      h.form([{ r: 21, c: 16, len: 3 }]);
     },
     renderOne: function (h) {
-      var k = this.list[this.cur], per = 11, pages = Math.max(1, Math.ceil(k.tracks.length / per)), p = this.page % pages;
+      var k = this.list[this.cur], per = this.TPER, pages = Math.max(1, Math.ceil(k.tracks.length / per)), p = Math.min(this.page, pages - 1);
       var v = kh(new Vdt(), (p + 1) + '/' + pages);
       h.clearForm();
       v.pos(5, 2).fg(3).size('h').text(cut(k.name, 38));
       v.pos(7, 2).fg(6).text(k.tracks.length + L(' morceaux', ' tracks'));
       k.tracks.slice(p * per, p * per + per).forEach(function (t, i) { v.pos(9 + i, 2).fg(7).text(cut(t.title, 38)); });
       v.pos(21, 2).fg(6).text(L('Adresse : ', 'Address: ')).fg(7).text('mauktenieb.github.io/k/' + k.pk.slice(0, 8));
-      UI.footer(v, [[L('Liste', 'List'), 'SOMMAIRE'], [L('Suite', 'Next'), 'SUITE']]);
+      UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
+      UI.footer(v, [[L('Liste', 'List'), 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
       h.out(v);
     },
     key: function (h, k, vals) {
       if (this.cur >= 0) {
-        if (k.fn === 'SUITE') { this.page++; h.term.flush(); this.renderOne(h); return true; }
-        if (k.fn === 'RETOUR') { this.page = Math.max(0, this.page - 1); h.term.flush(); this.renderOne(h); return true; }
+        var pages = Math.max(1, Math.ceil(this.list[this.cur].tracks.length / this.TPER));
+        if (k.fn === 'SUITE' || k.fn === 'RETOUR') {
+          var np = this.page + (k.fn === 'SUITE' ? 1 : -1);
+          if (np < 0 || np >= pages) { h.bell(); return true; }
+          this.page = np; h.term.flush(); this.renderOne(h); return true;
+        }
         if (k.fn === 'SOMMAIRE') { this.cur = -1; h.term.flush(); this.render(h); return true; }
         return false;
       }
+      if (k.fn === 'SUITE' || k.fn === 'RETOUR') {
+        var lp = this.lp + (k.fn === 'SUITE' ? 1 : -1);
+        if (!this.list || lp < 0 || lp >= this.pages()) { h.bell(); return true; }
+        this.lp = lp; h.term.flush(); this.render(h); return true;
+      }
       if (k.fn !== 'ENVOI') return false;
       var n = parseInt(norm(vals[0] || '').trim(), 10);
-      if (!this.list || !(n >= 1 && n <= Math.min(12, this.list.length))) { h.clearField(0); h.bell(); return true; }
+      if (!this.list || !(n >= 1 && n <= this.list.length)) { h.clearField(0); h.bell(); return true; }
       this.cur = n - 1; this.page = 0; h.term.flush(); this.renderOne(h); return true;
     }
   };
 
+  /* ======================================================================
+     CURATORS — les cassettes du magnétoscope d'Insert Koin tirées des
+     classements des curateurs, lues dans /insertkoin/kg-vhs-curations.js
+     (window.KG_VHS_LIBRARY_SNAPSHOT). Liste par pages de 12, puis une
+     cassette : ses morceaux (11 par page) et le lien YouTube qui joue ses
+     50 premières vidéos à la suite (ENVOI, nouvel onglet).
+     ====================================================================== */
+  KM.CUR = {
+    URL: '/insertkoin/kg-vhs-curations.js', PER: 12, TPER: 11, YT: 50,
+    help: function () {
+      return [
+        L("Les cassettes Curators d'Insert Koin,", 'The Curators tapes of Insert Koin,'),
+        L('tirées des classements des curateurs.', "drawn from the curators' rankings."),
+        '',
+        L("Numéro d'une cassette, puis ", 'Number of a tape, then ') + K('ENVOI') + '.',
+        L('Sur une cassette, ', 'On a tape, ') + K('ENVOI') + L(' ouvre YouTube', ' opens YouTube'),
+        L('dans un nouvel onglet.', 'in a new tab.'),
+        '',
+        UI.hk('SUITE', 'page suivante', 'next page'),
+        UI.hk('RETOUR', 'page précédente', 'previous page'),
+        UI.hk('SOMMAIRE', 'liste, puis accueil', 'list, then home page')
+      ];
+    },
+    // le fichier est un script : le JSON suit « window.KG_VHS_LIBRARY_SNAPSHOT = »
+    load: function () {
+      var self = this;
+      if (this.data) return Promise.resolve(this.data);
+      return fetch(this.URL).then(function (r) { return r.ok ? r.text() : ''; }).then(function (s) {
+        var i = s.indexOf('KG_VHS_LIBRARY_SNAPSHOT'), j = i < 0 ? -1 : s.indexOf('=', i);
+        if (j < 0) return null;
+        self.data = JSON.parse(s.slice(j + 1).trim().replace(/;\s*$/, ''));
+        return self.data;
+      }).catch(function () { return null; });
+    },
+    label: function (t) { return L(t.label || t.label_en || '', t.label_en || t.label || ''); },
+    rep: function (t) { return L(t.rep || t.date || '', t.rep_en || t.rep || t.date || ''); },
+    // « 17 vendémiaire an 235 » : « 17 vend. 235 »
+    repShort: function (t) {
+      var w = norm(this.rep(t)).split(/\s+/);
+      return w.length >= 3 ? w[0] + ' ' + w[1].slice(0, 4) + '. ' + w[w.length - 1] : w.join(' ');
+    },
+    ids: function (t) { return (t.tracks || []).map(function (x) { return x.id; }).filter(Boolean).slice(0, this.YT); },
+    url: function (t) { return 'https://www.youtube.com/watch_videos?video_ids=' + this.ids(t).join(','); },
+    enter: function (h) {
+      var self = this; this.cur = -1; this.page = 0; this.lp = 0; this.list = null; this.failed = false;
+      this.render(h);
+      this.load().then(function (d) {
+        self.list = (d && d.tapes) || [];
+        self.failed = !d;
+        if (h.svc === KOR && KOR.mode === self && !h.helpOpen) { h.term.flush(); self.render(h); }
+      });
+    },
+    pages: function () { return Math.max(1, Math.ceil((this.list || []).length / this.PER)); },
+    render: function (h) {
+      if (this.cur >= 0) { this.renderOne(h); return; }
+      var self = this, list = this.list, per = this.PER, n = this.pages(), p = Math.min(this.lp, n - 1);
+      var v = kh(new Vdt(), 'CURATORS ' + (p + 1) + '/' + n);
+      v.pos(6, 2).fg(3).size('h').text('Curators');
+      if (!list) v.pos(9, 2).fg(6).text(L('Lecture des cassettes...', 'Reading the tapes...'));
+      else if (!list.length) v.pos(9, 2).fg(6).text(this.failed ? L('Cassettes injoignables.', 'Tapes unreachable.') : L('Zéro cassette pour l\'instant.', 'Zero tape for now.'));
+      else list.slice(p * per, p * per + per).forEach(function (t, i) {
+        v.pos(8 + i, 2).fg(7).text(lpad(p * per + i + 1, 2) + ' ').fg(3).text(pad(cut(self.label(t), 18), 19))
+          .fg(7).text(lpad(t.count || (t.tracks || []).length, 3) + ' ').fg(6).text(cut(self.repShort(t), 12));
+      });
+      v.pos(21, 2).fg(7).text(L('Cassette n° :', 'Tape no.     :'));
+      v.pos(21, 21); UI.kbtn(v, 'ENVOI');
+      UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
+      UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+      h.out(v);
+      h.form([{ r: 21, c: 16, len: 3 }]);
+    },
+    renderOne: function (h) {
+      var t = this.list[this.cur], tr = t.tracks || [], per = this.TPER;
+      var pages = Math.max(1, Math.ceil(tr.length / per)), p = Math.min(this.page, pages - 1), nv = this.ids(t).length;
+      var v = kh(new Vdt(), (p + 1) + '/' + pages);
+      h.clearForm();
+      v.pos(5, 2).fg(3).size('h').text(cut(this.label(t), 38));
+      v.pos(7, 2).fg(6).text(cut(tr.length + L(' morceaux, ', ' tracks, ') + this.rep(t), 38));
+      tr.slice(p * per, p * per + per).forEach(function (x, i) { v.pos(9 + i, 2).fg(7).text(cut(x.title, 38)); });
+      if (nv) { v.pos(21, 2).fg(6).text('YouTube : ').fg(7).text(nv + L(' vidéos à la suite ', ' videos in a row ')); UI.kbtn(v, 'ENVOI'); }
+      UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
+      UI.footer(v, [[L('Liste', 'List'), 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+      h.out(v);
+    },
+    key: function (h, k, vals) {
+      if (this.cur >= 0) {
+        var t = this.list[this.cur], pages = Math.max(1, Math.ceil((t.tracks || []).length / this.TPER));
+        if (k.fn === 'SUITE' || k.fn === 'RETOUR') {
+          var np = this.page + (k.fn === 'SUITE' ? 1 : -1);
+          if (np < 0 || np >= pages) { h.bell(); return true; }
+          this.page = np; h.term.flush(); this.renderOne(h); return true;
+        }
+        if (k.fn === 'ENVOI') {
+          if (!this.ids(t).length) { h.bell(); return true; }
+          try { global.open(this.url(t), '_blank', 'noopener'); } catch (e) { /* rien */ }
+          msg(h, L('YouTube : nouvel onglet.', 'YouTube: new tab.'), false, 2);
+          return true;
+        }
+        if (k.fn === 'SOMMAIRE') { this.cur = -1; h.term.flush(); this.render(h); return true; }
+        return false;
+      }
+      if (k.fn === 'SUITE' || k.fn === 'RETOUR') {
+        var lp = this.lp + (k.fn === 'SUITE' ? 1 : -1);
+        if (!this.list || lp < 0 || lp >= this.pages()) { h.bell(); return true; }
+        this.lp = lp; h.term.flush(); this.render(h); return true;
+      }
+      if (k.fn !== 'ENVOI') return false;
+      var n = parseInt(norm(vals[0] || '').trim(), 10);
+      if (!this.list || !(n >= 1 && n <= this.list.length)) { h.clearField(0); h.bell(); return true; }
+      this.cur = n - 1; this.page = 0; h.term.flush(); this.renderOne(h); return true;
+    }
+  };
+
+  /* ======================================================================
+     HALL OF KAVE — le palmarès en pleine page, une table par page
+     (SUITE / RETOUR). Une table : titre, deux colonnes, dix lignes au plus.
+     tables() donne les tables dans l'ordre des pages ; une table combinée
+     s'ajoute à cette liste.
+     ====================================================================== */
+  KM.HALL = {
+    N: 10,
+    tables: function () {
+      var n = this.N, k = PAL.data.kave || [], out = [];
+      /* HALL OF KAVE : les vingt meilleurs totaux de tous les jeux (points + Koins gagnés), dix par page */
+      [0, 1].forEach(function (i) {
+        out.push({ title: 'TOP 20', cols: ['POINTS', 'KOINS'], rows: k.slice(i * n, i * n + n), from: i * n,
+          name: function (x) { return String(x.name || '').toUpperCase().slice(0, 9); },
+          cells: function (x) { return [x.pts, x.c ? x.c.ko : '']; } });
+      });
+      return out.concat(PAL.GAMES.map(function (g) {
+        return { title: g[1], cols: [g[2], L(g[3][0], g[3][1])], rows: (PAL.data[g[0]] || []).slice(0, n), from: 0,
+          name: function (x) { return x.ini; },
+          cells: function (x) { return [x.a, x.b]; } };
+      }));
+    },
+    help: function () {
+      return [
+        L('Les vingt meilleurs joueurs de tous', 'The twenty best players of all'),
+        L("les jeux d'Insert Koin : points de", 'the games of Insert Koin: points of'),
+        L('chaque jeu et Koins gagnés.', 'every game and Koins earned.'),
+        L('Puis les dix de Korong! et de', 'Then the top ten of Korong! and'),
+        L('FaunInvaders.', 'FaunInvaders.'),
+        '',
+        [[3, 'KORONG!      '], [7, L('Masks battus, buts pris', 'Masks beaten, goals in')]],
+        [[3, 'FAUNINVADERS '], [7, L('score, vague atteinte', 'score, wave reached')]],
+        '',
+        UI.hk('SUITE', 'table suivante', 'next table'),
+        UI.hk('RETOUR', 'table précédente', 'previous table'),
+        UI.hk('SOMMAIRE', "retour à l'accueil", 'back to the home page')
+      ];
+    },
+    enter: function (h) {
+      var self = this; this.page = 0; this.ready = false;
+      PAL.load(function () {
+        self.ready = true;
+        if (h.svc === KOR && KOR.mode === self && !h.helpOpen) { h.term.flush(); self.render(h); }
+      });
+      if (!this.ready) this.render(h);
+    },
+    render: function (h) {
+      var ts = this.tables(), n = ts.length, p = Math.min(this.page, n - 1), t = ts[p];
+      var v = kh(new Vdt(), 'HALL OF KAVE ' + (p + 1) + '/' + n);
+      h.clearForm();
+      v.pos(6, 2).fg(3).size('h').text(t.title);
+      v.pos(8, 2).fg(6).text(' #  ' + L('NOM', 'NAME')).pos(8, 16).fg(6).text(lpad(t.cols[0], 9)).pos(8, 28).fg(6).text(lpad(t.cols[1], 10));
+      for (var i = 0; i < this.N; i++) {
+        var x = t.rows[i], r = 10 + i, col = i ? 7 : 3;
+        v.pos(r, 2).fg(col).text(lpad(t.from + i + 1, 2) + '  ' + (x ? t.name(x) : (this.ready ? '...' : '')));
+        if (x) { var c = t.cells(x); v.pos(r, 16).fg(col).text(lpad(c[0], 9)).pos(r, 28).fg(col).text(lpad(c[1], 10)); }
+      }
+      if (!this.ready) v.pos(21, 2).fg(6).text(L('Lecture du réseau...', 'Reading the network...'));
+      UI.keyHints(v, 23, [[L('Suite', 'Next'), 'SUITE'], [L('Retour', 'Back'), 'RETOUR']]);
+      UI.footer(v, [['KORHOGO!', 'SOMMAIRE'], [L('Aide', 'Help'), 'GUIDE']]);
+      h.out(v);
+    },
+    key: function (h, k) {
+      var n = this.tables().length;
+      if (k.fn === 'SUITE' || k.fn === 'ENVOI' || k.fn === 'RETOUR') {
+        var np = this.page + (k.fn === 'RETOUR' ? -1 : 1);
+        if (np < 0 || np >= n) { h.bell(); return true; }
+        this.page = np; h.term.flush(); this.render(h); return true;
+      }
+      return false;
+    }
+  };
+
+  /* ======================================================================
+     Service 3615 KORHOGO : l'accueil et ses modes (KM.*).
+     KOR.once : mode ouvert à l'entrée (routeur, lien ?svc=korhogo).
+     ====================================================================== */
   var KOR = {
-    get help() { var x = (this.mode && this.mode.help) || KM.HOME.help; return typeof x === 'function' ? x() : x; },
-    enter: function (h) { this.h = h; this.koinPlus = false; if (KOR.kurOnce) { KOR.kurOnce = false; this.mode = KM.HOME; KOR.open('KUR'); return; } if (KOR.faunaOnce) { KOR.faunaOnce = false; this.mode = KM.HOME; KOR.open('KAVE'); return; } this.mode = KM.HOME; KM.HOME.render(h); },
+    get help() { var x = (this.mode && this.mode.help) || KM.HOME.help; return typeof x === 'function' ? x.call(this.mode || KM.HOME) : x; },
+    enter: function (h) {
+      this.h = h;
+      var m = KOR.once; KOR.once = null;
+      this.mode = KM.HOME;
+      if (m && KM[m]) { KOR.open(m); return; }
+      KM.HOME.render(h);
+    },
+    // cible du routeur : un mode nommé ; sans mode, l'accueil, et depuis l'accueil la branche KORHOGO
+    goto: function (h, mode) {
+      if (h.svc !== KOR) { KOR.once = mode || null; h.go('KORHOGO'); return; }
+      if (!mode) mode = this.mode === KM.HOME ? 'KORHOGO' : 'HOME';
+      this.open(mode);
+    },
     open: function (name) {
       var h = this.h;
       if (this.mode && this.mode.leave) this.mode.leave(h);
@@ -12999,10 +13244,10 @@ window.KORHOGO_FAUNA = [
       setLeds();
       // dès la connexion : on compte parmi les connectés, et les messages différés sont signalés
       if (S.NET && S.NET.ok) { S.NET.start(); this.notify(S.NET.unread()); }
-      var name = code ? S.resolve(code) : null;
-      if (code && /^KURATIONS?$/.test(norm(code).toUpperCase().replace(/[^A-Z]/g, ''))) { name = 'KORHOGO'; if (S.KORHOGO) S.KORHOGO.kurOnce = true; }
-      this.go(name || 'KORHOGO');
-      if (code && !name) UI.message(this, L('Service inconnu : ', 'Unknown service: ') + UI.cut(code, 18), true);
+      // « 3615 CODE » : le routeur des codes (S.open), comme au kiosque et sur les pages KORHOGO
+      if (code && S.open(this, code)) return;
+      this.go('KORHOGO');
+      if (code) UI.message(this, L('Service inconnu : ', 'Unknown service: ') + UI.cut(code, 18), true);
     },
     hangup: function () {
       clearTimeout(this.dialTimer);
@@ -13209,20 +13454,19 @@ window.KORHOGO_FAUNA = [
   applyLang();
   term.status('', 'F');
   H.go('LOCAL');
-  /* Lien depuis l'arcade, badge en haut à droite de l'écran de présentation : ?svc=koins */
+  /* Liens depuis l'arcade : ?svc=korhogo (la Fauna) et ?svc=koins (la page KOINS, solde crédité) */
   try {
     var _q = new URLSearchParams(location.search);
     var _svc = (_q.get('svc') || (location.hash || '').replace(/^#/, '')).toLowerCase();
     /* from the arcade's Minitel: straight to 3615 KORHOGO, the line dials by itself */
     if (_svc === 'korhogo' && H.state === 'local') {
       H.lastNumber = '3615 KORHOGO';
-      if (S.KORHOGO) S.KORHOGO.faunaOnce = true;   /* the arcade lands on the Fauna, the list of the Masks */
+      if (S.KORHOGO) S.KORHOGO.once = 'FAUNA';   /* the arcade lands on the Fauna, the list of the Masks */
       H.go('LOCAL');
       setTimeout(function () { H.dial(); }, 700);
     }
     if (_svc === 'koins' && H.state === 'local') {
       H.lastNumber = '3615 KOINS';
-      H.gateOnce = true;   /* après le crédit KOINS, on débouche sur l'accueil */
       H.go('LOCAL');
       H.dial();
     }

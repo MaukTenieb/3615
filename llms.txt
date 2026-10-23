@@ -1,20 +1,23 @@
-# K Terminal — 3615
+# K Terminal (3615)
 
-> K Terminal — le Minitel de Korhogo Fauna, l'univers de Mauk Tenieb. Composez le 3615 : KORHOGO (The Fauna, Kalabass, Koins), la météo et l'encyclopédie. / The Minitel of Korhogo Fauna. Dial 3615: KORHOGO (The Fauna, Kalabass, Koins), the weather and the encyclopedia.
+> Le Minitel de Korhogo Fauna, l'univers de Mauk Tenieb. Composez le 3615 : l'accueil de 3615 KORHOGO propose six entrées : WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE. / The Minitel of Korhogo Fauna, the universe of Mauk Tenieb. Dial 3615: the 3615 KORHOGO home page offers six entries: WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE.
 
 ## Services
-- 3615 — le kiosque : 1 KORHOGO, 2 METEO, 3 ENCYCLO. / the kiosk: 1 KORHOGO, 2 WEATHER, 3 ENCYCLO.
-- 3615 KORHOGO — 1 The Fauna (les fiches de la Fauna), 2 Kalabass (Direct Kaves, Votre Kalabass, Unkle Maukie), 3 Koins. / 1 The Fauna (the Fauna profiles), 2 Kalabass (Direct Kaves, Your Kalabass, Unkle Maukie), 3 Koins.
-- 3615 KOINS — le solde et les règles. / the balance and the rules.
-- 3615 KALABASS — la Kalabass. / the Kalabass.
-- Koins : 3 à la première connexion du jour, puis 1 par connexion (au plus une fois par heure) ; 1 par fiche de la Fauna lue jusqu'au bout ; 1 par message envoyé (5 par jour) ; 10 par jour au plus ; solde partagé avec Insert Koin. / Koins: 3 on the first connection of the day, then 1 per connection (at most once an hour); 1 per Fauna profile read to the end; 1 per message sent (5 a day); 10 a day at most; balance shared with Insert Koin.
-- 3615 METEO, 3615 ENCYCLO (Wikipédia). / 3615 WEATHER, 3615 ENCYCLO (Wikipedia).
+- 3615 KORHOGO : l'accueil, six entrées, et les cinq premiers du Hall of Kave. / the home page, six entries, and the top five of the Hall of Kave.
+- 3615 WORLD : METEO, ENCYCLO (Wikipédia), SNCF, MINITEL (go.minipavi.fr). / WEATHER, ENCYCLO (Wikipedia), SNCF, MINITEL (go.minipavi.fr).
+- Entrée KORHOGO : FAUNA (les 18 fiches de la Fauna), KAVES (tchat en direct), KALABASS (boîte chiffrée, écrire, annuaire, profil), MAUKIE (un mot par e-mail). KAVES et KALABASS demandent un pseudo. / KORHOGO entry: FAUNA (the 18 Fauna profiles), KAVES (live chat), KALABASS (encrypted mailbox, write, directory, profile), MAUKIE (a word by e-mail). KAVES and KALABASS ask for a nickname.
+- 3615 KOINS : le solde, les gains du jour, le barème. / the balance, today's gains, the rules.
+- 3615 KURATIONS : les cassettes Korhogo Kuration des visiteurs d'Insert Koin, lues sur Nostr, 12 par page. / the Korhogo Kuration cassettes of Insert Koin visitors, read on Nostr, 12 per page.
+- 3615 CURATORS : les cassettes tirées des classements des curateurs, 12 par page ; ENVOI ouvre la lecture YouTube d'une cassette. / the tapes drawn from the curators' rankings, 12 per page; ENVOI opens the YouTube playback of a tape.
+- 3615 HALL : le Hall of Kave, les dix meilleurs de Korong! puis de FaunInvaders, une table par page. / the Hall of Kave, the top ten of Korong! then of FaunInvaders, one table per page.
+- Koins : 3 à la première connexion du jour au 3615 KOINS, puis 1 par heure, 10 par jour au plus ; 1 par fiche de la Fauna lue jusqu'au bout ; 1 par message envoyé, 5 par jour ; 1 par victoire dans un jeu ; solde partagé avec Insert Koin. / Koins: 3 at the first connection of the day to 3615 KOINS, then 1 an hour, 10 a day at most; 1 per Fauna profile read to the end; 1 per message sent, 5 a day; 1 per win in a game; balance shared with Insert Koin.
+- Codes : chaque code marche au numéroteur, au kiosque et sur les pages KORHOGO, avec le préfixe 3615 ou seul. / Codes: each code works at the dialler, in the kiosk and on the KORHOGO pages, with the 3615 prefix or alone.
 
 ## Links
 - [mauktenieb.github.io, the index of Mauk Tenieb's sites](https://mauktenieb.github.io/)
 - [K Terminal](https://mauktenieb.github.io/3615/)
 - [Insert Koin](https://mauktenieb.github.io/insertkoin/)
-- [Mauk Tenieb — GitHub](https://github.com/MaukTenieb)
+- [Mauk Tenieb on GitHub](https://github.com/MaukTenieb)
 
 ## Rights
 Copyright © Mauk Tenieb & Korhogo, all rights reserved for everything Korhogo: characters, texts, game rules, portraits, names (Korhogo™, Korhogo Fauna™, Fauna Masks™, Katabatik™, Insert Koin™). The terminal engine is MIT (see LICENSE). Minitel is a trademark of Orange; independent project.
