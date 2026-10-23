@@ -12701,9 +12701,7 @@ window.KORHOGO_FAUNA = [
       v.pos(5, 2).fg(3).size('h').text(cut(k.name, 38));
       v.pos(7, 2).fg(6).text(k.tracks.length + L(' morceaux', ' tracks'));
       k.tracks.slice(p * per, p * per + per).forEach(function (t, i) { v.pos(9 + i, 2).fg(7).text(cut(t.title, 38)); });
-      v.pos(20, 2).fg(6).text('mauktenieb.github.io/insertkoin/?k=');
-      v.pos(21, 2).fg(7).text(k.pk.slice(0, 32));
-      v.pos(22, 2).fg(7).text(k.pk.slice(32));
+      v.pos(21, 2).fg(6).text(L('Adresse : ', 'Address: ')).fg(7).text('mauktenieb.github.io/k/' + k.pk.slice(0, 8));
       UI.footer(v, [[L('Liste', 'List'), 'SOMMAIRE'], [L('Suite', 'Next'), 'SUITE']]);
       h.out(v);
     },
