@@ -396,6 +396,38 @@ button:focus-visible { outline: 2px solid #f1dc3c; outline-offset: 2px; }
 .topline-kor:hover, .topline-kor:focus-visible { color: var(--ink); border-bottom-color: currentColor; outline: none; }
 /* inside Insert Koin the page frame already names the 3615: no second header */
 html.framed .topline { display: none; }
+
+/* ---------- Écran commun d'Insert Koin ----------
+   Dans Insert Koin (page encadrée, /insertkoin/ik-ecran.js servi à la même origine), l'écran du
+   terminal devient l'écran commun du site : même cadre, même taille 4:3, même place que la TV VHS
+   et Photofauna ; rendu « minitel » (verre bombé, reflet, phosphore). Le boîtier blanc reste tout
+   autour : la coque remplit la vue, le clavier occupe la case des commandes, la plaque VT·40 et
+   ses réglages passent sous l'écran quand la place suffit. Sans ik-ecran.js, la page reste telle quelle. */
+html.ike-wait .desk { visibility: hidden; }
+html.ike-on, html.ike-on body { height: 100%; overflow: hidden; }
+html.ike-on .desk { position: fixed; inset: 0; max-width: none; margin: 0; padding: 0; display: block; }
+html.ike-on .terminal {
+  position: absolute; inset: 0; max-width: none; margin: 0;
+  background: linear-gradient(180deg, #e7e0d0 0%, var(--shell) 40%, var(--shell-lo) 100%);
+  border-radius: 26px 26px 14px 14px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .7), inset 0 -4px 0 rgba(0, 0, 0, .12);
+}
+html.ike-on .terminal > .ike-frame { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), inset 0 0 0 1px rgba(201, 168, 76, .2), 0 3px 0 rgba(255, 255, 255, .55), 0 8px 18px rgba(60, 45, 30, .35); }
+html.ike-on .hood { display: none; }
+html.ike-on .crt { display: flex; align-items: center; justify-content: center; padding: 0; background: #040504; border-radius: 3px; }
+html.ike-on .crt canvas, html.ike-on .crt.color canvas { width: auto; height: 90%; max-width: 92%; flex: none; filter: var(--ike-filter, none); }
+html.ike-on .crt.drop { box-shadow: 0 0 0 2px var(--brick), inset 0 0 0 1px #000; }
+html.ike-on .mt-ctl { display: flex; flex-direction: column; gap: 12px; padding: 4px 2px 14px; }
+html.ike-on .terminal > .strip { position: absolute; z-index: 1; padding: 0 4px; box-sizing: border-box; }
+html.ike-on .mt-ctl > .strip { padding: 2px 4px 0; justify-content: center; }
+html.ike-on .mt-ctl > .controls { justify-content: center; padding-top: 4px; }
+html.ike-on .deck { width: 100%; margin: 0; padding: 12px; grid-template-columns: minmax(0, 1fr); gap: 12px; box-shadow: 0 10px 22px rgba(60, 45, 30, .35), inset 0 2px 0 rgba(255, 255, 255, .35), inset 0 -3px 0 rgba(0, 0, 0, .12); }
+html.ike-on .keys { gap: 4px; }
+html.ike-on .k { font-size: 15px; }
+html.ike-on .fkeys { order: -1; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+html.ike-on .fk { font-size: 11px; letter-spacing: .04em; min-height: 40px; }
+html.ike-on .fk small { display: none; }
+html.ike-on .fk-cx { grid-column: span 4; }
 </style>
 </head>
 <body>
@@ -13504,6 +13536,60 @@ function koinDrop(n){
     };
   })(i);
 }
+</script>
+<script>
+/* [IK] l'écran commun d'Insert Koin : dans le site (page encadrée), le 3615 charge /insertkoin/ik-ecran.js
+   (même origine sur GitHub Pages). Chargé : l'écran du terminal prend le rectangle d'écran commun et le rendu
+   « minitel », le clavier la case des commandes, le boîtier blanc reste tout autour. Absent ou trop lent
+   (3 s) : le 3615 garde son écran et sa page. */
+(function () {
+  'use strict';
+  var html = document.documentElement;
+  if (!html.classList.contains('framed')) return;
+  var settled = false;
+  html.classList.add('ike-wait');
+  function settle() { if (settled) return false; settled = true; html.classList.remove('ike-wait'); return true; }
+  function on() {
+    var E = window.IKEcran;
+    if (!E || !E.layout || !E.mount || parseInt(E.version, 10) < 2) return;
+    var term = document.querySelector('.terminal'), crt = document.getElementById('crt'),
+        hood = term && term.querySelector('.hood'), strip = term && term.querySelector('.strip'),
+        deck = term && term.querySelector('.deck');
+    if (!term || !crt || !hood || !strip || !deck) return;
+    var ctl = document.createElement('div');
+    ctl.className = 'mt-ctl';
+    term.appendChild(crt);
+    term.appendChild(ctl);
+    ctl.appendChild(deck);
+    html.classList.add('ike-on');
+    /* la plaque et les voyants : sous l'écran quand la vue large laisse la place, les réglages en tête
+       du clavier ; sinon tout le bandeau en tête du clavier */
+    var sets = strip.querySelector('.controls');
+    function place(g) {
+      var below = g.mode === 'wide' ? g.view.h - (g.frame.y + g.frame.h) : 0;
+      if (below >= 44) {
+        if (sets) ctl.insertBefore(sets, ctl.firstChild);
+        if (strip.parentNode !== term) term.appendChild(strip);
+        strip.style.left = g.frame.x + 'px';
+        strip.style.width = g.frame.w + 'px';
+        strip.style.top = (g.frame.y + g.frame.h + Math.max(8, Math.round((below - strip.offsetHeight) / 2) - 4)) + 'px';
+      } else {
+        strip.style.left = strip.style.width = strip.style.top = '';
+        if (sets && sets.parentNode !== strip) strip.appendChild(sets);
+        if (strip.parentNode !== ctl) ctl.insertBefore(strip, ctl.firstChild);
+      }
+    }
+    ctl.insertBefore(strip, ctl.firstChild);
+    E.mount(crt, { program: 'terminal', content: '#screen' });
+    E.layout(term, { screen: crt, controls: ctl, onlayout: place });
+  }
+  var s = document.createElement('script');
+  s.src = '/insertkoin/ik-ecran.js';
+  s.onload = function () { if (settle()) { try { on(); } catch (e) { console.error('[3615] écran commun', e); } } };
+  s.onerror = settle;
+  setTimeout(settle, 3000);
+  document.head.appendChild(s);
+})();
 </script>
 </body>
 </html>
