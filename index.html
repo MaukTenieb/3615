@@ -456,6 +456,8 @@ html.ike-on .seg button::after, html.ike-on .toggle::after, html.ike-on .power::
 }
 /* téléphone couché : les touches de fonction d'abord (ENVOI, CONNEXION/FIN à portée), les réglages ensuite */
 @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) { html.ike-on .mt-ctl > .deck { order: -1; } }
+/* téléphone debout : l'image occupe tout le tube (D3) */
+html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout="narrow"] .crt.color canvas { height: 97%; max-width: 97%; }
 </style>
 </head>
 <body>
