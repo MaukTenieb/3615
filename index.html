@@ -12438,7 +12438,7 @@ window.KORHOGO_FAUNA = [
             try { pool.close(R.RELAYS); } catch (e) {}
             var ok = evs.filter(function (e) { try { return NT.verifyEvent(e); } catch (x) { return false; } });
             var live = ok.map(R.entry).filter(Boolean);
-            self.data.kave = R.hall ? R.hall((off.kave || []).concat(ok.map(R.card).filter(Boolean))) : (off.kave || []);
+            self.data.kave = R.hall ? R.hall((off.kave || []).concat(ok.map(R.card).filter(Boolean)), off.first) : (off.kave || []);
             self.GAMES.forEach(function (g) {
               var o = (off[g[0]] || []).map(function (x) { return Object.assign({ game: g[0] }, x); });
               self.data[g[0]] = R.top(o.concat(live), g[0]);
