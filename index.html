@@ -13592,7 +13592,8 @@ function koinDrop(n){
     E.layout(term, { screen: crt, controls: ctl, onlayout: place });
   }
   var s = document.createElement('script');
-  s.src = '/insertkoin/ik-ecran.js';
+  var inBorne = false; try { inBorne = /^\/borne\//.test(parent.location.pathname); } catch (e) {}
+  s.src = inBorne ? '/borne/ik-ecran.js' : '/insertkoin/ik-ecran.js';  /* dans la borne, son écran commun (mise en page du téléphone couché) */
   s.onload = function () { if (settle()) { try { on(); } catch (e) { console.error('[3615] écran commun', e); } } };
   s.onerror = settle;
   setTimeout(settle, 3000);
