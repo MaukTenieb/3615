@@ -443,12 +443,11 @@ html.ike-on .ctl-label, html.ike-on .led { font-size: 12px; color: #554a3c; }
 html.ike-on .seg button, html.ike-on .toggle, html.ike-on .power { position: relative; }
 html.ike-on .seg button::after, html.ike-on .toggle::after, html.ike-on .power::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%); }
 @media (pointer: coarse) { html.ike-on .k, html.ike-on .fk { min-height: 44px; } }
-/* grand écran : raccourcis des touches de fonction visibles, touches à la hauteur de la colonne, réglages sur une ligne */
+/* grand écran : raccourcis des touches de fonction visibles, touches à la hauteur de la colonne */
 @media (min-width: 900px) and (min-height: 600px) {
   html.ike-on .fk small { display: block; }
   html.ike-on .fk { font-size: 13px; }
   html.ike-on .k { height: clamp(38px, 5.5vh, 56px); }
-  html.ike-on .controls { flex-wrap: nowrap; }
 }
 /* téléphone couché : les touches de fonction d'abord (ENVOI, CONNEXION/FIN à portée), les réglages ensuite */
 @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) { html.ike-on .mt-ctl > .deck { order: -1; } }
@@ -537,7 +536,7 @@ html.ike-on .seg button::after, html.ike-on .toggle::after, html.ike-on .power::
         <button type="button" class="fk" data-fn="REPETITION"><span data-fr="Répétition" data-en="Repeat">Répétition</span><small data-fr="F2" data-en="F2">F2</small></button>
         <button type="button" class="fk" data-fn="GUIDE"><span data-fr="Guide" data-en="Guide">Guide</span><small data-fr="F1" data-en="F1">F1</small></button>
         <button type="button" class="fk" data-fn="CORRECTION"><span data-fr="Correction" data-en="Correct">Correction</span><small data-fr="⌫" data-en="⌫">⌫</small></button>
-        <button type="button" class="fk" data-fn="SUITE"><span data-fr="Suite" data-en="Next">Suite</span><small data-fr="Page ↓ · Tab" data-en="PgDn · Tab">Page ↓ · Tab</small></button>
+        <button type="button" class="fk" data-fn="SUITE"><span data-fr="Suite" data-en="Next">Suite</span><small data-fr="Page ↓" data-en="PgDn">Page ↓</small></button>
         <button type="button" class="fk fk-send" data-fn="ENVOI"><span data-fr="Envoi" data-en="Send">Envoi</span></button>
         <button type="button" class="fk fk-cx" data-fn="CONNEXION"><span data-fr="Connexion / Fin" data-en="Connect / End">Connexion / Fin</span><small data-fr="F9" data-en="F9">F9</small></button>
       </div>
@@ -1622,7 +1621,7 @@ html.ike-on .seg button::after, html.ike-on .toggle::after, html.ike-on .power::
     line: function (v, r, c, plus) {
       var n = this.get();
       if (n === null) return v;
-      v.pos(r, c).fg(6).text(Math.random() < .5 ? 'KOINS  ' : 'KINOS  ').g1().fg(3).raw(0x7F).g0().fg(3).text(' ' + n);
+      v.pos(r, c).fg(6).text('KOINS  ').g1().fg(3).raw(0x7F).g0().fg(3).text(' ' + n);
       if (plus) v.fg(2).text('  +1');
       return v;
     }
@@ -1656,7 +1655,7 @@ html.ike-on .seg button::after, html.ike-on .toggle::after, html.ike-on .power::
       var h = this.h, v = new Vdt(), o = KOIN.day(), bal = KOIN.get(), at = KOIN.nextAt();
       v.cls().cur(0);
       v.big(2, 3, '3615', 7);
-      v.pos(4, 22).fg(3).size('d').text(Math.random() < .5 ? 'KOINS' : 'KINOS');
+      v.pos(4, 22).fg(3).size('d').text('KOINS');
       rule(v, 9, 4);
       v.pos(11, 3).fg(7).text(cut(L('Truce vérifie ton solde : ', 'Truce checks your balance: ') + (bal === null ? '?' : bal) + '.', 38));
       if (this.won) v.pos(12, 3).fg(2).text('+' + this.won + ' Koin' + (this.won > 1 ? 's' : '') + L(' à cette connexion', ' on this connection'));
@@ -12421,7 +12420,7 @@ window.KORHOGO_FAUNA = [
      ====================================================================== */
   // [mode, libellé FR, libellé EN] : un mode KORHOGO (KM.*), ou @SERVICE pour un service du 3615
   /* the Koins read Koins or Kinos, drawn at each visit */
-  var KW = Math.random() < .5 ? 'KOINS' : 'KINOS';
+  var KW = 'KOINS';  /* le menu dit toujours KOINS (décision de Mauk Tenieb, 30 oct.) ; le mot tourne sur la fente de la borne */
   var MENU = [
     ['WORLD', 'WORLD', 'WORLD'],
     ['KORHOGO', 'KORHOGO', 'KORHOGO'],
@@ -12457,7 +12456,8 @@ window.KORHOGO_FAUNA = [
         this.rules()
       ]).then(function (r) {
         var off = r[0] || {}, R = r[1];
-        if (!R || !NT) { self.GAMES.forEach(function (g) { self.data[g[0]] = off[g[0]] || []; }); self.data.kave = off.kave || []; self.at = Date.now(); cb(); return; }
+        var essai0 = function (x) { var n = String((x && (x.ini || x.name || x.nick)) || '').trim(); return /^TEST\b/i.test(n) || /^A+$/i.test(n); };
+        if (!R || !NT) { self.GAMES.forEach(function (g) { self.data[g[0]] = (off[g[0]] || []).filter(function (x) { return !essai0(x); }); }); self.data.kave = (off.kave || []).filter(function (x) { return !essai0(x); }); self.at = Date.now(); cb(); return; }
         var pool = new NT.SimplePool();
         pool.querySync(R.RELAYS, { kinds: [R.KIND], '#t': R.KAVE ? [R.TAG, R.KAVE] : [R.TAG], since: R.SINCE, limit: 1000 }, { maxWait: 4000 }).catch(function () { return []; })
           .then(function (evs) {
@@ -12469,6 +12469,9 @@ window.KORHOGO_FAUNA = [
               var o = (off[g[0]] || []).map(function (x) { return Object.assign({ game: g[0] }, x); });
               self.data[g[0]] = R.top(o.concat(live), g[0]);
             });
+            /* les parties d'essai (TEST…, AAA) restent hors du palmarès affiché (décision de Mauk Tenieb, 30 oct.) */
+            var essai = function (x) { var n = String((x && (x.ini || x.name || x.nick)) || '').trim(); return /^TEST\b/i.test(n) || /^A+$/i.test(n); };
+            Object.keys(self.data).forEach(function (k) { if (Array.isArray(self.data[k])) self.data[k] = self.data[k].filter(function (x) { return !essai(x); }); });
             self.at = Date.now(); cb();
           });
       });
