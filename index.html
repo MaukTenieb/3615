@@ -12505,7 +12505,7 @@ window.KORHOGO_FAUNA = [
     if (k.fn !== 'ENVOI') return false;
     var q = norm(vals[0] || '').trim(), n = parseInt(q, 10);
     if (/^\d{1,2}$/.test(q) && items[n - 1]) q = items[n - 1][0];
-    if (!S.open(h, q)) { h.clearField(0); h.bell(); }
+    if (!S.open(h, q)) { h.clearField(0); h.bell(); UI.message(h, L('Numéro ou code inconnu.', 'Unknown number or code.'), true); }
     return true;
   }
 
@@ -12617,7 +12617,7 @@ window.KORHOGO_FAUNA = [
         return true;
       }
       /* tout code du 3615 : « KORHOGO » ouvre ici la branche KORHOGO */
-      if (!S.open(h, q)) { h.clearField(0); h.bell(); }
+      if (!S.open(h, q)) { h.clearField(0); h.bell(); UI.message(h, L('Numéro ou code inconnu.', 'Unknown number or code.'), true); }
       return true;
     }
   };
