@@ -264,6 +264,11 @@ body {
 }
 .power[aria-pressed="true"] i { border-color: var(--brick); border-top-color: transparent; }
 .power:active { transform: translateY(1px); }
+/* D16 : en marche, le voyant rougeoie ; à l'arrêt, il s'éteint */
+.power[aria-pressed="true"] { box-shadow: 0 2px 0 var(--shell-edge), 0 3px 6px rgba(0, 0, 0, .35), 0 0 0 2px rgba(178, 74, 52, .45), 0 0 12px rgba(220, 90, 60, .55); }
+.power[aria-pressed="true"] i { filter: drop-shadow(0 0 3px rgba(230, 90, 60, .9)); }
+.power[aria-pressed="false"] { background: radial-gradient(circle at 40% 35%, #d9d1c1, #9d927c); }
+.power[aria-pressed="false"] i { border-color: #8a7f6c; border-top-color: transparent; }
 .kbd-btn {
   height: 24px; min-width: 42px; border-radius: 6px; border: 0; cursor: pointer;
   font: 600 13px/1 var(--display);
