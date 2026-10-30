@@ -12602,7 +12602,7 @@ window.KORHOGO_FAUNA = [
     countBytes: function (v) {
       var NET = S.NET, t;
       if (!NET || !NET.ok) t = '';
-      else if (!NET.started || !NET.relaysUp()) t = L('connexion au réseau...', 'reaching the network...');
+      else if (!NET.started || !NET.relaysUp()) { if (!this.netT0) this.netT0 = Date.now(); t = Date.now() - this.netT0 > 8000 ? L('hors réseau', 'offline') : L('connexion au réseau...', 'reaching the network...'); }
       else t = UI.onlineText(NET.online());
       v.pos(1, 1).can();
       if (t) v.pos(1, 40 - t.length).fg(NET.started && NET.relaysUp() ? 2 : 5).text(t);
@@ -13061,6 +13061,8 @@ window.KORHOGO_FAUNA = [
     h.out(KM.HOME.countBytes(new Vdt()));
     h.refocus();
   };
+  /* sans relais au bout de 8 s, l'accueil affiche « hors réseau » */
+  setInterval(function () { try { var N = S.NET; if (N && N.ok && (!N.started || !N.relaysUp())) KOR.presence(); } catch (e) {} }, 3000);
   S.KORHOGO = KOR;
 
 })(window);
@@ -13461,7 +13463,7 @@ window.KORHOGO_FAUNA = [
     if (e.key && e.key.length === 1) {
       if (t && t.tagName === 'BUTTON' && e.key === ' ') return;
       e.preventDefault();
-      H.key({ ch: e.key });
+      H.key({ ch: e.key.toUpperCase() });  /* le clavier du Minitel tape en capitales, comme le clavier à l'écran */
     }
   });
 
