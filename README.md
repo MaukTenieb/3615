@@ -1,6 +1,6 @@
 # 3615 KORHOGO (K Terminal)
 
-Le Minitel de [Korhogo Fauna](https://mauktenieb.github.io/katabase), l'univers de Mauk Tenieb.
+Le MiniTale de [Korhogo Fauna](https://mauktenieb.github.io/katabase), l'univers de Mauk Tenieb.
 
 En ligne : https://mauktenieb.github.io/3615/
 
@@ -60,7 +60,7 @@ Projet indépendant d'Orange. Minitel est une marque d'Orange.
 
 ## English
 
-The Minitel of [Korhogo Fauna](https://mauktenieb.github.io/katabase), the universe of Mauk Tenieb. Online: https://mauktenieb.github.io/3615/
+The MiniTale of [Korhogo Fauna](https://mauktenieb.github.io/katabase), the universe of Mauk Tenieb. Online: https://mauktenieb.github.io/3615/
 
 The K Terminal dials 3615 and opens the 3615 KORHOGO home page. The home menu has six entries. Below the menu, the Hall of Kave shows the top five of Korong! and of FaunInvaders.
 

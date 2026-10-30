@@ -1424,7 +1424,9 @@ html.ike-on .seg button::after, html.ike-on .toggle::after, html.ike-on .power::
   function keyHints(v, r, items, c) {
     v.pos(r, c || 1);
     items.forEach(function (it, i) {
-      v.fg(6).text((i ? '  ' : ' ') + it[0] + ' ');
+      /* le libellé qui répète le nom de la touche s'efface (« Next NEXT ») */
+      if (String(it[0]).toUpperCase() === String(K(it[1])).toUpperCase()) v.fg(6).text(i ? '  ' : ' ');
+      else v.fg(6).text((i ? '  ' : ' ') + it[0] + ' ');
       kbtn(v, it[1]);
     });
     return v;

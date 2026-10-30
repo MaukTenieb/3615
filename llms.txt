@@ -1,6 +1,6 @@
 # K Terminal (3615)
 
-> Le Minitel de Korhogo Fauna, l'univers de Mauk Tenieb. Composez le 3615 : l'accueil de 3615 KORHOGO propose six entrées : WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE. / The Minitel of Korhogo Fauna, the universe of Mauk Tenieb. Dial 3615: the 3615 KORHOGO home page offers six entries: WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE.
+> Le MiniTale de Korhogo Fauna, l'univers de Mauk Tenieb. Composez le 3615 : l'accueil de 3615 KORHOGO propose six entrées : WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE. / The MiniTale of Korhogo Fauna, the universe of Mauk Tenieb. Dial 3615: the 3615 KORHOGO home page offers six entries: WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE.
 
 ## Services
 - 3615 KORHOGO : l'accueil, six entrées, et les cinq premiers du Hall of Kave. / the home page, six entries, and the top five of the Hall of Kave.
