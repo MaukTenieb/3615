@@ -427,6 +427,11 @@ html.ike-on .fk { font-size: 11px; letter-spacing: .04em; min-height: 40px; }
 html.ike-on .fk small { display: none; }
 html.ike-on .fk-cx { grid-column: span 4; }
 /* phone on its side, inside Insert Koin: the phone's own keyboard types (button Aa); the letter keys step aside, the function keys stay in view */
+/* phone upright, inside Insert Koin: the keys come first under the screen, the settings follow below */
+@media (orientation: portrait) and (pointer: coarse) {
+  html.ike-on .mt-ctl > .deck { order: -1; }
+  html.ike-on .k { min-height: 38px; }
+}
 @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) {
   html.ike-on .keys { display: none; }
   html.ike-on .mt-ctl { overflow-y: auto; }
