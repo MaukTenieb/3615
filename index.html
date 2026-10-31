@@ -418,7 +418,7 @@ html.ike-on .terminal {
 html.ike-on .terminal > .ike-frame { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), inset 0 0 0 1px rgba(201, 168, 76, .2), 0 3px 0 rgba(255, 255, 255, .55), 0 8px 18px rgba(60, 45, 30, .35); }
 html.ike-on .hood { display: none; }
 html.ike-on .crt { display: flex; align-items: center; justify-content: center; padding: 0; background: #040504; border-radius: 3px; }
-html.ike-on .crt canvas, html.ike-on .crt.color canvas { width: auto; height: 90%; max-width: 92%; flex: none; filter: var(--ike-filter, none); }
+html.ike-on .crt canvas, html.ike-on .crt.color canvas { width: auto; height: 97%; max-width: 97%; flex: none; filter: var(--ike-filter, none); }
 html.ike-on .crt.drop { box-shadow: 0 0 0 2px var(--brick), inset 0 0 0 1px #000; }
 html.ike-on .mt-ctl { display: flex; flex-direction: column; gap: 12px; padding: 4px 2px 14px; }
 html.ike-on .terminal > .strip { position: absolute; z-index: 1; padding: 0 4px; box-sizing: border-box; }
@@ -456,6 +456,8 @@ html.ike-on .seg button::after, html.ike-on .toggle::after, html.ike-on .power::
 }
 /* téléphone couché : les touches de fonction d'abord (ENVOI, CONNEXION/FIN à portée), les réglages ensuite */
 @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) { html.ike-on .mt-ctl > .deck { order: -1; } }
+/* téléphone debout : le clavier entier sous l'écran, rangées serrées (marges et écarts réduits) */
+@media (orientation: portrait) and (pointer: coarse) { html.ike-on .deck { padding: 6px 8px; gap: 6px; } html.ike-on .keys { gap: 3px; } html.ike-on .fkeys { gap: 4px; } html.ike-on .mt-ctl { padding-top: 0; gap: 6px; } }
 /* téléphone debout : l'image occupe tout le tube (D3) */
 html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout="narrow"] .crt.color canvas { height: 97%; max-width: 97%; }
 </style>
