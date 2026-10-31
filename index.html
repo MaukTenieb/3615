@@ -458,6 +458,14 @@ html.ike-on .seg button::after, html.ike-on .toggle::after, html.ike-on .power::
 @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) { html.ike-on .mt-ctl > .deck { order: -1; } }
 /* téléphone debout : le clavier entier sous l'écran, rangées serrées (marges et écarts réduits) */
 @media (orientation: portrait) and (pointer: coarse) { html.ike-on .deck { padding: 6px 8px; gap: 6px; } html.ike-on .keys { gap: 3px; } html.ike-on .fkeys { gap: 4px; } html.ike-on .mt-ctl { padding-top: 0; gap: 6px; } }
+/* petit téléphone debout : touches de 34 px pour que le clavier entier tienne sous l'écran */
+@media (orientation: portrait) and (pointer: coarse) and (max-height: 620px) { html.ike-on .k, html.ike-on .fk { min-height: 34px; height: 34px; } }
+/* petit téléphone : rangées à 2 px d'écart, la dernière rangée entière avec son relief */
+@media (orientation: portrait) and (pointer: coarse) and (max-height: 700px) { html.ike-on .keys { gap: 2px; } html.ike-on .deck { padding-bottom: 8px; } }
+/* téléphone couché : langue, vitesse et couleur quittent la colonne (la molette FR · EN de la borne règle la langue) */
+@media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) { html.ike-on .mt-ctl > .strip { display: none; } html.ike-on .mt-ctl { justify-content: center; } }
+/* grand écran : la colonne des commandes centrée en hauteur face au tube */
+@media (min-width: 900px) and (min-height: 600px) { html.ike-on .mt-ctl { justify-content: center; } }
 /* téléphone debout : l'image occupe tout le tube (D3) */
 html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout="narrow"] .crt.color canvas { height: 97%; max-width: 97%; }
 </style>
