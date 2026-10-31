@@ -466,6 +466,23 @@ html.ike-on .seg button::after, html.ike-on .toggle::after, html.ike-on .power::
 @media (orientation: landscape) and (max-height: 520px) and (pointer: coarse) { html.ike-on .mt-ctl > .strip { display: none; } html.ike-on .mt-ctl { justify-content: center; } }
 /* grand écran : la colonne des commandes centrée en hauteur face au tube */
 @media (min-width: 900px) and (min-height: 600px) { html.ike-on .mt-ctl { justify-content: center; } }
+/* lot 1.1 d'Insert Koin (31 oct.) : capitales dans les réglages et sous les touches ; lettrages de 12 px au moins */
+html.ike-on :is(.seg button, .fk small, .ctl-label, .led) { text-transform: uppercase; }
+html.ike-on .fk { font-size: 12.5px; }
+html.ike-on .fk small { font-size: 13px; }
+html.ike-on :is(.ctl-label, .led) { font-size: 12.5px; }
+/* lot 1.1, reprise : zones de frappe de 44 px au moins autour des touches, sans changer leur aspect */
+html.ike-on :is(.k, .fk, .kbd-btn) { position: relative; }
+html.ike-on :is(.k, .fk, .kbd-btn)::after { content: ""; position: absolute; inset: -6px -4px; }
+/* 31 oct. — au toucher, la saisie passe par le clavier du téléphone : la grille des lettres cède la place à une bande au dessin des touches ; touches de fonction et réglages restent */
+.keys-band { display: none; }
+@media (pointer: coarse) {
+  html.ike-on .deck .keys { display: none; }
+  html.ike-on .ctl-kbd { display: none; }
+  html.ike-on .keys-band { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; height: 52px; letter-spacing: .2em; text-transform: uppercase; }
+  html.ike-on .keys-band b { font: 600 20px/1 var(--display); letter-spacing: .04em; text-transform: none; }
+  html.ike-on .keys-band small { font: 600 13px/1 var(--display); }
+}
 /* téléphone debout : l'image occupe tout le tube (D3) */
 html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout="narrow"] .crt.color canvas { height: 97%; max-width: 97%; }
 </style>
@@ -538,6 +555,7 @@ html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout
     </div>
 
     <div class="deck">
+      <button type="button" class="k keys-band" id="keys-band" data-fr-label="Ouvrir le clavier du téléphone" data-en-label="Open the phone keyboard" aria-label="Ouvrir le clavier du téléphone"><b>Aa</b><small data-fr="Clavier" data-en="Keyboard">Clavier</small></button>
       <div class="keys" data-fr-label="Clavier alphanumérique" data-en-label="Alphanumeric keyboard" aria-label="Clavier alphanumérique">
         <button type="button" class="k" data-ch="1">1</button><button type="button" class="k" data-ch="2">2</button><button type="button" class="k" data-ch="3">3</button><button type="button" class="k" data-ch="4">4</button><button type="button" class="k" data-ch="5">5</button><button type="button" class="k" data-ch="6">6</button><button type="button" class="k" data-ch="7">7</button><button type="button" class="k" data-ch="8">8</button><button type="button" class="k" data-ch="9">9</button><button type="button" class="k" data-ch="0">0</button>
         <button type="button" class="k" data-ch="A">A</button><button type="button" class="k" data-ch="Z">Z</button><button type="button" class="k" data-ch="E">E</button><button type="button" class="k" data-ch="R">R</button><button type="button" class="k" data-ch="T">T</button><button type="button" class="k" data-ch="Y">Y</button><button type="button" class="k" data-ch="U">U</button><button type="button" class="k" data-ch="I">I</button><button type="button" class="k" data-ch="O">O</button><button type="button" class="k" data-ch="P">P</button>
@@ -13504,6 +13522,7 @@ window.KORHOGO_FAUNA = [
   function focusKbd() { try { kbd.focus({ preventScroll: true }); } catch (e) { kbd.focus(); } resetKbd(); }
   crt.addEventListener('click', function () { if (matchMedia('(pointer: coarse)').matches) focusKbd(); });
   $('kbd-btn').addEventListener('click', focusKbd);
+  $('keys-band').addEventListener('click', function () { snd.ensure(); snd.click(); focusKbd(); });
 
   /* ---------- Touches à l'écran ------------------------------------------ */
   function flashKey(fn) {
