@@ -1,6 +1,6 @@
 # K Terminal (3615)
 
-> Le MiniTale de Korhogo Fauna, l'univers de Mauk Tenieb. Composez le 3615 : l'accueil de 3615 KORHOGO propose six entrées : WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE. / The MiniTale of Korhogo Fauna, the universe of Mauk Tenieb. Dial 3615: the 3615 KORHOGO home page offers six entries: WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE.
+> Le MiniTale de la Korhogo Fauna, alias Hordalék ou les Masques, l'univers de Mauk Tenieb. Composez le 3615 : l'accueil de 3615 KORHOGO propose six entrées : WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE. / The MiniTale of the Korhogo Fauna, aka Hordalék or the Masks, the universe of Mauk Tenieb. Dial 3615: the 3615 KORHOGO home page offers six entries: WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE.
 
 ## Services
 - 3615 KORHOGO : l'accueil, six entrées, et les cinq premiers du Hall of Kave. / the home page, six entries, and the top five of the Hall of Kave.
@@ -21,3 +21,11 @@
 
 ## Rights
 Copyright © Mauk Tenieb & Korhogo, all rights reserved for everything Korhogo: characters, texts, game rules, portraits, names (Korhogo™, Korhogo Fauna™, Fauna Masks™, Katabatik™, Insert Koin™). The terminal engine is MIT (see LICENSE). Minitel is a trademark of Orange; independent project.
+
+## Mauk Tenieb
+- [Site](https://mauktenieb.github.io/)
+- [Bandcamp](https://mauktenieb.bandcamp.com)
+- [YouTube](https://www.youtube.com/@mauktenieb)
+- [MusicBrainz](https://musicbrainz.org/artist/701a6795-f583-4567-b8f4-0d05f961d63f)
+- [Discogs](https://www.discogs.com/artist/9104440-Mauk-Tenieb)
+- [Wikidata](https://www.wikidata.org/wiki/Q141544315)
