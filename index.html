@@ -593,10 +593,9 @@ html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout
    ========================================================================== */
 (function (global) {
   'use strict';
-  var lang = 'fr';
+  var lang = 'en';
   try {
-    lang = localStorage.getItem('ik.lang') || localStorage.getItem('vdx.lang') ||
-      ((navigator.language || 'fr').slice(0, 2).toLowerCase() === 'fr' ? 'fr' : 'en');
+    lang = localStorage.getItem('ik.lang') || 'en';  /* une seule clé de langue, anglais par défaut */
   } catch (e) { /* rien */ }
   if (lang !== 'en') lang = 'fr';
   try { document.documentElement.lang = lang; } catch (e) { /* rien */ }
