@@ -494,6 +494,25 @@ html.ike-on :is(.k, .fk, .kbd-btn)::after { content: ""; position: absolute; ins
   .keys-band b { font: 600 20px/1 var(--display); letter-spacing: .04em; text-transform: none; }
   .keys-band small { font: 600 13px/1 var(--display); }
 }
+/* 10 nov. 2026 — règle commune des écrans (DA.md), 3615 seul : téléphone couché, l'image sur toute la hauteur, les commandes sur le côté */
+@media (orientation: landscape) and (max-height: 520px) {
+  html:not(.ike-on) .desk { max-width: none; padding: 0 8px 8px; gap: 4px; }
+  html:not(.ike-on) .topline { padding-block: 2px; }
+  html:not(.ike-on) .desk { display: block; }
+  html:not(.ike-on) .terminal { max-width: none; margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "ecran reglages" "ecran touches"; gap: 8px 10px; align-items: start; width: 100%; }
+  html:not(.ike-on) .hood { display: contents; }
+  html:not(.ike-on) .bezel { grid-area: ecran; width: calc((100svh - 44px) * 1.28); padding: 6px; border-radius: 14px; }
+  html:not(.ike-on) .crt { padding: 1.5% 2%; }
+  html:not(.ike-on) .strip { grid-area: reglages; background: linear-gradient(180deg, #e7e0d0, var(--shell)); border-radius: 12px; padding: 8px 10px; }
+  html:not(.ike-on) .deck { grid-area: touches; width: 100%; padding: 8px; }
+  html:not(.ike-on) .deck .fkeys { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  html:not(.ike-on) .deck { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  html:not(.ike-on) .deck .keys-band { order: 2; height: 44px; }
+  html:not(.ike-on) .terminal { height: calc(100svh - 44px); grid-template-rows: auto minmax(0, 1fr); }
+  html:not(.ike-on) .deck { overflow-y: auto; align-self: stretch; max-height: 100%; }
+  html:not(.ike-on) .deck .k, html:not(.ike-on) .deck .fk { min-height: 44px; }
+  html:not(.ike-on) .strip { gap: 6px 12px; }
+}
 /* téléphone debout : l'image occupe tout le tube (D3) */
 html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout="narrow"] .crt.color canvas { height: 97%; max-width: 97%; }
 </style>
