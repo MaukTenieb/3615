@@ -266,7 +266,7 @@ body {
 .power[aria-pressed="true"] i { border-color: var(--brick); border-top-color: transparent; }
 .power:active { transform: translateY(1px); }
 /* D16 : en marche, le voyant rougeoie ; à l'arrêt, il s'éteint */
-.power[aria-pressed="true"] { box-shadow: 0 2px 0 var(--shell-edge), 0 3px 6px rgba(0, 0, 0, .35), 0 0 0 2px rgba(178, 74, 52, .45), 0 0 12px rgba(220, 90, 60, .55); }
+.power[aria-pressed="true"] { box-shadow: 0 2px 0 var(--shell-edge), 0 3px 6px rgba(0, 0, 0, .35), 0 0 0 2px rgba(178, 74, 52, .45); }
 .power[aria-pressed="true"] i { filter: drop-shadow(0 0 3px rgba(230, 90, 60, .9)); }
 .power[aria-pressed="false"] { background: radial-gradient(circle at 40% 35%, #d9d1c1, #9d927c); }
 .power[aria-pressed="false"] i { border-color: #8a7f6c; border-top-color: transparent; }
@@ -336,24 +336,7 @@ body {
   text-transform: none;
   opacity: .62;
 }
-/* ENVOI : même gris que les autres touches ; halo électroluminescent autour,
-   porté par un pseudo-élément derrière la touche (jamais sur elle) */
-.fk-send { position: relative; z-index: 0; }
-@keyframes sendglow {
-  0%, 100% { opacity: .45; transform: scale(.97); }
-  50% { opacity: .85; transform: scale(1); }
-}
-.fk-send::before {
-  content: '';
-  position: absolute;
-  inset: -7px;
-  z-index: -1;
-  border-radius: 12px;
-  background: radial-gradient(ellipse at center, rgba(255, 130, 55, .55) 0%, rgba(255, 130, 55, .20) 45%, rgba(255, 130, 55, 0) 72%);
-  animation: sendglow 4.5s ease-in-out infinite;
-  pointer-events: none;
-}
-.fk-send:active::before, .fk-send.down::before { animation: none; opacity: .3; }
+.fk-send { position: relative; }
 .fk-cx {
   grid-column: span 2;
   color: #fff3e8;
@@ -485,6 +468,28 @@ html.ike-on :is(.k, .fk, .kbd-btn)::after { content: ""; position: absolute; ins
   html.ike-on .keys-band small { font: 600 13px/1 var(--display); }
   html.ike-on .seg button { min-width: 46px; }
 }
+/* 10 nov. 2026 — 3615 seul (hors borne) : texte ≥ 12 px, contraste AA, cibles ≥ 44 px, écran plus grand au téléphone */
+.ctl-label, .led { font-size: 12px; color: #4a3f33; }
+.plate-kind { color: #4a3f33; }
+.k, .fk { min-height: 44px; }
+.fk small { font-size: 12px; opacity: 1; color: #3a3026; }
+.fk-cx { color: #fff; background: linear-gradient(180deg, #b9462f, #a93e29); }
+:is(.seg button, .toggle, .power, .kbd-btn, .topline-kor) { position: relative; }
+:is(.seg button, .toggle, .power, .kbd-btn, .topline-kor)::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%); }
+@media (max-width: 720px) {
+  .desk { padding-inline: 6px; }
+  .hood { padding: 8px 8px 12px; }
+  .bezel { padding: 8px; }
+  .crt { padding: 2% 2.4%; }
+}
+@media (max-width: 420px) { .fk { font-size: 12px; letter-spacing: .02em; } }
+@media (pointer: coarse) {
+  .deck .keys { display: none; }
+  .ctl-kbd { display: none; }
+  .keys-band { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; height: 52px; letter-spacing: .2em; text-transform: uppercase; }
+  .keys-band b { font: 600 20px/1 var(--display); letter-spacing: .04em; text-transform: none; }
+  .keys-band small { font: 600 13px/1 var(--display); }
+}
 /* téléphone debout : l'image occupe tout le tube (D3) */
 html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout="narrow"] .crt.color canvas { height: 97%; max-width: 97%; }
 </style>
@@ -501,7 +506,7 @@ html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout
     <div class="hood">
       <div class="bezel">
         <div class="crt" id="crt">
-          <canvas id="screen" width="960" height="750" data-fr-label="Écran du terminal, 40 colonnes par 25 rangées" data-en-label="Terminal screen, 40 columns by 25 rows" aria-label="Écran du terminal, 40 colonnes par 25 rangées"></canvas>
+          <canvas id="screen" role="img" width="960" height="750" data-fr-label="Écran du terminal, 40 colonnes par 25 rangées" data-en-label="Terminal screen, 40 columns by 25 rows" aria-label="Écran du terminal, 40 colonnes par 25 rangées"></canvas>
           <div class="crt-scan" aria-hidden="true"></div>
           <div class="crt-glass" aria-hidden="true"></div>
           <div class="crt-grime" aria-hidden="true"></div>
@@ -558,7 +563,7 @@ html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout
 
     <div class="deck">
       <button type="button" class="k keys-band" id="keys-band" data-fr-label="Ouvrir le clavier du téléphone" data-en-label="Open the phone keyboard" aria-label="Ouvrir le clavier du téléphone"><b>Aa</b><small data-fr="Clavier" data-en="Keyboard">Clavier</small></button>
-      <div class="keys" data-fr-label="Clavier alphanumérique" data-en-label="Alphanumeric keyboard" aria-label="Clavier alphanumérique">
+      <div class="keys" role="group" data-fr-label="Clavier alphanumérique" data-en-label="Alphanumeric keyboard" aria-label="Clavier alphanumérique">
         <button type="button" class="k" data-ch="1">1</button><button type="button" class="k" data-ch="2">2</button><button type="button" class="k" data-ch="3">3</button><button type="button" class="k" data-ch="4">4</button><button type="button" class="k" data-ch="5">5</button><button type="button" class="k" data-ch="6">6</button><button type="button" class="k" data-ch="7">7</button><button type="button" class="k" data-ch="8">8</button><button type="button" class="k" data-ch="9">9</button><button type="button" class="k" data-ch="0">0</button>
         <button type="button" class="k" data-ch="A">A</button><button type="button" class="k" data-ch="Z">Z</button><button type="button" class="k" data-ch="E">E</button><button type="button" class="k" data-ch="R">R</button><button type="button" class="k" data-ch="T">T</button><button type="button" class="k" data-ch="Y">Y</button><button type="button" class="k" data-ch="U">U</button><button type="button" class="k" data-ch="I">I</button><button type="button" class="k" data-ch="O">O</button><button type="button" class="k" data-ch="P">P</button>
         <button type="button" class="k" data-ch="Q">Q</button><button type="button" class="k" data-ch="S">S</button><button type="button" class="k" data-ch="D">D</button><button type="button" class="k" data-ch="F">F</button><button type="button" class="k" data-ch="G">G</button><button type="button" class="k" data-ch="H">H</button><button type="button" class="k" data-ch="J">J</button><button type="button" class="k" data-ch="K">K</button><button type="button" class="k" data-ch="L">L</button><button type="button" class="k" data-ch="M">M</button>
@@ -566,7 +571,7 @@ html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout
         <button type="button" class="k" data-ch="é">é</button><button type="button" class="k" data-ch="è">è</button><button type="button" class="k" data-ch="à">à</button><button type="button" class="k k-space" data-ch=" " data-fr="espace" data-en="space">espace</button><button type="button" class="k" data-ch="@">@</button><button type="button" class="k" data-ch="ç">ç</button><button type="button" class="k" data-ch="/">/</button><button type="button" class="k" data-ch="?">?</button>
       </div>
 
-      <div class="fkeys" data-fr-label="Touches de fonction" data-en-label="Function keys" aria-label="Touches de fonction">
+      <div class="fkeys" role="group" data-fr-label="Touches de fonction" data-en-label="Function keys" aria-label="Touches de fonction">
         <button type="button" class="fk" data-fn="SOMMAIRE"><span data-fr="Sommaire" data-en="Index">Sommaire</span><small data-fr="Échap" data-en="Esc">Échap</small></button>
         <button type="button" class="fk" data-fn="ANNULATION"><span data-fr="Annulation" data-en="Cancel">Annulation</span><small data-fr="Suppr" data-en="Del">Suppr</small></button>
         <button type="button" class="fk" data-fn="RETOUR"><span data-fr="Retour" data-en="Back">Retour</span><small data-fr="Page ↑" data-en="PgUp">Page ↑</small></button>
