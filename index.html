@@ -10084,7 +10084,9 @@ var NostrTools = (() => {
           self.emit('dm', ev);
         }, function () { self.plain[ev.id] = null; });
       };
-      this.on(function (type) { if (type === 'dir') Object.keys(self.held).forEach(function (id) { if (self.dir[self.held[id].pubkey]) onDm(self.held[id]); }); });
+      self.onDm = onDm;
+      // un seul écouteur pour toute la vie de la page, quel que soit le nombre de connexions
+      if (!self.heldHook) { self.heldHook = true; this.on(function (type) { if (type === 'dir' && self.started) Object.keys(self.held).forEach(function (id) { if (self.dir[self.held[id].pubkey]) self.onDm(self.held[id]); }); }); }
       this.subs.push(this.pool.subscribe(RELAYS, { kinds: [4], '#p': [this.pk], limit: 200 }, { onevent: onDm }));
       this.subs.push(this.pool.subscribe(RELAYS, { kinds: [4], authors: [this.pk], limit: 200 }, { onevent: onDm }));
       if (this.nick()) this.publishProfile();
@@ -12517,7 +12519,7 @@ window.KORHOGO_FAUNA = [
             Object.keys(self.data).forEach(function (k) { if (Array.isArray(self.data[k])) self.data[k] = self.data[k].filter(function (x) { return !essai(x); }); });
             self.at = Date.now(); cb();
           });
-      });
+      }).catch(function () { cb(); });  /* une erreur affiche le palmarès déjà chargé au lieu de figer l'écran */
     },
     first: function () { return ''; }
   };
