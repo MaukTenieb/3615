@@ -1,4 +1,4 @@
-# K Terminal (3615)
+# MiniTale (3615)
 
 > Le MiniTale de la Korhogo Fauna, alias Hordalék ou les Masques, l'univers de Mauk Tenieb. Composez le 3615 : l'accueil de 3615 KORHOGO propose six entrées : WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE. / The MiniTale of the Korhogo Fauna, aka Hordalék or the Masks, the universe of Mauk Tenieb. Dial 3615: the 3615 KORHOGO home page offers six entries: WORLD, KORHOGO, KOINS, KURATIONS, CURATORS, HALL OF KAVE.
 
@@ -15,7 +15,7 @@
 
 ## Links
 - [mauktenieb.github.io, the index of Mauk Tenieb's sites](https://mauktenieb.github.io/)
-- [K Terminal](https://mauktenieb.github.io/3615/)
+- [MiniTale](https://mauktenieb.github.io/3615/)
 - [Insert Koin](https://mauktenieb.github.io/insertkoin/)
 - [Mauk Tenieb on GitHub](https://github.com/MaukTenieb)
 
