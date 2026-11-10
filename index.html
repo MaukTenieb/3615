@@ -239,19 +239,22 @@ body {
   box-shadow: 0 1px 0 rgba(255, 255, 255, .3);
 }
 .toggle {
-  width: 42px; height: 24px; border: 0; border-radius: 12px; padding: 0;
-  background: var(--shell-edge);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, .4);
+  /* poussoir à voyant, comme les touches de réglage des terminaux des années 1980 */
+  width: 44px; height: 28px; border: 0; border-radius: 4px; padding: 0;
+  background: linear-gradient(180deg, #ece5d6, #c9bfa9);
+  box-shadow: 0 2px 0 var(--shell-edge), inset 0 1px 0 rgba(255, 255, 255, .6);
   position: relative; cursor: pointer;
+  display: grid; place-items: center;
 }
 .toggle i {
-  position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
-  background: linear-gradient(#f5efe2, #d4cab5);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, .45);
-  transition: transform .15s ease;
+  width: 14px; height: 5px; border-radius: 1px;
+  background: #5a4d3e;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .55);
 }
-.toggle[aria-checked="true"] { background: var(--bezel); }
-.toggle[aria-checked="true"] i { transform: translateX(18px); }
+.toggle:active { transform: translateY(1px); box-shadow: 0 1px 0 var(--shell-edge), inset 0 1px 0 rgba(255, 255, 255, .6); }
+.toggle[aria-checked="true"] { background: linear-gradient(180deg, #ded6c5, #bcb29b); box-shadow: 0 1px 0 var(--shell-edge), inset 0 1px 2px rgba(0, 0, 0, .25); transform: translateY(1px); }
+.toggle[aria-checked="true"] i { background: var(--led-green); box-shadow: 0 0 4px var(--led-green); }
+#sw-color[aria-checked="true"] i { background: linear-gradient(90deg, #e3483b 0 33%, #4caf50 33% 66%, #3f7fd8 66%); box-shadow: none; }
 .power {
   width: 34px; height: 34px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
   background: radial-gradient(circle at 40% 35%, #f3ecdd, #bdb29b);
@@ -515,7 +518,7 @@ html.ike-on [data-ike-layout="narrow"] .crt canvas, html.ike-on [data-ike-layout
 
       <div class="strip">
         <div class="plate">
-          <span class="plate-model">VT·40</span>
+          <span class="plate-model">MiniTale</span>
           <span class="plate-kind" data-fr="Terminal vidéotex" data-en="Videotex terminal">Terminal vidéotex</span>
         </div>
 
@@ -13497,6 +13500,8 @@ window.KORHOGO_FAUNA = [
     var t = e.target;
     if (t && t !== kbd && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
     if (e.ctrlKey || e.metaKey || e.altKey) { if (!(e.key === 'Enter' && e.ctrlKey)) return; }
+    /* F3 : couleur ou noir et blanc, d'une touche */
+    if (e.key === 'F3') { e.preventDefault(); $('sw-color').click(); return; }
     var k = mapKey(e);
     if (k) {
       e.preventDefault();
