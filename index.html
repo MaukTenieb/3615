@@ -13173,6 +13173,13 @@ window.KORHOGO_FAUNA = [
   /* ---------- Hôte ------------------------------------------------------- */
   var H = {
     term: term, snd: snd, state: 'local', svc: null, fm: null, helpOpen: false, powered: true, gen: 0,
+    /* touches tapées pendant l'appel : elles attendent en file et jouent une fois la page du service affichée */
+    kq: [], kqHold: false,
+    kqPlay: function () {
+      var self = this;
+      if (!this.kq.length || this.state !== 'online') return;
+      term.then(function () { var q = self.kq.splice(0); q.forEach(function (k) { self.key(k); }); });
+    },
 
     out: function (v) { term.send(v.bytes ? v.bytes() : v); },
     bell: function () { snd.beep(); },
@@ -13307,6 +13314,7 @@ window.KORHOGO_FAUNA = [
       this.svc = s;
       s.name = name;
       s.enter(this);
+      this.kqPlay();
     },
     showHelp: function (svc) {
       var v = new Vdt();
@@ -13328,6 +13336,7 @@ window.KORHOGO_FAUNA = [
       if (!m) { UI.message(this, L('Tapez un numéro, par exemple 3615.', 'Type a number, for example 3615.'), true); return; }
       var num = m[1], code = m[2].trim();
       this.lastNumber = raw.trim();
+      this.kqHold = false;
       this.state = 'dialing';
       this.gen++;
       this.clearForm();
@@ -13341,6 +13350,7 @@ window.KORHOGO_FAUNA = [
     },
     connected: function (num, code) {
       if (num !== '3615') {
+        this.kq = [];
         this.state = 'local';
         term.status('', 'F');
         snd.hangup();
@@ -13361,6 +13371,7 @@ window.KORHOGO_FAUNA = [
     },
     hangup: function () {
       clearTimeout(this.dialTimer);
+      this.kq = []; this.kqHold = false;
       if (S.NET) S.NET.stop();
       this.unread = 0;
       if (this.svc && this.svc.leave) this.svc.leave();
@@ -13376,7 +13387,8 @@ window.KORHOGO_FAUNA = [
     key: function (k) {
       if (!this.powered) return;
       snd.ensure();
-      if (this.state === 'dialing') { if (k.fn === 'CONNEXION') this.hangup(); else if (k.fn || k.ch) this.bell(); return; }
+      if (k.fn !== 'CONNEXION' && (this.kqHold || this.state === 'dialing' || (this.state === 'online' && this.kq.length))) { if (this.kq.length < 64) this.kq.push(k); return; }
+      if (this.state === 'dialing') { this.hangup(); return; }
       if (k.fn === 'CONNEXION') { if (this.state === 'online') this.hangup(); else this.dial(); return; }
       var svc = this.svc;
       if (!svc) return;
@@ -13576,6 +13588,7 @@ window.KORHOGO_FAUNA = [
       H.lastNumber = '3615 KORHOGO';
       if (S.KORHOGO) S.KORHOGO.once = 'FAUNA';   /* the arcade lands on the Fauna, the list of the Masks */
       H.go('LOCAL');
+      H.kqHold = true;
       setTimeout(function () { H.dial(); }, 700);
     }
     if (_svc === 'koins' && H.state === 'local') {
